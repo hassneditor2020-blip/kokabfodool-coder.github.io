@@ -2,11 +2,11 @@
 const root=document.querySelector('[data-age-journey]');
 if(root){
  const ar=document.documentElement.lang==='ar', tr=(a,e)=>ar?a:e;
- const ids=['letter-match','letter-hunt','vowel-drive','trace','counting','english-abc','robo-lab','memory','puzzle','sound-quiz','fudool-shop','word-factory','lumaa-clock','code-robo'];
+ const ids=['letter-match','letter-hunt','vowel-drive','trace','counting','english-abc','robo-lab','memory','puzzle','sound-quiz','fudool-shop','word-factory','lumaa-clock','code-robo','world-mishaal','planet-engineer','healthy-hero','space-journey','spot-differences','grand-challenge'];
  const ranges={
- '3-5':[[1,4],[1,4],[1,3],[1,2],[1,2],[1,4],[1,2],[1,3],[1,4],[1,3],[1,3],[1,5],[1,2],[1,4]],
- '6-7':[[5,9],[5,10],[4,10],[3,8],[3,10],[5,10],[3,6],[4,7],[5,7],[4,6],[4,9],[6,10],[3,6],[5,12]],
- '8-10':[[10,12],[11,15],[11,15],[9,10],[11,18],[11,15],[7,10],[8,10],[8,10],[7,10],[10,15],[11,15],[7,10],[13,20]]
+ '3-5':[[1,4],[1,4],[1,3],[1,2],[1,2],[1,4],[1,2],[1,3],[1,4],[1,3],[1,3],[1,5],[1,2],[1,4],[1,0],[1,5],[1,4],[1,0],[1,5],[1,0]],
+ '6-7':[[5,9],[5,10],[4,10],[3,8],[3,10],[5,10],[3,6],[4,7],[5,7],[4,6],[4,9],[6,10],[3,6],[5,12],[1,7],[6,10],[5,8],[1,7],[6,10],[1,8]],
+ '8-10':[[10,12],[11,15],[11,15],[9,10],[11,18],[11,15],[7,10],[8,10],[8,10],[7,10],[10,15],[11,15],[7,10],[13,20],[8,15],[11,15],[9,10],[8,15],[11,15],[9,20]]
  };
  const info={
  '3-5':['🌱','المستكشف الصغير','Little explorer','الصور والحروف الأولى والعدّ والألغاز البسيطة.','Pictures, first letters, counting and simple puzzles.'],
@@ -31,7 +31,7 @@ if(root){
   panel.hidden=false;
   const [icon,titleAr,titleEn,descAr,descEn]=info[selected];
   const h=node('h2',icon+' '+tr(titleAr,titleEn)+' · '+selected.replace('-','–')+' '+tr('سنوات','years'));
-  const intro=node('p',tr(descAr,descEn)), rows=ids.map((id,i)=>{const [first,last]=ranges[selected][i];const sc=scores(id);const completed=sc.slice(first-1,last).filter(Boolean).length;return {id,first,last,sc,completed,total:last-first+1}});
+  const intro=node('p',tr(descAr,descEn)), rows=ids.map((id,i)=>{const [first,last]=ranges[selected][i];const sc=scores(id);const completed=sc.slice(first-1,last).filter(Boolean).length;return {id,first,last,sc,completed,total:last-first+1}}).filter(r=>r.total>0);
   const total=rows.reduce((n,r)=>n+r.total,0), done=rows.reduce((n,r)=>n+r.completed,0);
   const bar=node('progress');bar.max=total;bar.value=done;bar.setAttribute('aria-label',tr('إنجاز المسار','Journey progress'));
   const stat=node('p',tr('أكملت '+done+' من '+total+' مستوى · '+Math.round(done/total*100)+'%','Completed '+done+' of '+total+' levels · '+Math.round(done/total*100)+'%'),'age-stat');
