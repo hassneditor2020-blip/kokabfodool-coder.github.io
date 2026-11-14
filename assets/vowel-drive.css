@@ -1,0 +1,168 @@
+.drive-shell {
+  max-width: 900px;
+}
+
+.drive-board {
+  gap: .55rem;
+  padding: clamp(.55rem, 3vw, 1.55rem);
+}
+
+.drive-listen {
+  margin-block: .2rem .35rem;
+  min-block-size: 46px;
+}
+
+.drive-scene {
+  position: relative;
+  isolation: isolate;
+  inline-size: 100%;
+  block-size: clamp(242px, 54vw, 365px);
+  overflow: hidden;
+  border: 2px solid #bce9dc;
+  border-radius: 22px;
+  background: linear-gradient(#b8e7ff 0%, #e9fbff 42%, #b1ebc6 42%, #83d6a5 100%);
+}
+
+.drive-landscape {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: #fff;
+  background: radial-gradient(circle at 84% 14%, #fff9b5 0 5%, transparent 5.3%),
+    radial-gradient(ellipse at 5% 55%, #a6d8ed 0 35%, transparent 35.3%),
+    radial-gradient(ellipse at 90% 55%, #a6d8ed 0 35%, transparent 35.3%);
+}
+
+.drive-landscape span { position: absolute; }
+.drive-landscape span:nth-child(1) { left: 12%; top: 7%; }
+.drive-landscape span:nth-child(2) { left: 48%; top: 2%; }
+.drive-landscape span:nth-child(3) { right: 27%; top: 8%; }
+
+.drive-road {
+  position: absolute;
+  inset: 52% 0 0;
+  background: linear-gradient(#535777, #343955);
+  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+}
+
+.drive-road::before,
+.drive-road::after {
+  position: absolute;
+  content: '';
+  inset-block: 0;
+  inline-size: 4px;
+  background: repeating-linear-gradient(#ffeaa0 0 12%, transparent 12% 24%);
+}
+
+.drive-road::before { left: 32%; transform: skewX(-12deg); }
+.drive-road::after { right: 32%; transform: skewX(12deg); }
+
+.drive-gates {
+  position: absolute;
+  z-index: 1;
+  inset: 9% 8% auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(5px, 2vw, 16px);
+}
+
+.drive-gate {
+  --frame: #a1459f;
+  --door: #f8daf5;
+  min-inline-size: 0;
+  min-block-size: clamp(104px, 23vw, 161px);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+  padding: .25rem .12rem .55rem;
+  color: #1c1b39;
+  background: var(--door);
+  border: clamp(3px, .8vw, 7px) solid var(--frame);
+  border-radius: 45% 45% 14px 14px;
+  box-shadow: inset 0 0 0 2px #fff9, 0 6px 0 #24304c55;
+  touch-action: manipulation;
+}
+
+.drive-gate[data-vowel="0"] { --frame: #a55814; --door: #fff0b1; }
+.drive-gate[data-vowel="1"] { --frame: #25669d; --door: #dbf2ff; }
+.drive-gate:hover:not([aria-disabled="true"]) { filter: brightness(1.05); }
+.drive-gate[aria-disabled="true"] { cursor: default; }
+.drive-gate[data-result="wrong"] { outline: 3px solid #bb3456; outline-offset: 2px; }
+.drive-gate[data-result="correct"] {
+  --frame: #137749;
+  --door: #bdf5cc;
+  box-shadow: inset 0 0 0 2px #fff9, 0 0 14px #7ef3a6;
+}
+
+.drive-gate-letter {
+  font-size: clamp(2.35rem, 9vw, 4.4rem);
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.drive-gate-label { font-size: clamp(.58rem, 2.5vw, .96rem); font-weight: 850; }
+
+.drive-car {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 10%;
+  width: clamp(43px, 10vw, 75px);
+  aspect-ratio: 1.2;
+  border-radius: 46% 46% 23% 23%;
+  border: 2px solid #a73545;
+  background: linear-gradient(#ffb578 0%, #ff775e 34%, #df3a52 100%);
+  transform: translateX(-50%);
+  transition: left 320ms ease-out, bottom 500ms ease-in, transform 500ms ease-in;
+  box-shadow: 0 4px 0 #1a234866, -5px 3px 0 -1px #20213b, 5px 3px 0 -1px #20213b;
+  pointer-events: none;
+}
+
+.drive-car-glass {
+  position: absolute;
+  inset: 18% 17% 42%;
+  border-radius: 45% 45% 18% 18%;
+  background: linear-gradient(145deg, #e8faff, #61badd 46%, #376087);
+}
+
+.drive-car-lights {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 18%;
+  height: 12%;
+  border-inline: 6px solid #ffeb9f;
+  border-radius: 9px;
+}
+
+.drive-scene[data-lane="0"] .drive-car { left: 21%; }
+.drive-scene[data-lane="2"] .drive-car { left: 79%; }
+.drive-scene[data-drive-state="pass"] .drive-car { bottom: 52%; transform: translateX(-50%) scale(.48); }
+
+.drive-board .game-feedback {
+  margin: 0;
+  min-block-size: 2.05em;
+}
+
+.drive-example { color: #155e49; font-weight: 850; }
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-car { transition: none; }
+}
+
+.drive-adult {
+  color: #32564b;
+  font-size: .88rem;
+}
+
+.drive-adult summary {
+  cursor: pointer;
+  padding: .3rem .65rem;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+
+.drive-adult b {
+  font-size: 1.4rem;
+}
+.drive-garage{margin:1rem auto;width:min(100%,520px);text-align:center}.drive-garage summary{font-weight:800;cursor:pointer}.drive-garage>div{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:.8rem 0}.drive-garage button[aria-pressed=true]{outline:3px solid #29a47c}.drive-scene[data-skin="blue"] .drive-car{background:linear-gradient(#c5e6ff,#478bf0,#22468a);border-color:#22468a}.drive-scene[data-skin="mint"] .drive-car{background:linear-gradient(#d1ffcb,#5dcf94,#16704f);border-color:#16704f}.drive-scene[data-skin="gold"] .drive-car{background:linear-gradient(#fff2b5,#ffcb51,#b97b20);border-color:#aa701b}.drive-scene[data-skin="space"]{background:linear-gradient(#372d83,#8b75d3 42%,#bcb4df 42%,#a293d4 100%)}.drive-scene[data-skin="space"] .drive-car{background:linear-gradient(#e8e2ff,#a495ff,#6647ca);border-color:#49328a}.drive-gate[data-vowel="3"]{--frame:#287b63;--door:#ddffef}

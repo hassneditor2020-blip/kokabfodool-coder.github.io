@@ -1,0 +1,100 @@
+.home-page {
+  --home-lavender: #f5f1ff;
+  --home-gold: #fff1be;
+}
+
+.home-page .home-hero {
+  padding-block: clamp(1.25rem, 3.5vw, 3rem);
+  background: radial-gradient(ellipse at 85% 90%, #fff0cf 0%, transparent 54%), var(--home-lavender);
+}
+
+.home-page .hero-grid { gap: clamp(1.1rem, 3vw, 3.3rem); }
+.home-page .hero-copy h1 { margin-block: .35em .25em; }
+.home-page .hero-text { max-inline-size: 37ch; margin-block-end: 1.05rem; }
+.home-page .hero-art { border-radius: 28px; aspect-ratio: 1.62; max-block-size: 385px; }
+.home-page .hero-cutout {
+  position: absolute;
+  inset: 3% 20%;
+  width: auto;
+  height: auto;
+  min-block-size: 0;
+}
+.home-page .hero-cutout picture,
+.home-page .hero-cutout img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.home-page .hero-cutout img { object-fit: contain; }
+.home-page .hero-friend-robo { width: 20%; }
+.home-page .hero-friend-lumaa { width: 19%; }
+.home-page .home-play-button { min-block-size: 54px; font-size: 1.08rem; }
+.home-page .home-watch-button { min-block-size: 54px; }
+.home-resume {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 .65rem;
+  margin-block-start: .8rem;
+  font-size: .9rem;
+  color: var(--muted);
+}
+.home-resume .text-link { border-radius: 14px; padding-inline: .7rem; background: var(--home-gold); }
+
+.home-page .section { padding-block: clamp(1.8rem, 4.4vw, 3.8rem); }
+.home-page .section-head { margin-block-end: clamp(.9rem, 2vw, 1.35rem); }
+.home-page .section-head p { margin-block-start: .35rem; }
+.home-games { background: #fff; border-block-end: 1px solid var(--line); }
+.home-games .activity-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(.65rem, 2vw, 1rem); }
+.home-games .activity-card {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr;
+  align-items: start;
+  gap: .6rem .35rem;
+  padding: clamp(.75rem, 2vw, 1.2rem);
+  border: 1px solid var(--tone-line);
+  background: linear-gradient(165deg, var(--tone), #fff 72%);
+}
+.home-games .activity-symbol { justify-self: start; grid-column: 1; }
+.home-games .round-arrow { grid-column: 2; grid-row: 1; align-self: center; }
+.home-games .activity-card > div { grid-column: 1 / -1; }
+.home-games h3 { font-size: clamp(.95rem, 2vw, 1.24rem); }
+.home-games .activity-card p { font-size: clamp(.77rem, 1.65vw, .91rem); overflow-wrap: anywhere; }
+.home-page .section-wash { background: var(--home-lavender); }
+.home-page .episode-grid .episode-art { aspect-ratio: 4 / 3; }
+.home-page .episode-art img { max-inline-size: 100%; object-fit: contain; }
+.home-page .portrait-cover img { max-inline-size: 94%; }
+.home-page .episode-caption, .home-page .series-caption { align-items: start; }
+.home-page .episode-caption h3 { min-block-size: 2.8em; }
+.home-page .series-card { display: grid; grid-template-rows: auto 1fr; }
+.home-page .series-caption h3 { min-block-size: 2.8em; }
+.home-page .subscribe-section {
+  margin-block-end: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1rem, 3.6vw, 2rem);
+  background: var(--home-lavender);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+}
+
+@media (max-width: 799px) {
+  .home-page .hero-copy h1 { font-size: clamp(1.85rem, 7.1vw, 3.35rem); }
+  .home-page .hero-art { max-inline-size: 480px; justify-self: center; }
+  .home-resume { justify-content: center; }
+  .home-page .section-head { flex-wrap: wrap; align-items: start; gap: .35rem 1rem; }
+}
+@media (max-width: 569px) {
+  .home-page .hero-art { aspect-ratio: 2.1; }
+  .home-page .home-play-button, .home-page .home-watch-button { font-size: .95rem; }
+}
+@media (min-width: 900px) {
+  .home-games .activity-grid.games-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.home-page .hero-copy .home-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .65rem .55rem;
+  max-inline-size: 420px;
+}
+.home-page .home-actions .button { padding-inline: .45rem; }
+.home-page .home-shortcut { font-size: .88rem; }
+@media (min-width: 570px) and (max-width: 799px) {
+  .home-page .hero-copy .home-actions { margin-inline: auto; }
+}
