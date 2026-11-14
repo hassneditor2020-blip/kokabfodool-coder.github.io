@@ -1,5 +1,5 @@
 import {illustrate} from './learning-art.js?v=1';
-import { bindJourney, shuffle } from './game-progress.js?v=6';
+import { bindJourney, shuffle } from './game-progress.js?v=8';
 import {renderExtra,stopSpeech} from './game-extra.js?v=8';
 
 const board = document.querySelector('[data-game]');
