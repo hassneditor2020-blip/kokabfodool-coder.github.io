@@ -1,4 +1,4 @@
-import {speak,stopSpeech,playRecording} from './game-extra.js?v=6';
+import {speak,stopSpeech,playRecording} from './game-extra.js?v=7';
 import { bindJourney, shuffle } from './game-progress.js?v=6';
 
 const game = document.querySelector('[data-letter-match]');
@@ -138,7 +138,7 @@ puzzle.addEventListener('click', (event) => {
   if (mode === "audio" && button.dataset.heard !== "yes") {
     const item=round.find(x=>x.id===button.dataset.matchKey);
     const fallback=()=>{button.querySelector("span").textContent=item.cue;};
-    if(item.audio)playRecording(item.audio,fallback);else speak(item.cue,"ar",fallback);
+    if(item.speech)speak(item.speech,"ar-SA",()=>item.audioFallback?playRecording(item.audioFallback,fallback):fallback());else if(item.audio)playRecording(item.audio,fallback);else speak(item.cue,"ar-SA",fallback);
     button.dataset.heard="yes";
     showFeedback(lang === "ar" ? "استمع ثم اضغط مرة أخرى للاختيار." : "Listen, then tap again to choose.");
     return;

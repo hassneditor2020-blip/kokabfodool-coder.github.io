@@ -77,3 +77,9 @@
 .game-shell[data-game-theme] .game-cue :is(.word-slots,.planet-pattern,.shop-items){max-width:100%}
 .game-visual-card:hover{border-color:var(--gv-main)}
 @media(max-width:360px){.game-shell[data-game-theme]:has([data-game]:not([hidden])) .game-visual-hero{grid-template-columns:minmax(0,1fr) 75px}.game-visual-meta{font-size:.7rem}.game-shell[data-game-theme] .game-level small{font-size:.7rem}}
+
+/* Increase illustrations rather than card dimensions. */
+.game-shell[data-game-theme] .shop-item .new-picture{font-size:clamp(2.7rem,10vw,4rem)}
+.game-shell[data-game-theme] .planet-spot-cell{font-size:clamp(1.4rem,5vw,2.35rem)}
+.game-shell[data-game-theme] .maze-cell{font-size:clamp(1.1rem,5vw,2rem)}
+@media(max-width:480px){.game-shell[data-game-theme] .planet-spot-cell{font-size:clamp(1.1rem,5vw,1.8rem)}}
