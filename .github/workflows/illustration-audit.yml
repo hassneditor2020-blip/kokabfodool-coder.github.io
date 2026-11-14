@@ -53,3 +53,36 @@ jobs:
             git commit -m "Refresh illustration cache on all forty game pages"
             git push origin HEAD:development/illustrated-game-assets
           fi
+
+      - name: Browser smoke test on narrow and wide screens
+        shell: bash
+        run: |
+          python3 -m http.server 8765 > /tmp/fudool-server.log 2>&1 &
+          google-chrome --headless --no-sandbox --disable-dev-shm-usage --remote-debugging-port=9222 --user-data-dir=/tmp/fudool-chrome about:blank >/tmp/fudool-chrome.log 2>&1 &
+          node --input-type=module <<'JS'
+          const wait=ms=>new Promise(r=>setTimeout(r,ms));
+          let pages;
+          for(let i=0;i<40;i++){try{pages=await (await fetch('http://127.0.0.1:9222/json/list')).json();break}catch{await wait(250)}}
+          if(!pages)throw Error('Chromium not ready');
+          const ws=new WebSocket(pages.find(x=>x.type==='page').webSocketDebuggerUrl);
+          await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject});
+          let seq=0;const pending=new Map();
+          ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id&&pending.has(m.id)){const [resolve,reject]=pending.get(m.id);pending.delete(m.id);m.error?reject(m.error):resolve(m.result)}};
+          const cmd=(method,params={})=>new Promise((resolve,reject)=>{const id=++seq;pending.set(id,[resolve,reject]);ws.send(JSON.stringify({id,method,params}))});
+          const evaluate=async expression=>{const r=await cmd('Runtime.evaluate',{expression,returnByValue:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value};
+          await cmd('Page.enable');await cmd('Runtime.enable');
+          const paths=['sound-quiz','letter-hunt','letter-match','counting','english-abc','fudool-shop','word-factory','code-robo','planet-engineer','spot-differences'];
+          for(const width of [360,1280]){
+            await cmd('Emulation.setDeviceMetricsOverride',{width,height:width===360?800:900,deviceScaleFactor:1,mobile:width===360});
+            for(const pre of ['', 'en/'])for(const id of paths){
+              await cmd('Page.navigate',{url:'http://127.0.0.1:8765/'+pre+'games/'+id+'/?level=1'});
+              let info;
+              for(let i=0;i<40;i++){await wait(125);info=await evaluate("(()=>{const b=document.querySelector('[data-game],[data-letter-match]');const d=document.querySelector('#game-data,#match-data');if(!b||!d||b.hidden||JSON.parse(d.textContent).id!=="+JSON.stringify(id)+")return null;const art=[...b.querySelectorAll('svg.fudool-art')];return {n:art.length,painted:art.filter(e=>{try{return e.getBBox().width>0}catch{return false}}).length,overflow:document.documentElement.scrollWidth>innerWidth+4}})()");if(info&&info.n>0&&info.painted===info.n)break}
+              if(!info||!info.n||info.painted!==info.n)throw Error('Illustrations not rendered '+pre+id+' '+JSON.stringify(info));
+              console.log(width,pre+id,JSON.stringify(info));
+              if(id==='sound-quiz'&&!pre){const result=await evaluate("(()=>{const b=[...document.querySelectorAll('[data-options] button')].find(x=>x.getAttribute('aria-label')==='🦁');if(!b)return false;b.click();return !document.querySelector('[data-next]').hidden})()");if(!result)throw Error('Sound quiz answer failed')}
+              await evaluate('localStorage.clear()');
+            }
+          }
+          ws.close();console.log('40 live Chromium rendering checks passed');
+          JS
