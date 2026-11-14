@@ -1,4 +1,4 @@
-import {bindJourney,shuffle} from './game-progress.js?v=6';
+import {bindJourney,shuffle} from './game-progress.js?v=7';
 const game=JSON.parse(document.getElementById('game-data').textContent), ar=game.lang==='ar', tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'), cue=board.querySelector('[data-cue]'), options=board.querySelector('[data-options]'), feedback=board.querySelector('[data-feedback]'), next=board.querySelector('[data-next]');
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return n};
@@ -19,7 +19,7 @@ function render(round){
   return;
  }
  if(round.kind==='order'){
-   let pos=0;const seq=el('div','','planet-pattern'),slots=round.target.map(()=>el('span','?','planet-pattern-item planet-blank'));seq.dir='ltr';seq.append(...slots);cue.append(seq);
+   let pos=0;const seq=el('div','','planet-pattern'),slots=round.target.map(()=>el('span','?','planet-pattern-item planet-blank'));seq.dir=/[\u0600-\u06FF]/.test(round.target[0])?'rtl':'ltr';seq.append(...slots);cue.append(seq);
    for(const value of shuffle(round.target)){const b=btn(value,()=>{if(solved||b.disabled)return;if(value!==round.target[pos]){wrong();return}slots[pos].textContent=value;slots[pos].classList.remove('planet-blank');pos++;b.disabled=true;journey.correct();if(pos===round.target.length)done()});group.append(b)}
    return;
  }
