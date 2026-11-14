@@ -11,11 +11,11 @@ function render(round){
  const done=()=>{if(solved)return;solved=true;journey.solve();say(tr('رائع! أحسنت!','Great job!'),'correct');next.hidden=false};
  const group=el('div','','new-controls');options.append(group);
  if(round.kind==='shop'){
-  let paid=0;const items=el('div','','shop-items');for(const item of round.items){const tile=el('div','','shop-item');tile.append(el('span',item.icon,'new-picture'),el('span',item.name),el('strong',item.price+' '+tr('عملة','coins')));items.append(tile)}
-  const total=round.items.reduce((s,i)=>s+i.price,0), price=el('p',tr('المبلغ المطلوب: ','Total to pay: ')+total,'new-total'), counter=el('p','','new-total'), coins=el('div','','new-controls');cue.append(items,price,counter);group.append(coins);
+  let paid=0,payments=[];const items=el('div','','shop-items');for(const item of round.items){const tile=el('div','','shop-item');tile.append(el('span',item.icon,'new-picture'),el('span',item.name),el('strong',item.price+' '+tr('عملة','coins')));items.append(tile)}
+  const total=round.items.reduce((s,i)=>s+i.price,0), price=el('p',round.showTotal?tr('المبلغ المطلوب: ','Total to pay: ')+total:tr('اجمع أسعار المشتريات','Add up the prices'),'new-total'), counter=el('p','','new-total'), coins=el('div','','new-controls');cue.append(items,price,counter);group.append(coins);
   function draw(){counter.textContent=tr('دفعت: ','Paid: ')+paid}
-  for(const v of round.coins)coins.append(btn('🪙 '+v,()=>{if(!solved){paid+=v;draw()}}));
-  group.append(btn(tr('تراجع عن آخر دفعة','Undo last payment'),()=>{if(!solved){paid=0;draw()}},'button button-white'),btn(tr('ادفع','Pay'),()=>{if(solved)return;if(paid===total)done();else{wrong();paid=0;draw()}},'button button-primary'));draw();return;
+  for(const v of round.coins)coins.append(btn('🪙 '+v,()=>{if(!solved){payments.push(v);paid+=v;draw()}}));
+  group.append(btn(tr('تراجع عن آخر دفعة','Undo last payment'),()=>{if(!solved){paid-=payments.pop()||0;draw()}},'button button-white'),btn(tr('ادفع','Pay'),()=>{if(solved)return;if(paid===total)done();else{wrong();paid=0;payments=[];draw()}},'button button-primary'));draw();return;
  }
  if(round.kind==='word'){
   let pos=0;const target=Array.from(round.word), slots=el('div','','word-slots');slots.dir='rtl';
