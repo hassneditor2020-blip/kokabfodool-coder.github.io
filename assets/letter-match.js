@@ -1,4 +1,5 @@
-import {speak,stopSpeech,playRecording} from './game-extra.js?v=7';
+import {illustrate} from './learning-art.js?v=1';
+import {speak,stopSpeech,playRecording} from './game-extra.js?v=8';
 import { bindJourney, shuffle } from './game-progress.js?v=6';
 
 const game = document.querySelector('[data-letter-match]');
@@ -37,7 +38,7 @@ function makeCard(item, side) {
     picture.setAttribute('aria-hidden', 'true');
     picture.textContent = mode === "word" ? item.example : mode === "position" ? item.positionCue : mode === "audio" ? "🔊" : item.picture;
     if(item.image && (mode === null || mode === "word-picture")){const img=document.createElement("img");img.src=item.image;img.alt="";img.className="match-art";picture.replaceChildren(img);}
-    if(mode === "word" || mode === "position")picture.classList.add("match-word");
+    if(mode === "word" || mode === "position")picture.classList.add("match-word");else if(!picture.querySelector('img'))illustrate(picture,item.name==='الذال'&&item.example==='ذَهَب'?'art:gold':picture.textContent);
     button.append(picture);
     button.setAttribute('aria-label', item.pictureLabel);
   }
