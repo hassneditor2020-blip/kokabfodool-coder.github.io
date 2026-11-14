@@ -166,3 +166,11 @@
   font-size: 1.4rem;
 }
 .drive-garage{margin:1rem auto;width:min(100%,520px);text-align:center}.drive-garage summary{font-weight:800;cursor:pointer}.drive-garage>div{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:.8rem 0}.drive-garage button[aria-pressed=true]{outline:3px solid #29a47c}.drive-scene[data-skin="blue"] .drive-car{background:linear-gradient(#c5e6ff,#478bf0,#22468a);border-color:#22468a}.drive-scene[data-skin="mint"] .drive-car{background:linear-gradient(#d1ffcb,#5dcf94,#16704f);border-color:#16704f}.drive-scene[data-skin="gold"] .drive-car{background:linear-gradient(#fff2b5,#ffcb51,#b97b20);border-color:#aa701b}.drive-scene[data-skin="space"]{background:linear-gradient(#372d83,#8b75d3 42%,#bcb4df 42%,#a293d4 100%)}.drive-scene[data-skin="space"] .drive-car{background:linear-gradient(#e8e2ff,#a495ff,#6647ca);border-color:#49328a}.drive-gate[data-vowel="3"]{--frame:#287b63;--door:#ddffef}
+
+/* A dimensional, readable car and brighter learning gates. */
+.drive-car{width:clamp(50px,13vw,88px);border-radius:44% 44% 24% 24%;box-shadow:0 5px 0 #27324d77,-6px 3px 0 -1px #29263e,6px 3px 0 -1px #29263e,inset 0 3px 3px #ffffff90}
+.drive-car-glass{border:2px solid #ffffff85;box-shadow:inset 0 3px 4px #ffffff70}
+.drive-car-lights{border-inline-width:8px;filter:drop-shadow(0 0 3px #fff2a7)}
+.drive-gate{box-shadow:0 4px 0 #d9cdef;transition:transform .15s,background .15s}
+.drive-gate:active{transform:translateY(2px);box-shadow:none}
+@media(prefers-reduced-motion:reduce){.drive-gate{transition:none}}
