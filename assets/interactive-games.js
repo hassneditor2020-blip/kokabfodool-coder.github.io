@@ -65,12 +65,16 @@ function render(round){
  if(round.kind==='clock'){
   const ns='http://www.w3.org/2000/svg', svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 220 220');svg.setAttribute('class','lesson-clock');svg.setAttribute('role','img');svg.setAttribute('aria-label',tr('ساعة بعقارب','Analog clock'));
   const shape=(tag,attrs,txt)=>{const e=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,String(v));if(txt)e.textContent=txt;svg.append(e);return e};
-  shape('circle',{cx:110,cy:110,r:103,fill:'#fff',stroke:'#6b4bc3','stroke-width':6});
-  for(let i=1;i<=12;i++){const a=i*Math.PI/6;shape('text',{x:110+81*Math.sin(a),y:116-81*Math.cos(a),'text-anchor':'middle','font-size':18,'font-weight':800,fill:'#38236b'},i)}
-  for(let i=0;i<60;i++){const a=i*Math.PI/30,r=i%5===0?91:97;shape('line',{x1:110+r*Math.sin(a),y1:110-r*Math.cos(a),x2:110+100*Math.sin(a),y2:110-100*Math.cos(a),stroke:'#b1a5cf','stroke-width':i%5===0?2:1})}
+  shape('circle',{cx:110,cy:110,r:105,fill:'#d9eaff',stroke:'#5777ba','stroke-width':4});
+  shape('circle',{cx:110,cy:110,r:98,fill:'#fffdf7',stroke:'#b3c9e8','stroke-width':2});
+  for(let i=1;i<=12;i++){const a=i*Math.PI/6;shape('text',{x:110+75*Math.sin(a),y:116-75*Math.cos(a),'text-anchor':'middle','font-size':18,'font-weight':800,fill:'#38236b'},i)}
+  for(let i=0;i<60;i++){const a=i*Math.PI/30,r=i%5===0?89:94;shape('line',{x1:110+r*Math.sin(a),y1:110-r*Math.cos(a),x2:110+97*Math.sin(a),y2:110-97*Math.cos(a),stroke:'#b1a5cf','stroke-width':i%5===0?2:1})}
   const hand=(angle,len,color,w)=>{const a=angle*Math.PI/180;shape('line',{x1:110,y1:110,x2:110+len*Math.sin(a),y2:110-len*Math.cos(a),stroke:color,'stroke-width':w,'stroke-linecap':'round'})};
-  hand((round.hour%12)*30+round.minute*.5,49,'#5032a1',8);hand(round.minute*6,71,'#d97918',5);shape('circle',{cx:110,cy:110,r:5,fill:'#5032a1'});cue.append(svg);
-  for(const v of shuffle(round.choices))group.append(btn(v,()=>{if(solved)return;if(v===round.answer)done();else wrong()}));return;
+  hand((round.hour%12)*30+round.minute*.5,49,'#5032a1',8);hand(round.minute*6,71,'#b46318',5);shape('circle',{cx:110,cy:110,r:5,fill:'#5032a1'});
+  const studio=el('div','','clock-studio'),head=el('div',tr('مختبر الوقت مع لُمعة','Lumaa time lab'),'clock-lab-title'),legend=el('div','','clock-legend');
+  legend.append(el('span',tr('العقرب القصير: الساعات','Short hand: hours'),'clock-hour-key'),el('span',tr('العقرب الطويل: الدقائق','Long hand: minutes'),'clock-minute-key'));
+  const digital=el('div','--:--','clock-digital');digital.dir='ltr';digital.setAttribute('aria-live','polite');studio.append(head,svg,legend,digital);cue.append(studio);
+  for(const v of shuffle(round.choices)){const b=btn(v,()=>{if(solved||b.disabled)return;if(v===round.answer){b.dataset.state='correct';digital.textContent=round.answer;studio.dataset.complete='true';done()}else{b.dataset.state='wrong';b.disabled=true;wrong()}},'game-option clock-answer');b.dir='ltr';group.append(b)}return;
  }
  if(round.kind==='maze'){
   const n=round.size,open=new Set(round.path.map(p=>p.join(','))),target=round.path.at(-1),start=round.path[0];
