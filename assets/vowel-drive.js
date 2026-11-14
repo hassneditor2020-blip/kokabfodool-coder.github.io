@@ -1,4 +1,4 @@
-import {speak,stopSpeech} from './game-extra.js?v=9';
+import {approvedClips} from './vowel-audio-review.js?v=1';
 import {pronunciation} from './arabic-pronunciation.js?v=1';
 import {bindJourney, shuffle,totalStars} from './game-progress.js?v=8';
 
@@ -40,36 +40,28 @@ function syllable(letter, vowel) {
 function stopAudio() {
   playback++;
   audio.pause();
-  stopSpeech();
+  audio.currentTime=0;
 }
 
-async function hear() {
-  if (!target || answered || board.hidden || target.vowel===3) return;
-  const request = ++playback;
-  listenLabel.textContent = tr('جارٍ التحميل…', 'Loading…');
-  const spoken=pronunciation(target.letter,target.vowel,target.example);
-  const fallback=async()=>{
-  if(request!==playback)return;
-  if(!target.audio){feedback.textContent=tr('الصوت العربي غير متاح على هذا الجهاز.','Arabic voice is unavailable on this device.');adult.open=true;return;}
-  const source = `/assets/vowel-drive-audio-v3/${target.audio}.mp3`;
-  if (audio.getAttribute('src') !== source) audio.src = source;
-  audio.currentTime = 0;
-
-  try {
-    await audio.play();
-    if (request !== playback) return;
-    listenLabel.textContent = tr('أعد الاستماع', 'Listen again');
-    feedback.textContent = '';
-    adult.open = false;
-  } catch {
-    if (request !== playback) return;
-    listenLabel.textContent = tr('أعد تشغيل الصوت', 'Retry audio');
-    feedback.textContent = tr('تعذّر تشغيل الصوت. أعد المحاولة أو اطلب مساعدة الأهل.',
-      'Audio could not play. Try again or ask a grown-up for help.');
-  }
-  };
-  audio.pause();
-  if(speak(spoken,'ar-SA',fallback)){listenLabel.textContent=tr('أعد الاستماع','Listen again');feedback.textContent='';adult.open=false;}
+function isApproved(round){return round.vowel!==3&&approvedClips.has(round.audio)}
+function showVisual(round){
+  const base=round.letter==='أ'&&round.vowel===1?'إ':round.letter;
+  const parts=round.example.match(/[^\p{Mark}]\p{Mark}*|\p{Mark}+/gu)||[round.example];
+  const position=parts.findIndex(part=>part.startsWith(base)&&part.includes(vowels[round.vowel][0]));
+  drivePrompt.textContent=round.mode==='missing'?tr('اختر الحركة الناقصة: ','Choose the missing vowel: '):tr('اختر حركة الحرف المحدد: ','Choose the marked letter’s vowel: ');
+  const word=document.createElement('span');word.lang='ar';word.dir='rtl';
+  parts.forEach((part,i)=>{if(i!==position){word.append(document.createTextNode(part));return}const marked=document.createElement('mark');marked.textContent=round.mode==='missing'?part.replace(vowels[round.vowel][0],'◌'):part;word.append(marked)});
+  drivePrompt.append(word);
+}
+async function hear(){
+  if(!target||answered||board.hidden||!isApproved(target))return;
+  const request=++playback;
+  listenLabel.textContent=tr('جارٍ التحميل…','Loading…');
+  const source='/assets/vowel-drive-audio-v3/'+target.audio+'.mp3';
+  if(audio.getAttribute('src')!==source)audio.src=source;
+  audio.currentTime=0;
+  try{await audio.play();if(request!==playback)return;listenLabel.textContent=tr('أعد الاستماع','Listen again');adult.open=false;}
+  catch{if(request!==playback)return;listen.disabled=true;listenLabel.textContent=tr('الصوت غير متاح — تدريب بصري','Audio unavailable — visual practice');showVisual(target);adult.open=true;}
 }
 
 function choose(button, lane, vowel) {
@@ -79,7 +71,7 @@ function choose(button, lane, vowel) {
 
   if (vowel !== target.vowel) {
     button.dataset.result = 'wrong';
-    feedback.textContent = tr('جرّب بابًا آخر. يمكنك سماع الحرف مرة ثانية.', 'Try another gate. You can listen again.');
+    feedback.textContent = isApproved(target)?tr('جرّب بابًا آخر. يمكنك سماع الحرف مرة ثانية.', 'Try another gate. You can listen again.'):tr('جرّب بابًا آخر. انظر إلى حركة الحرف الملوّن.', 'Try another gate. Look at the highlighted letter.');
     feedback.dataset.state='wrong';
     journey.mistake();
     return;
@@ -122,25 +114,15 @@ function renderRound(round) {
   counter.textContent = journey.roundLabel();
   drawRoute();
   delete feedback.dataset.state;
-  listen.disabled = round.vowel===3;
-  listenLabel.textContent = round.vowel!==3 ? tr('اسمع الحرف وحركته', 'Listen to the letter and vowel') : tr('تحدٍّ بصري دون تسجيل صوتي', 'Visual challenge without audio');
+  listen.disabled = !isApproved(round);
+  listenLabel.textContent=isApproved(round)?tr('اسمع الحرف وحركته','Listen to the letter and vowel'):round.vowel===3?tr('تحدٍّ بصري: السكون','Visual challenge: sukūn'):tr('تدريب بصري — التسجيلات قيد المراجعة','Visual practice — recordings under review');
   adult.open = false;
   adult.hidden = false;
-  adultCue.textContent = syllable(round.letter, round.vowel);
+  adultCue.textContent=pronunciation(round.letter,round.vowel,round.example);
   next.hidden = true;
   feedback.textContent = '';
   drivePrompt.textContent=tr('اسمع واختر الباب','Listen and choose the gate');
-  if (round.mode && round.mode !== 'audio') {
-    const base=round.letter==='أ'&&round.vowel===1?'إ':round.letter;
-    const parts=round.example.match(/[^\p{Mark}]\p{Mark}*|\p{Mark}+/gu) || [round.example];
-    let position=parts.findIndex(part=>part.startsWith(base)&&part.includes(vowels[round.vowel][0]));
-    if(position<0) position=parts.findIndex(part=>part.startsWith(base));
-    drivePrompt.textContent=round.mode==='missing' ? tr('اختر الحركة الناقصة: ','Choose the missing vowel: ') : tr('اختر حركة الحرف المحدد: ','Choose the marked letter’s vowel: ');
-    const word=document.createElement('span');word.lang='ar';word.dir='rtl';
-    parts.forEach((part,i)=>{if(i!==position){word.append(document.createTextNode(part));return;}const marked=document.createElement('mark');marked.textContent=round.mode==='missing'?part.replace(vowels[round.vowel][0],'◌'):part;word.append(marked);});
-    drivePrompt.append(word);
-
-  }
+  if(!isApproved(round)||(round.mode&&round.mode!=='audio'))showVisual(round);
   gates.replaceChildren(...shuffle(round.vowel===3?[0,1,3]:[0, 1, 2]).map((vowel, lane) => {
     const button = document.createElement('button');
     button.type = 'button';
