@@ -1,5 +1,5 @@
 import { bindJourney, shuffle } from './game-progress.js?v=6';
-import {renderExtra,stopSpeech} from './game-extra.js?v=6';
+import {renderExtra,stopSpeech} from './game-extra.js?v=7';
 
 const board = document.querySelector('[data-game]');
 const game = JSON.parse(document.getElementById('game-data').textContent);
@@ -33,8 +33,17 @@ function makeOption(choice, correct) {
     button.append(picture, label);
     if (!abcGame && lang === 'en') button.append(element('small', en, 'option-gloss'));
   } else {
-    button.textContent = String(choice);
-    if (!countGame) button.lang = abcGame ? 'en' : lang;
+    const value=String(choice);
+    const emojiOnly=typeof choice==='string' && /^[\p{Extended_Pictographic}\uFE0F\u200D\s]+$/u.test(value.trim());
+    if(emojiOnly){
+      const picture=element('span',value,'game-picture game-picture-standalone');
+      picture.setAttribute('aria-hidden','true');
+      button.classList.add('game-picture-choice');
+      button.setAttribute('aria-label',value);button.append(picture);
+    }else{
+      button.textContent=value;
+      if(!countGame)button.lang=abcGame?'en':lang;
+    }
   }
   button.addEventListener('click', (event) => {
     if (solved || button.dataset.state === 'wrong') return;
