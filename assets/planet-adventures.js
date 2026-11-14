@@ -4,11 +4,11 @@ const board=document.querySelector('[data-game]'), cue=board.querySelector('[dat
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return n};
 const btn=(txt,cb,cls='game-option')=>{const b=el('button',txt,cls);b.type='button';b.addEventListener('click',cb);return b};
 function render(round){
- board.querySelector('[data-progress]').textContent=journey.roundLabel();board.querySelector('[data-prompt]').textContent=round.prompt;
+ const label=journey.roundLabel();board.querySelector('[data-progress]').textContent=label;const meter=board.querySelector('[data-visual-round-meter]');const numbers=label.match(/\d+/g)?.map(Number);if(meter&&numbers?.length>=3){meter.max=numbers[2];meter.value=Math.max(0,numbers[1]-1)}board.querySelector('[data-prompt]').textContent=round.prompt;
  cue.replaceChildren();options.replaceChildren();options.dataset.columns='1';feedback.textContent='';delete feedback.dataset.state;next.hidden=true;next.textContent=journey.nextLabel();let solved=false;
  const say=(t,state)=>{feedback.textContent=t;feedback.dataset.state=state||''};
  const wrong=()=>{if(!solved){journey.mistake();say(tr('جرّب مرة أخرى.','Try again.'),'wrong')}};
- const done=()=>{if(solved)return;solved=true;journey.solve();say(tr('أحسنت! أكملت الجولة.','Well done! Round complete.'),'correct');next.hidden=false};
+ const done=()=>{if(solved)return;solved=true;journey.solve();const meter=board.querySelector('[data-visual-round-meter]');if(meter)meter.value=Math.min(meter.max,meter.value+1);say(tr('أحسنت! أكملت الجولة.','Well done! Round complete.'),'correct');next.hidden=false};
  const group=el('div','','new-controls');options.append(group);
  if(round.kind==='quiz'||round.kind==='pattern'){
   if(round.kind==='pattern'){

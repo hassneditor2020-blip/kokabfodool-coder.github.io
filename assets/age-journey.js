@@ -41,7 +41,7 @@ if(root){
   for(const r of rows){
    const c=cards.get(r.id);if(!c)continue;
    const item=node('article','','age-journey-card'),name=c.querySelector('h3').textContent, sym=c.querySelector('.activity-symbol')?.textContent||'⭐';
-   item.append(node('span',sym,'age-symbol'),node('h3',name),node('p',tr('المستويات '+r.first+'–'+r.last,'Levels '+r.first+'–'+r.last)),node('p',tr(r.completed+' من '+r.total+' مكتملة',r.completed+' of '+r.total+' complete'),'age-stat'));
+   const cover=c.querySelector('.game-visual-cover');if(cover){item.dataset.gameTheme=r.id;item.append(cover.cloneNode(true))}else item.append(node('span',sym,'age-symbol'));item.append(node('h3',name),node('p',tr('المستويات '+r.first+'–'+r.last,'Levels '+r.first+'–'+r.last)),node('p',tr(r.completed+' من '+r.total+' مكتملة',r.completed+' of '+r.total+' complete'),'age-stat'));
    const target=r.sc.slice(r.first-1,r.last).findIndex(v=>!v)+r.first;
    const requested=r.completed===r.total?r.first:target;
    let actual=requested;
