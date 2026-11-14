@@ -1,0 +1,8 @@
+/* Compact bilingual game highlights on the home page. */
+.home-game-highlights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(.4rem,1.3vw,.8rem);margin:1rem 0 1.15rem;max-width:34rem;list-style:none;padding:0}
+.home-game-highlights li{display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:0;min-height:76px;padding:.65rem .3rem;border:1px solid #e1d7fa;border-radius:16px;background:#fff;color:#3e287d;text-align:center;box-shadow:0 4px 12px #4220730b}
+.home-game-highlights li:first-child{background:#5a38b8;border-color:#5a38b8;color:#fff}
+.home-game-highlights strong{font-size:clamp(1.3rem,3vw,2rem);font-weight:900;line-height:1.15;font-variant-numeric:tabular-nums;direction:ltr}
+.home-game-highlights span{font-size:clamp(.7rem,1.5vw,.88rem);line-height:1.35;font-weight:700;margin-top:.25rem}
+.home-games-total{display:inline-block;color:#5032a1;background:#eee7ff;border-radius:999px;padding:.22em .55em;font-size:.65em;vertical-align:middle;white-space:nowrap}
+@media(max-width:480px){.home-game-highlights{gap:.35rem;margin:.75rem 0}.home-game-highlights li{min-height:65px;border-radius:12px;padding:.5rem .2rem}.home-game-highlights strong{font-size:1.35rem}.home-game-highlights span{font-size:.7rem}}
