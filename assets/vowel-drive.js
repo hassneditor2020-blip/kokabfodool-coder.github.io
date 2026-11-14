@@ -1,3 +1,5 @@
+import {speak,stopSpeech} from './game-extra.js?v=7';
+import {pronunciation} from './arabic-pronunciation.js?v=1';
 import {bindJourney, shuffle,totalStars} from './game-progress.js?v=6';
 
 const data = JSON.parse(document.querySelector('#drive-data').textContent);
@@ -36,12 +38,17 @@ function syllable(letter, vowel) {
 function stopAudio() {
   playback++;
   audio.pause();
+  stopSpeech();
 }
 
 async function hear() {
-  if (!target || answered || board.hidden || !target.audio) return;
+  if (!target || answered || board.hidden || target.vowel===3) return;
   const request = ++playback;
   listenLabel.textContent = tr('جارٍ التحميل…', 'Loading…');
+  const spoken=pronunciation(target.letter,target.vowel,target.example);
+  const fallback=async()=>{
+  if(request!==playback)return;
+  if(!target.audio){feedback.textContent=tr('الصوت العربي غير متاح على هذا الجهاز.','Arabic voice is unavailable on this device.');adult.open=true;return;}
   const source = `/assets/vowel-drive-audio-v3/${target.audio}.mp3`;
   if (audio.getAttribute('src') !== source) audio.src = source;
   audio.currentTime = 0;
@@ -58,6 +65,9 @@ async function hear() {
     feedback.textContent = tr('تعذّر تشغيل الصوت. أعد المحاولة أو اطلب مساعدة الأهل.',
       'Audio could not play. Try again or ask a grown-up for help.');
   }
+  };
+  audio.pause();
+  if(speak(spoken,'ar-SA',fallback)){listenLabel.textContent=tr('أعد الاستماع','Listen again');feedback.textContent='';adult.open=false;}
 }
 
 function choose(button, lane, vowel) {
@@ -105,8 +115,8 @@ function renderRound(round) {
   delete scene.dataset.lane;
   delete scene.dataset.driveState;
   counter.textContent = journey.roundLabel();
-  listen.disabled = !round.audio;
-  listenLabel.textContent = round.audio ? tr('اسمع الحرف وحركته', 'Listen to the letter and vowel') : tr('تحدٍّ بصري دون تسجيل صوتي', 'Visual challenge without audio');
+  listen.disabled = round.vowel===3;
+  listenLabel.textContent = round.vowel!==3 ? tr('اسمع الحرف وحركته', 'Listen to the letter and vowel') : tr('تحدٍّ بصري دون تسجيل صوتي', 'Visual challenge without audio');
   adult.open = false;
   adult.hidden = false;
   adultCue.textContent = syllable(round.letter, round.vowel);
