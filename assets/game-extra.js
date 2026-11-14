@@ -1,5 +1,5 @@
 import {illustrate} from './learning-art.js?v=1';
-import {shuffle} from './game-progress.js?v=6';
+import {shuffle} from './game-progress.js?v=8';
 const ar=document.documentElement.lang==='ar';
 const tr=(a,b)=>ar?a:b;
 const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};
