@@ -1,6 +1,6 @@
 import {illustrate} from './learning-art.js?v=1';
 import { bindJourney, shuffle } from './game-progress.js?v=8';
-import {renderExtra,stopSpeech} from './game-extra.js?v=10';
+import {renderExtra,stopSpeech} from './game-extra.js?v=11';
 
 const board = document.querySelector('[data-game]');
 const game = JSON.parse(document.getElementById('game-data').textContent);
@@ -69,7 +69,7 @@ function makeOption(choice, correct) {
   return button;
 }
 
-function objectGroup(count, symbol, first, removed = 0) {
+function objectGroup(count, symbol, first, removed = 0, onChange=()=>{}) {
   const group = element('ul', '', 'game-count');
   for (let i = 0; i < count; i++) {
     const item = document.createElement('li');
@@ -78,8 +78,7 @@ function objectGroup(count, symbol, first, removed = 0) {
     token.setAttribute('aria-label', `${messages.object} ${first + i}`);
     token.setAttribute('aria-pressed', 'false');
     if(i>=count-removed){token.dataset.removed='true';token.setAttribute('aria-label',`${messages.object} ${first+i} · ${lang==='ar'?'محذوف':'removed'}`);token.disabled=true;}
-    token.addEventListener('click', () => token.setAttribute('aria-pressed',
-      String(token.getAttribute('aria-pressed') === 'false')));
+    token.addEventListener('click', () => {if(solved)return;token.setAttribute('aria-pressed',String(token.getAttribute('aria-pressed') === 'false'));onChange();});
     item.append(token);
     group.append(item);
   }
@@ -87,7 +86,7 @@ function objectGroup(count, symbol, first, removed = 0) {
 }
 
 function renderCount([number, symbol, choices, answer, math]) {
-  cue.classList.add('game-cue-count');
+  cue.classList.add('game-cue-count','count-lab');
   if (math) {
     prompt.textContent = messages.math;
     const expression = element('span', math.expression, 'math-expression');
@@ -99,12 +98,16 @@ function renderCount([number, symbol, choices, answer, math]) {
   if (groups.length) {
     const visual = element('div', '', 'count-groups');
     visual.dir = 'ltr';
+    const counter=element('strong','','count-lab-value'),readout=element('div','','count-lab-readout');
+    counter.setAttribute('aria-live','polite');readout.append(element('span',lang==='ar'?'عدد ما لمسته':'Objects tapped'),counter);
+    function refresh(){let n=0;for(const token of visual.querySelectorAll('.count-token')){if(token.getAttribute('aria-pressed')==='true'){token.dataset.counted=String(++n)}else delete token.dataset.counted;}counter.textContent=String(n);}
+    const reset=element('button',lang==='ar'?'ابدأ العد من جديد':'Count again','button button-white count-reset');reset.type='button';reset.addEventListener('click',()=>{if(solved)return;for(const t of visual.querySelectorAll('.count-token'))t.setAttribute('aria-pressed','false');refresh()});readout.append(reset);
     let first = 1;
     for (const size of groups) {
-      visual.append(objectGroup(size, symbol, first, math?.removed ?? 0));
+      visual.append(objectGroup(size, symbol, first, math?.removed ?? 0,refresh));
       first += size;
     }
-    cue.append(visual, element('small', messages.objects, 'count-instruction'));
+    cue.append(readout,visual, element('small', messages.objects, 'count-instruction'));refresh();
   }
   return {choices, answer};
 }
@@ -141,7 +144,7 @@ function renderRound(round) {
   next.textContent = journey.nextLabel();
   options.replaceChildren();
   stopSpeech();
-  cue.classList.remove('game-cue-count');
+  cue.classList.remove('game-cue-count','count-lab');
   if (!Array.isArray(round)) {
     prompt.textContent=round.prompt;
     renderExtra(round,{cue,options,feedback,next,journey,makeOption});
