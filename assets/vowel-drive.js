@@ -29,6 +29,8 @@ const audio = new Audio();
 audio.preload = 'none';
 let playback = 0;
 let driveTimer;
+const routeMeter=document.createElement('div');routeMeter.className='drive-route-meter';routeMeter.setAttribute('aria-label',tr('تقدم الرحلة','Journey progress'));scene.before(routeMeter);
+function drawRoute(done=false){const nums=journey.roundLabel().match(/\d+/g)?.map(Number);if(!nums||nums.length<3)return;const current=nums[1],total=nums[2];const label=document.createElement('span');label.className='drive-route-label';label.textContent=tr('محطة ','Stop ')+current+' / '+total;const track=document.createElement('progress');track.max=total;track.value=current-1+Number(done);track.setAttribute('aria-label',tr('محطات مكتملة','Completed stops'));routeMeter.replaceChildren(label,track);}
 
 function syllable(letter, vowel) {
   const base = letter === 'أ' && vowel === 1 ? 'إ' : letter;
@@ -78,11 +80,13 @@ function choose(button, lane, vowel) {
   if (vowel !== target.vowel) {
     button.dataset.result = 'wrong';
     feedback.textContent = tr('جرّب بابًا آخر. يمكنك سماع الحرف مرة ثانية.', 'Try another gate. You can listen again.');
+    feedback.dataset.state='wrong';
     journey.mistake();
     return;
   }
 
   answered = true;
+  feedback.dataset.state='correct';
   stopAudio();
   button.dataset.result = 'correct';
   for (const gate of gates.children) gate.setAttribute('aria-disabled', 'true');
@@ -104,6 +108,7 @@ function choose(button, lane, vowel) {
   driveTimer = window.setTimeout(() => {
     scene.dataset.driveState = 'pass';
   }, 240);
+  drawRoute(true);
   journey.solve();
 }
 
@@ -115,6 +120,8 @@ function renderRound(round) {
   delete scene.dataset.lane;
   delete scene.dataset.driveState;
   counter.textContent = journey.roundLabel();
+  drawRoute();
+  delete feedback.dataset.state;
   listen.disabled = round.vowel===3;
   listenLabel.textContent = round.vowel!==3 ? tr('اسمع الحرف وحركته', 'Listen to the letter and vowel') : tr('تحدٍّ بصري دون تسجيل صوتي', 'Visual challenge without audio');
   adult.open = false;

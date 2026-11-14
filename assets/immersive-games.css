@@ -1,0 +1,52 @@
+/* Immersive market and code laboratory, scoped to their game panels. */
+[data-immersive="shop"] .game-cue,[data-immersive="maze"] .game-cue{display:grid;gap:.7rem;width:min(100%,640px);padding:clamp(.3rem,1.5vw,.75rem);min-width:0}
+.market-scene{width:100%;border:1px solid #e6bd83;border-radius:20px;background:#fff8e9;overflow:hidden;box-shadow:0 5px 0 #e7cca5}
+.market-awning{min-height:43px;padding:.6rem;text-align:center;font-size:1rem;font-weight:900;color:#72421d;background:repeating-linear-gradient(90deg,#ffd69d 0 34px,#fff4d8 34px 68px);border-bottom:3px solid #e4b577;text-shadow:0 1px #fff}
+.market-shelf{display:flex;justify-content:center;flex-wrap:wrap;gap:.6rem;padding:.7rem .35rem 1rem;background:linear-gradient(#fffdf4 0 85%,#d7a574 85% 90%,#f1d6ab 90%)}
+.game-board[data-immersive="shop"] .market-product{flex:1 1 85px;max-width:148px;min-width:70px;background:#fff;border:1px solid #ead4ab;box-shadow:0 3px 0 #e7c69c;padding:.45rem .25rem;gap:.22rem}
+.market-item-name{font-size:.78rem;font-weight:800;overflow-wrap:anywhere}
+.market-price{background:#fff0cc;color:#794510;border:1px solid #e3b767;border-radius:9px;padding:.12rem .7rem;min-width:38px;font-size:1.05rem;direction:ltr}
+.market-checkout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.55rem;text-align:start;width:100%}
+.market-receipt{background:#fff;border:1px solid #e7d9c5;border-radius:13px;padding:.65rem;box-shadow:0 3px 0 #e9dac6}
+.market-heading{font-size:.88rem;line-height:1.4;font-weight:900;margin:0 0 .45rem}
+.market-line{display:flex;justify-content:space-between;align-items:center;gap:.35rem;padding:.24rem 0;font-size:.78rem}
+.market-line strong{font-variant-numeric:tabular-nums;direction:ltr}
+.market-total{border-top:1px dashed #c7b9aa;font-weight:900;margin-top:.25rem;padding-top:.45rem}
+.market-register{background:#505578;color:#fff;border:3px solid #727ba1;border-radius:14px;padding:.55rem;display:grid;align-content:start;gap:.35rem;text-align:center;min-width:0}
+.market-register .market-heading{margin:0;color:#fff}
+.market-display{display:block;padding:.18rem .5rem;background:#202e46;border:2px solid #8593ac;border-radius:8px;color:#bcf5b0;font-size:clamp(1.5rem,6vw,2.4rem);font-variant-numeric:tabular-nums;line-height:1.15}
+.market-tray{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;min-height:29px;align-content:start}
+.market-coin-face{width:100%;aspect-ratio:1;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff2aa,#f7cf6d 50%,#e2a449);border:3px solid #c69036;box-shadow:inset 0 0 0 3px #ffe4a0,0 3px 0 #a97a2d;color:#75490f;font-weight:950;font-size:1.4rem;font-variant-numeric:tabular-nums;direction:ltr}
+.market-tray .market-coin-face{width:22px;font-size:.65rem;border-width:1px;box-shadow:inset 0 0 0 1px #ffe4a0}
+.market-more{color:white;font-size:.7rem}
+.market-wallet{width:100%;display:grid;gap:.55rem}
+.market-coins{display:flex;justify-content:center;flex-wrap:wrap;gap:.8rem;direction:ltr}
+.market-coin{width:clamp(47px,14vw,66px);border:0;background:transparent;padding:0;cursor:pointer;touch-action:manipulation;border-radius:50%}
+.market-coin:active:not(:disabled){transform:translateY(3px)}
+.market-coin:focus-visible,.code-arrow:focus-visible{outline:3px solid #6b4bc3;outline-offset:4px}
+.market-actions{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;width:100%}
+.market-actions .button{min-height:44px;flex:0 1 auto}
+.market-actions button:disabled{opacity:.5;cursor:default}
+.market-scene[data-paid="true"]{border-color:#58b080;box-shadow:0 5px 0 #a4dcba}
+.code-lab{width:100%;display:grid;gap:.6rem;padding:.6rem;border-radius:20px;background:#e5f6f1;border:1px solid #a9d8cd}
+.code-lab-head{display:flex;align-items:center;justify-content:center;gap:.45rem;color:#255c57;font-weight:900;font-size:.9rem}
+.code-guide{width:36px;height:36px;object-fit:contain}
+.code-grid.robo-maze{position:relative;isolation:isolate;gap:0;width:min(100%,330px);border:5px solid #426c77;border-radius:14px;overflow:hidden;box-shadow:0 4px 0 #b3d8d0}
+.code-grid .maze-cell{aspect-ratio:1;min-width:0;border-radius:0!important;border:1px solid #d7e9e4!important;position:relative}
+.code-grid .maze-open{background:#fffdfa!important;color:#b4d8ca!important}
+.code-grid .maze-wall{background:repeating-linear-gradient(135deg,#527c85 0 8px,#5e8a92 8px 16px)!important;border-color:#4c7079!important}
+.code-grid .maze-open .fudool-art{width:73%;height:73%}
+.code-rover{position:absolute;z-index:2;transform:translate(-50%,-50%);aspect-ratio:1;transition:top .22s ease,left .22s ease;pointer-events:none;filter:drop-shadow(0 2px 1px #224e6470)}
+.code-rover-image{display:block;width:100%;height:100%;object-fit:contain}
+.code-program{border:1px solid #b0d9cc;border-radius:13px;background:#fff;padding:.45rem;min-width:0}
+.code-sequence{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;margin:.3rem 0;min-height:35px}
+.code-chip{display:grid;place-items:center;min-width:29px;height:32px;padding:0 .2rem;border-radius:7px;background:#e0f2ea;border:1px solid #b1d5c7;font-size:1.2rem;color:#2a665e}
+.code-chip[data-active=true]{background:#f6d37c;border-color:#c99338;color:#694719}
+.code-placeholder,.code-status{font-size:.75rem;color:#52706d;margin:.2rem 0}
+.code-keypad{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.35rem;width:min(100%,350px);direction:ltr}
+.code-keypad .code-arrow{display:grid;place-items:center;min-width:0;min-height:57px;padding:.25rem;background:#fff;border-color:#b0d9cd}
+.code-arrow strong{font-size:1.7rem;line-height:1;color:#256b60}
+.code-arrow small{font-size:.65rem;line-height:1.1}
+.code-lab[data-complete=true]{border-color:#459d75;background:#d9f7e4}
+@media(max-width:480px){.market-checkout{gap:.35rem}.market-receipt,.market-register{padding:.4rem}.market-coins{gap:.55rem}.market-shelf{gap:.3rem}.market-line{font-size:.7rem}.market-heading{font-size:.78rem}.code-lab{padding:.35rem}.code-grid.robo-maze{width:min(100%,280px)}.market-actions .button{font-size:.76rem;padding:.4rem .65rem}.code-arrow small{font-size:.6rem}}
+@media(prefers-reduced-motion:reduce){.code-rover,.market-coin{transition:none!important;animation:none!important}}
