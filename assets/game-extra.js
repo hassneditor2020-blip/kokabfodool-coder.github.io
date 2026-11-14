@@ -1,3 +1,4 @@
+import {approvedClips,vowelClipId} from './vowel-audio-review.js?v=2';
 import {drawGuide,evaluateTrace} from './trace-assessment.js?v=1';
 import {illustrate} from './learning-art.js?v=1';
 import {shuffle} from './game-progress.js?v=8';
@@ -7,7 +8,7 @@ const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textConten
 let voiceToken=0, toneContext, recording;
 const activeTones=new Set();
 export function stopSpeech(){voiceToken++;recording?.pause();for(const tone of activeTones){try{tone.stop();}catch{}}activeTones.clear();if('speechSynthesis' in window)window.speechSynthesis.cancel();}
-export async function playRecording(src,fallback){stopSpeech();const token=voiceToken;recording??=new Audio();recording.src=src;try{await recording.play();return true;}catch{if(token===voiceToken)fallback?.();return false;}}
+export async function playRecording(src,fallback){stopSpeech();const clipId=vowelClipId(src);if(clipId!==null&&!approvedClips.has(clipId)){fallback?.();return false;}const token=voiceToken;recording??=new Audio();recording.src=src;try{await recording.play();return true;}catch{if(token===voiceToken)fallback?.();return false;}}
 export function speak(text,lang='ar',fallback){
   stopSpeech();const token=voiceToken;
   if(!('speechSynthesis' in window)){fallback?.();return false;}
@@ -29,7 +30,9 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
     if(round.cue){const content=illustrate(el('span',round.cue,'extra-cue'),round.cue);if(round.ltr)content.dir='ltr';cue.append(content);}
     if(round.speech||round.tones||round.audio){
       const fallback=()=>{if(!cue.querySelector('.audio-fallback'))cue.append(el('small',tr('الصوت غير متاح. أعد المحاولة أو اطلب مساعدة الأهل.','Audio unavailable. Try again or ask a grown-up for help.'),'audio-fallback'));};
-      const play=button(tr('🔊 استمع','🔊 Listen'),async()=>{cue.querySelector('.audio-fallback')?.remove();if(round.tones){if(!await tones(round.tones))say(tr('الصوت غير متاح على هذا الجهاز.','Sound is unavailable on this device.'));}else if(round.audio)playRecording(round.audio,()=>round.speech&&!round.audio.startsWith('/assets/game-sound-effects/')?speak(round.speech,round.speechLang||'ar-SA',fallback):fallback());else speak(round.speech,round.speechLang,()=>round.audioFallback?playRecording(round.audioFallback,fallback):fallback());},'button button-white');cue.append(play);
+      const reviewedSource=[round.audio,round.audioFallback].find(src=>vowelClipId(src)!==null);
+      const visualFallback=()=>{if(!cue.querySelector('.audio-fallback')){const parts=String(round.speech||'').split(/\s+\.\s+/);cue.append(el('strong',parts.at(-1)||'', 'audio-fallback'));say(tr('اقرأ المثال واختر الإجابة.','Read the example and choose the answer.'))}};
+      const play=button(tr('🔊 استمع','🔊 Listen'),async()=>{cue.querySelector('.audio-fallback')?.remove();if(reviewedSource){await playRecording(reviewedSource,visualFallback);return}if(round.tones){if(!await tones(round.tones))say(tr('الصوت غير متاح على هذا الجهاز.','Sound is unavailable on this device.'));}else if(round.audio)playRecording(round.audio,()=>round.speech&&!round.audio.startsWith('/assets/game-sound-effects/')?speak(round.speech,round.speechLang||'ar-SA',fallback):fallback());else speak(round.speech,round.speechLang,()=>round.audioFallback?playRecording(round.audioFallback,fallback):fallback());},'button button-white');cue.append(play);
     }
     const buttons=round.choices.map((v,i)=>makeOption(v,i===round.answer));options.dataset.columns=Math.min(4,round.choices.length);options.replaceChildren(...shuffle(buttons));const hint=button(tr('💡 تلميح','💡 Hint'),()=>{if(next.hidden){buttons[round.answer].dataset.hint='true';say(tr('جرّب الاختيار المضيء.','Try the highlighted choice.'));}},'button button-white');cue.append(hint);return;
   }
