@@ -1,5 +1,5 @@
 import {illustrate} from './learning-art.js?v=1';
-import {speak,stopSpeech,playRecording} from './game-extra.js?v=8';
+import {speak,stopSpeech,playRecording} from './game-extra.js?v=9';
 import { bindJourney, shuffle } from './game-progress.js?v=8';
 
 const game = document.querySelector('[data-letter-match]');
