@@ -1,3 +1,4 @@
+import {illustrate} from './learning-art.js?v=1';
 import {shuffle} from './game-progress.js?v=6';
 const ar=document.documentElement.lang==='ar';
 const tr=(a,b)=>ar?a:b;
@@ -24,7 +25,7 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
   const wrong=()=>{journey.mistake();say(tr('حاول مرة أخرى.','Try again.'),'wrong');};
   const button=(label,handler,cls='game-option')=>{const b=el('button',label,cls);b.type='button';b.addEventListener('click',handler);return b;};
   if(kind==='quiz'){
-    if(round.cue){const content=el('span',round.cue,'extra-cue');if(round.ltr)content.dir='ltr';cue.append(content);}
+    if(round.cue){const content=illustrate(el('span',round.cue,'extra-cue'),round.cue);if(round.ltr)content.dir='ltr';cue.append(content);}
     if(round.speech||round.tones||round.audio){
       const fallback=()=>{if(!cue.querySelector('.audio-fallback'))cue.append(el('small',tr('الصوت غير متاح. أعد المحاولة أو اطلب مساعدة الأهل.','Audio unavailable. Try again or ask a grown-up for help.'),'audio-fallback'));};
       const play=button(tr('🔊 استمع','🔊 Listen'),async()=>{cue.querySelector('.audio-fallback')?.remove();if(round.tones){if(!await tones(round.tones))say(tr('الصوت غير متاح على هذا الجهاز.','Sound is unavailable on this device.'));}else if(round.audio)playRecording(round.audio,()=>round.speech&&!round.audio.startsWith('/assets/game-sound-effects/')?speak(round.speech,round.speechLang||'ar-SA',fallback):fallback());else speak(round.speech,round.speechLang,()=>round.audioFallback?playRecording(round.audioFallback,fallback):fallback());},'button button-white');cue.append(play);
@@ -33,7 +34,7 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
   }
   options.dataset.columns='1';
   if(kind==='order'){
-    const target=round.target;let pos=0;const seq=el('div','','extra-sequence');seq.dir=typeof target[0]==='number'||/^[A-Z]$/.test(target[0])?'ltr':'rtl';cue.append(el('span',round.cue,'extra-cue'),seq);
+    const target=round.target;let pos=0;const seq=el('div','','extra-sequence');seq.dir=typeof target[0]==='number'||/^[A-Z]$/.test(target[0])?'ltr':'rtl';cue.append(illustrate(el('span',round.cue,'extra-cue'),round.cue),seq);
     const group=el('div','','extra-order');group.dir=seq.dir;options.append(group);
     const cells=target.map(()=>el('span','?','extra-slot'));seq.append(...cells);
     for(const value of shuffle(target.map((v,i)=>({v,i})))){const b=button(String(value.v),()=>{if(finished)return;if(value.v!==target[pos]){wrong();return;}cells[pos++].textContent=value.v;b.disabled=true;journey.correct();if(pos===target.length)done();});group.append(b);}return;
