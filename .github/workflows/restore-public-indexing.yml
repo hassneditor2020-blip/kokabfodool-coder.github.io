@@ -37,7 +37,11 @@ jobs:
               s=p.read_text(encoding='utf-8')
               head=Head(); head.feed(s)
               assert head.canonical==[url], (p, head.canonical)
-              new=s.replace('<meta content="noindex,follow" name="robots"/>','<meta content="index,follow,max-image-preview:large" name="robots"/>')
+              temporary=['<meta content="noindex,follow" name="robots"/>','<meta name="robots" content="noindex,follow"/>']
+              new=s
+              for tag in temporary: new=new.replace(tag,'')
+              if not any('index' in v.lower() and 'noindex' not in v.lower() for v in head.robots):
+                  new=new.replace('</head>','<meta name="robots" content="index,follow,max-image-preview:large"/>\n</head>',1)
               head=Head(); head.feed(new)
               assert not any('noindex' in v.lower() for v in head.robots), (p,head.robots)
               if s!=new: changes.append((p,new))
