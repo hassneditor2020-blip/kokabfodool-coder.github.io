@@ -1,0 +1,75 @@
+/* Reward worlds — CSS-only motion, local mascots and accessible progress. */
+[data-reward-world]{--rw:#6b4bb5;--rw-pale:#f2ebff;--rw-line:#ddd0f5;--rw-deep:#47317c}
+[data-reward-world="sky"]{--rw:#376aab;--rw-pale:#e9f6ff;--rw-line:#c5dff3;--rw-deep:#284e83}
+[data-reward-world="mint"]{--rw:#287762;--rw-pale:#e9faf0;--rw-line:#bce4cf;--rw-deep:#235c4d}
+[data-reward-world="sun"]{--rw:#a26319;--rw-pale:#fff5dd;--rw-line:#f1d9a5;--rw-deep:#795019}
+[data-reward-world="space"]{--rw:#514bb2;--rw-pale:#edecff;--rw-line:#cecbf7;--rw-deep:#3b368c}
+[data-reward-world="rose"]{--rw:#9a508d;--rw-pale:#fff0f8;--rw-line:#ebcce4;--rw-deep:#773b6d}
+.game-board[data-reward-world]{border-color:var(--rw-line);background:radial-gradient(circle at 8% 7%,var(--rw-pale) 0 4px,transparent 5px),radial-gradient(circle at 92% 8%,var(--rw-pale) 0 7px,transparent 8px),linear-gradient(180deg,var(--rw-pale),#fff 34%);box-shadow:0 12px 30px #3425570d}
+.reward-world-banner{display:flex;align-items:center;gap:.5rem;justify-content:center;max-width:100%;border:1px solid var(--rw-line);background:#fff;border-radius:999px;padding:.15rem .8rem .15rem .35rem;font-weight:850;color:var(--rw-deep);font-size:.83rem}
+.reward-guide{width:36px;height:36px;object-fit:contain}
+.reward-map-summary,.reward-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem;width:min(100%,540px)}
+.reward-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+.reward-stat{min-width:0;border:1px solid var(--rw-line,#e0d5f5);border-radius:16px;padding:.55rem .25rem;background:white;display:grid;gap:.2rem;place-items:center;text-align:center}
+.reward-stat strong{font-size:clamp(1rem,4vw,1.5rem);font-weight:900;color:var(--rw-deep,#4b358b);direction:ltr;unicode-bidi:isolate}
+.reward-stat span{font-size:.76rem;line-height:1.35;font-weight:750}
+.reward-map-summary .reward-meter{grid-column:1/-1}
+.reward-meter{display:block;width:100%;height:12px;border:0;border-radius:999px;accent-color:var(--rw,#7554c4);overflow:hidden}
+.reward-meter::-webkit-progress-bar{background:#e9e4f4;border-radius:999px}
+.reward-meter::-webkit-progress-value{background:var(--rw,#7554c4);border-radius:999px}
+.reward-meter::-moz-progress-bar{background:var(--rw,#7554c4);border-radius:999px}
+.game-board[data-reward-world] .fudool-level-world{background:linear-gradient(135deg,var(--rw-pale),white);border-color:var(--rw-line)}
+.game-board[data-reward-world] .fudool-level-world h3{color:var(--rw-deep)}
+.game-board[data-reward-world] .game-level{grid-template-columns:36px minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:.6rem;border:1px solid var(--rw-line);border-radius:16px;padding:.55rem;min-width:0}
+.game-board[data-reward-world] .game-level .reward-level-orb{grid-column:1;grid-row:1/3;display:grid;place-items:center;border-radius:50%;width:36px;height:36px;font-weight:900;font-size:1rem;background:var(--rw-pale);color:var(--rw-deep)}
+.game-board[data-reward-world] .game-level strong{grid-column:2;grid-row:1;color:var(--rw-deep);font-size:.94rem}
+.game-board[data-reward-world] .game-level span:not(.reward-level-orb):not(.reward-level-stars){grid-column:2;grid-row:2;overflow-wrap:anywhere}
+.game-board[data-reward-world] .game-level small{grid-column:3;grid-row:1/3;text-align:center;max-width:90px;font-size:.73rem}
+.game-board[data-reward-world] .game-level[data-reward-state=available]{border-color:var(--rw);box-shadow:0 3px 0 var(--rw-line)}
+.game-board[data-reward-world] .game-level[data-reward-state=locked]{background:#f9f8fc;border-color:#e4e0e9}
+.game-board[data-reward-world] .game-level[data-reward-state=locked] .reward-level-orb{color:#777286;background:#eae7ef}
+.game-board[data-reward-world] .game-level[data-reward-state=complete] small{grid-row:1}
+.reward-level-stars{grid-column:3;grid-row:2;display:flex;justify-content:center;gap:1px}
+.reward-level-stars .reward-star{width:15px;height:15px}
+.reward-star{overflow:visible;filter:drop-shadow(0 3px 1px #ba842b22)}
+.reward-star path{fill:#ffd364;stroke:#c58b31;stroke-width:3;stroke-linejoin:round}
+.reward-star.empty path{fill:#e7e2ee;stroke:#bfb7cf}
+.game-result.reward-celebration{position:relative;isolation:isolate;overflow:hidden;max-width:650px;margin-inline:auto;text-align:center}
+.game-result.reward-celebration>img.reward-mascot{width:clamp(95px,27vw,160px);height:clamp(95px,27vw,160px);object-fit:contain;filter:drop-shadow(0 7px 6px #503b7d20)}
+.reward-detail{position:relative;width:min(100%,540px);display:grid;gap:.75rem;justify-items:center}
+.reward-earned-stars{display:flex;align-items:center;justify-content:center;gap:clamp(.3rem,3vw,1.1rem)}
+.reward-earned-stars .reward-star{width:clamp(48px,15vw,82px);height:auto}
+.reward-earned-stars .reward-star:nth-child(2){width:clamp(58px,18vw,94px)}
+.reward-milestone{width:100%;display:grid;gap:.35rem;text-align:start;border:1px solid var(--rw-line,#ded4f2);background:#fff;padding:.65rem .85rem;border-radius:16px;color:var(--rw-deep,#4b358b)}
+.reward-milestone strong{font-size:.87rem}.reward-milestone small{font-size:.78rem}
+.reward-unlock{margin:0;padding:.55rem .75rem;border-radius:12px;font-size:.88rem;font-weight:850;background:var(--rw-pale);color:var(--rw-deep)}
+.reward-burst{pointer-events:none;position:absolute;inset:0;overflow:visible;z-index:-1}
+.reward-spark{position:absolute;left:50%;top:12%;width:9px;height:13px;border-radius:3px;background:#ef9cb6;opacity:0}
+.reward-spark:nth-child(3n){background:#ffd371}.reward-spark:nth-child(3n+1){background:#91d9b4}
+.reward-spark[data-spark="0"]{--sx:135px;--sy:0px;--sr:0deg}
+.reward-spark[data-spark="1"]{--sx:117px;--sy:47px;--sr:33deg}
+.reward-spark[data-spark="2"]{--sx:68px;--sy:82px;--sr:66deg}
+.reward-spark[data-spark="3"]{--sx:0px;--sy:95px;--sr:99deg}
+.reward-spark[data-spark="4"]{--sx:-67px;--sy:82px;--sr:132deg}
+.reward-spark[data-spark="5"]{--sx:-117px;--sy:47px;--sr:165deg}
+.reward-spark[data-spark="6"]{--sx:-135px;--sy:0px;--sr:198deg}
+.reward-spark[data-spark="7"]{--sx:-117px;--sy:-47px;--sr:231deg}
+.reward-spark[data-spark="8"]{--sx:-68px;--sy:-82px;--sr:264deg}
+.reward-spark[data-spark="9"]{--sx:0px;--sy:-95px;--sr:297deg}
+.reward-spark[data-spark="10"]{--sx:68px;--sy:-82px;--sr:330deg}
+.reward-spark[data-spark="11"]{--sx:117px;--sy:-48px;--sr:363deg}
+.reward-animate .reward-mascot{animation:reward-bounce .65s ease-out both}
+.reward-animate .reward-earned-stars .earned{animation:reward-star-pop .45s cubic-bezier(.18,.85,.35,1.25) both}
+.reward-animate .reward-earned-stars .earned:nth-child(2){animation-delay:.12s}
+.reward-animate .reward-earned-stars .earned:nth-child(3){animation-delay:.24s}
+.reward-animate .reward-spark{animation:reward-spark .9s ease-out both}
+@keyframes reward-bounce{0%{transform:translateY(9px) scale(.92)}45%{transform:translateY(-9px) scale(1.04)}100%{transform:none}}
+@keyframes reward-star-pop{0%{transform:scale(.55);opacity:.3}100%{transform:scale(1);opacity:1}}
+@keyframes reward-spark{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--sx),var(--sy)) rotate(var(--sr));opacity:0}}
+.reward-hub-summary{display:grid;gap:.75rem;margin:.7rem 0}
+@media(max-width:480px){.reward-world-banner{font-size:.77rem}.reward-guide{width:28px;height:28px}.reward-stat span{font-size:.69rem}.game-board[data-reward-world] .game-level{grid-template-columns:29px minmax(0,1fr) auto;gap:.25rem .4rem;padding:.45rem}.game-board[data-reward-world] .game-level .reward-level-orb{width:29px;height:29px}.game-board[data-reward-world] .game-level small{max-width:75px;font-size:.68rem}.game-board[data-reward-world] .game-level strong{font-size:.84rem}.game-board[data-reward-world] .game-level span:not(.reward-level-orb):not(.reward-level-stars){font-size:.76rem}.reward-stat{border-radius:12px}.reward-spark{display:none}}
+@media(prefers-reduced-motion:reduce){.reward-animate .reward-mascot,.reward-animate .reward-earned-stars .earned,.reward-animate .reward-spark{animation:none;transform:none}.reward-burst{display:none}}
+
+.game-board[data-reward-world]:has(.game-feedback[data-state=correct]) .reward-guide{animation:reward-bounce .45s ease-out both}
+.game-board[data-reward-world] .game-cue:not(:empty){background:linear-gradient(145deg,var(--rw-pale),#fff);border-color:var(--rw-line)}
+@media(prefers-reduced-motion:reduce){.game-board[data-reward-world]:has(.game-feedback[data-state=correct]) .reward-guide{animation:none}}

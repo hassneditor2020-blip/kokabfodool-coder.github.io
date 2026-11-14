@@ -1,3 +1,4 @@
+import {setupWorld,updateMap,decorateLevel,celebrate,enhanceRewards} from './reward-worlds.js?v=1';
 import { bindGameAudio } from './game-audio.js?v=5';
 
 const language = document.documentElement.lang;
@@ -76,6 +77,7 @@ function renderRewards(rewards) {
   });
   const album=rewards.querySelector('[data-character-album]');
   if(album){const heading=document.createElement('h3');heading.textContent=tr('ألبوم الشخصيات','Character album');const grid=document.createElement('div');grid.className='fudool-album-grid';for(const [threshold,image,a,e] of [[0,'brand.webp','كوكب فضول','Kawkab Fudool'],[20,'lumaa.webp','لُمعة','Lumaa'],[40,'robo.webp','روبو','Robo'],[75,'mishal.webp','مشعال','Mishal']]){const item=document.createElement('div');const img=document.createElement('img');img.src='/assets/'+image;img.alt='';img.className=total>=threshold?'':'album-locked';const label=document.createElement('span');label.textContent=total>=threshold?tr(a,e):'🔒 '+threshold+' ⭐';item.append(img,label);grid.append(item);}album.replaceChildren(heading,grid);}
+  enhanceRewards(rewards,total,starBadges,max);
   rewards.hidden = false;
 }
 
@@ -136,6 +138,8 @@ export function bindJourney({id, levels}, board, renderRound) {
   let mistakes = 0;
   let solved = false;
   let roundOrder = null;
+  let previousTotal = totalStars();
+  setupWorld(id,board,map,result);
 
   function show(panel, focus = true) {
     for (const section of [map, board, result]) section.hidden = section !== panel;
@@ -144,6 +148,7 @@ export function bindJourney({id, levels}, board, renderRound) {
 
   function showMap(focus = true) {
     const {scores, checkpoints} = progress(id, levels.length);
+    updateMap(map,scores);
     const buttons=levels.map(({title}, index) => {
       const locked = index > 0 && !scores[index - 1] && !scores[index];
       const button = document.createElement('button');
@@ -159,6 +164,7 @@ export function bindJourney({id, levels}, board, renderRound) {
         Number.isInteger(checkpoints[index]?.round) ? tr('تابع اللعب', 'Continue playing') :
         scores[index] ? starText(scores[index]) : tr('ابدأ اللعب', 'Start playing');
       button.append(number, label, status);
+      decorateLevel(button,index,scores[index],locked);
       button.addEventListener('click', () => start(index));
       return button;
     });
@@ -175,6 +181,7 @@ export function bindJourney({id, levels}, board, renderRound) {
 
   function start(index, replay = false) {
     level = index;
+    previousTotal = totalStars();
     const length=levels[level].rounds.length;
     const previous=progress(id, levels.length);
     const existing=previous.orders[level];
@@ -216,6 +223,7 @@ export function bindJourney({id, levels}, board, renderRound) {
     badges.textContent = unlocked ? `${unlocked[1]} ${unlocked[2]}` : '';
     nextLevel.hidden = last;
     show(result);
+    celebrate(result,{score:score(),best,total,scores:progress(id,levels.length).scores,badges:starBadges,level,rounds:levels[level].rounds.length,last,previousTotal});
   }
 
   document.querySelectorAll('[data-level-menu]').forEach((button) => button.addEventListener('click', () => showMap()));

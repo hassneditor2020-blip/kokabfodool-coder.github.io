@@ -1,6 +1,6 @@
-import {speak,stopSpeech} from './game-extra.js?v=7';
+import {speak,stopSpeech} from './game-extra.js?v=9';
 import {pronunciation} from './arabic-pronunciation.js?v=1';
-import {bindJourney, shuffle,totalStars} from './game-progress.js?v=6';
+import {bindJourney, shuffle,totalStars} from './game-progress.js?v=8';
 
 const data = JSON.parse(document.querySelector('#drive-data').textContent);
 const board = document.querySelector('[data-drive]');
