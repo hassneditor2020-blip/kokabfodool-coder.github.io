@@ -2,11 +2,11 @@
 const root=document.querySelector('[data-age-journey]');
 if(root){
  const ar=document.documentElement.lang==='ar', tr=(a,e)=>ar?a:e;
- const ids=['letter-match','letter-hunt','vowel-drive','trace','counting','english-abc','robo-lab','memory','puzzle','sound-quiz'];
+ const ids=['letter-match','letter-hunt','vowel-drive','trace','counting','english-abc','robo-lab','memory','puzzle','sound-quiz','fudool-shop','word-factory','lumaa-clock','code-robo'];
  const ranges={
- '3-5':[[1,4],[1,4],[1,3],[1,2],[1,2],[1,4],[1,2],[1,3],[1,4],[1,3]],
- '6-7':[[5,9],[5,10],[4,10],[3,8],[3,10],[5,10],[3,6],[4,7],[5,7],[4,6]],
- '8-10':[[10,12],[11,15],[11,15],[9,10],[11,18],[11,15],[7,10],[8,10],[8,10],[7,10]]
+ '3-5':[[1,4],[1,4],[1,3],[1,2],[1,2],[1,4],[1,2],[1,3],[1,4],[1,3],[1,3],[1,5],[1,2],[1,4]],
+ '6-7':[[5,9],[5,10],[4,10],[3,8],[3,10],[5,10],[3,6],[4,7],[5,7],[4,6],[4,9],[6,10],[3,6],[5,12]],
+ '8-10':[[10,12],[11,15],[11,15],[9,10],[11,18],[11,15],[7,10],[8,10],[8,10],[7,10],[10,15],[11,15],[7,10],[13,20]]
  };
  const info={
  '3-5':['🌱','المستكشف الصغير','Little explorer','الصور والحروف الأولى والعدّ والألغاز البسيطة.','Pictures, first letters, counting and simple puzzles.'],
