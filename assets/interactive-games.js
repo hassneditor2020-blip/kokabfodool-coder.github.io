@@ -48,10 +48,19 @@ function render(round){
   draw();return;
  }
  if(round.kind==='word'){
-  let pos=0;const target=Array.from(round.word), slots=el('div','','word-slots');slots.dir='rtl';
-  const cells=target.map(()=>el('span','؟','word-slot'));slots.append(...cells);cue.append(el('span',round.icon,'new-picture'),el('p',round.clue),slots);
-  const distractors=round.distractors.filter(x=>!target.includes(x));const tiles=shuffle([...target,...distractors]);
-  for(const letter of tiles){const b=btn(letter,()=>{if(solved||b.disabled)return;if(letter!==target[pos]){wrong();return}cells[pos++].textContent=letter;b.disabled=true;journey.correct();if(pos===target.length)done()});group.append(b)}return;
+  let pos=0;const target=Array.from(round.word),slots=el('div','','word-slots factory-slots');slots.dir='rtl';
+  const scene=el('div','','factory-scene'),header=el('div',tr('مصنع الكلمات','Word factory'),'factory-header'),image=el('span',round.icon,'new-picture factory-picture');
+  const hint=el('p',round.clue,'factory-hint');const count=el('p','','factory-count');count.setAttribute('aria-live','polite');
+  const cells=target.map(()=>el('span','؟','word-slot'));slots.append(...cells);
+  const joined=el('p','','factory-joined');joined.dir='rtl';joined.lang='ar';joined.hidden=true;
+  scene.append(header,image,hint,count,slots,joined);cue.append(scene);
+  const tray=el('div','','factory-tray');tray.dir='rtl';const controls=el('div','','market-actions');group.append(tray,controls);
+  const distractors=round.distractors.filter(x=>!target.includes(x)),tiles=shuffle([...target,...distractors]),picked=[];
+  function draw(){count.textContent=tr('الحروف المكتملة: ','Letters placed: ')+pos+' / '+target.length;undo.disabled=!pos||solved;clear.disabled=!pos||solved;cells.forEach((c,i)=>{c.dataset.filled=String(i<pos);c.dataset.current=String(i===pos&&!solved)})}
+  const undo=btn(tr('تراجع','Undo'),()=>{if(solved||!pos)return;const b=picked.pop();b.disabled=false;cells[--pos].textContent='؟';draw()},'button button-white');
+  const clear=btn(tr('امسح الحروف','Clear letters'),()=>{if(solved)return;for(const b of picked)b.disabled=false;picked.length=0;pos=0;for(const c of cells)c.textContent='؟';draw()},'button button-white');
+  controls.append(undo,clear);
+  for(const letter of tiles){const b=btn(letter,()=>{if(solved||b.disabled)return;if(letter!==target[pos]){wrong();return}cells[pos++].textContent=letter;b.disabled=true;picked.push(b);journey.correct();if(pos===target.length){joined.textContent=round.word;joined.hidden=false;scene.dataset.complete='true';done()}draw()},'game-option factory-letter');b.lang='ar';b.dir='rtl';tray.append(b)}draw();return;
  }
  if(round.kind==='clock'){
   const ns='http://www.w3.org/2000/svg', svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 220 220');svg.setAttribute('class','lesson-clock');svg.setAttribute('role','img');svg.setAttribute('aria-label',tr('ساعة بعقارب','Analog clock'));
