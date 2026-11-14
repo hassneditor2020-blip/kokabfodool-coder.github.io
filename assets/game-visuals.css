@@ -67,3 +67,13 @@
 .game-shell[data-game-theme] .game-result img{filter:drop-shadow(0 6px 10px #6b48aa25)}
 @media(max-width:620px){.game-shell[data-game-theme] .game-level-list{grid-template-columns:1fr}.game-shell[data-game-theme] .game-visual-hero{grid-template-columns:minmax(0,1fr) minmax(0,.76fr);gap:.6rem;border-radius:18px;padding:.75rem}.game-visual-hero .game-visual-cover{aspect-ratio:1.15}.game-visual-hero h1{font-size:clamp(1.25rem,5vw,1.65rem)}.game-visual-hero p{font-size:.82rem}.game-shell[data-game-theme] .game-board{padding:.8rem;border-radius:20px}.game-shell[data-game-theme] .new-controls{gap:.45rem}.game-shell[data-game-theme] .game-option{min-height:49px}.game-visual-card .game-visual-cover{aspect-ratio:2.5}}
 @media(prefers-reduced-motion:reduce){.game-shell[data-game-theme] .game-option,.game-visual-card{transition:none;transform:none}}
+
+/* Keep the child's attention on the activity while playing, especially on phones. */
+.game-shell[data-game-theme]:has([data-game]:not([hidden])) .game-visual-hero{grid-template-columns:minmax(0,1fr) 100px;padding:.6rem .85rem;gap:.75rem}
+.game-shell[data-game-theme]:has([data-game]:not([hidden])) .game-visual-hero .game-visual-cover{aspect-ratio:1.7}
+.game-shell[data-game-theme]:has([data-game]:not([hidden])) .game-visual-hero h1{font-size:clamp(1.15rem,3vw,1.5rem)}
+.game-shell[data-game-theme]:has([data-game]:not([hidden])) .game-visual-hero p,.game-shell[data-game-theme]:has([data-game]:not([hidden])) .game-visual-hero .game-visual-meta{display:none}
+.game-shell[data-game-theme] .game-option:focus-visible,.game-visual-card:focus-visible{outline:3px solid var(--gv-main);outline-offset:3px}
+.game-shell[data-game-theme] .game-cue :is(.word-slots,.planet-pattern,.shop-items){max-width:100%}
+.game-visual-card:hover{border-color:var(--gv-main)}
+@media(max-width:360px){.game-shell[data-game-theme]:has([data-game]:not([hidden])) .game-visual-hero{grid-template-columns:minmax(0,1fr) 75px}.game-visual-meta{font-size:.7rem}.game-shell[data-game-theme] .game-level small{font-size:.7rem}}
