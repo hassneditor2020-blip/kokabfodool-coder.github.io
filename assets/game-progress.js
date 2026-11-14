@@ -219,7 +219,11 @@ export function bindJourney({id, levels}, board, renderRound) {
   result.querySelector('[data-level-replay]').addEventListener('click', () => start(level, true));
   window.addEventListener('pageshow', (event) => { if (event.persisted && !map.hidden) showMap(false); });
   window.addEventListener('storage', () => { if (!map.hidden) showMap(false); });
-  if (new URLSearchParams(location.search).get('continue') === '1') {
+  const requested = Number(new URLSearchParams(location.search).get('level')) - 1;
+  const requestedScores = progress(id, levels.length).scores;
+  if (Number.isInteger(requested) && requested >= 0 && requested < levels.length && (requested === 0 || requestedScores[requested-1] || requestedScores[requested])) {
+    queueMicrotask(() => start(requested));
+  } else if (new URLSearchParams(location.search).get('continue') === '1') {
     const {scores, checkpoints, lastLevel} = progress(id, levels.length);
     const unlocked = levels.map((_, index) => index).filter((index) => index === 0 || scores[index - 1] || scores[index]);
     const checkpoint = unlocked.findLast((index) => Number.isInteger(checkpoints[index]?.round));
