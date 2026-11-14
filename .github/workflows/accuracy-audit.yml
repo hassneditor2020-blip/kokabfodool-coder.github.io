@@ -1,0 +1,90 @@
+name: Audit educational accuracy
+on:
+  push:
+    branches: [development/educational-accuracy-v38]
+    paths: ['.github/workflows/accuracy-audit.yml']
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate all lesson references
+        run: |
+          python3 - <<'PY'
+          import re,json,pathlib,unicodedata
+          p=pathlib.Path
+          clips=json.loads(re.search(r'export const clips=(.*?);',p('assets/vowel-audio-review.js').read_text())[1])
+          assert len(clips)==84 and {x['id'] for x in clips}==set(range(1,85))
+          assert len({(x['letter'],x['vowel']) for x in clips})==84
+          assert all(x['status'] in ['pending','replace'] for x in clips)
+          assert all(p('assets/vowel-drive-audio-v3/'+str(x['id'])+'.mp3').stat().st_size>1000 for x in clips)
+          marks=['َ','ِ','ُ','ْ']
+          byid={x['id']:x for x in clips}
+          for prefix in ['', 'en/']:
+              s=p(prefix+'games/vowel-drive/index.html').read_text()
+              d=json.loads(re.search(r'<script id="drive-data"[^>]*>([\s\S]*?)</script>',s)[1])
+              assert len(d['levels'])==15
+              assert sum(len(l['rounds']) for l in d['levels'])==261
+              for l in d['levels']:
+                  for q in l['rounds']:
+                      letter='إ' if q['letter']=='أ' and q['vowel']==1 else q['letter']
+                      chunks=re.findall(r'[^\u064b-\u065f][\u064b-\u065f]*',q['example'])
+                      assert any(x.startswith(letter) and marks[q['vowel']] in x for x in chunks),q
+                      if q.get('audio'):
+                          c=byid[q['audio']]
+                          assert (q['letter'],q['vowel'],q['example'])==(c['letter'],c['vowel'],c['example']),q
+              assert 'noindex' not in re.search(r'<head>[\s\S]*?</head>',s)[0]
+          assert 'noindex,nofollow' in p('grown-ups/audio-review/index.html').read_text()
+          print('84 recordings inventoried; 522 bilingual driving rounds matched to correct written vowel; no unreviewed clip enabled')
+          PY
+          for f in assets/vowel-drive.js assets/vowel-audio-review.js assets/audio-review-page.js assets/trace-assessment.js assets/game-extra.js assets/games.js; do node --input-type=module --check < "$f"; done
+      - name: Test tracing and safe driving in Chromium
+        run: |
+          python3 -m http.server 8765 >/tmp/fudool-server.log 2>&1 &
+          google-chrome --headless --no-sandbox --disable-dev-shm-usage --remote-debugging-port=9222 --user-data-dir=/tmp/fudool-chrome about:blank >/tmp/fudool-chrome.log 2>&1 &
+          node --input-type=module <<'JS'
+          const wait=ms=>new Promise(r=>setTimeout(r,ms));let pages;
+          for(let i=0;i<40;i++){try{pages=await(await fetch('http://127.0.0.1:9222/json/list')).json();break}catch{await wait(250)}}
+          if(!pages)throw Error('Chrome unavailable');
+          const ws=new WebSocket(pages.find(p=>p.type==='page').webSocketDebuggerUrl);await new Promise((r,j)=>{ws.onopen=r;ws.onerror=j});
+          let seq=0;const pending=new Map();ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id&&pending.has(m.id)){const [r,j]=pending.get(m.id);pending.delete(m.id);m.error?j(m.error):r(m.result)}};
+          const cmd=(method,params={})=>new Promise((r,j)=>{const id=++seq;pending.set(id,[r,j]);ws.send(JSON.stringify({id,method,params}))});
+          const ev=async expression=>{const r=await cmd('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value};
+          const poll=async expression=>{for(let i=0;i<90;i++){await wait(100);const v=await ev(expression);if(v)return v}throw Error('Timed out: '+expression)};
+          const nav=async(path,ready)=>{const url='http://127.0.0.1:8765/'+path;await cmd('Page.navigate',{url});return poll("location.href==="+JSON.stringify(url)+" && ("+ready+")")};
+          const click=sel=>ev("document.querySelector("+JSON.stringify(sel)+").click();true");
+          const check=(v,m)=>{if(!v)throw Error(m)};
+          await cmd('Page.enable');await cmd('Runtime.enable');
+          await nav('games/trace/?level=1',"document.querySelector('.trace-model') && document.querySelector('.trace-metrics').textContent.includes('اتبع')");
+          const report=await ev(`(async()=>{const {drawGuide,evaluateTrace}=await import('/assets/trace-assessment.js?v=1');const files=[...new Set(JSON.parse(document.querySelector('#game-data').textContent).levels.flatMap(l=>l.rounds.map(q=>q.image)))];const canvas=()=>{const c=document.createElement('canvas');c.width=600;c.height=320;return c};let failures=[];for(const src of files){const img=new Image();img.src=src;await img.decode();const model=canvas(),ink=canvas(),guide=drawGuide(img,model),ctx=ink.getContext('2d');ctx.drawImage(model,0,0);const correct=evaluateTrace(guide,ink,100);ctx.clearRect(0,0,600,320);ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(5,5);ctx.lineTo(595,5);ctx.stroke();const bad=evaluateTrace(guide,ink,590);if(!correct.pass||bad.pass)failures.push({src,correct,bad})}return {count:files.length,failures}})()`);
+          check(report.count===65&&report.failures.length===0,JSON.stringify(report));console.log('65 distinct writing guides: exact coverage accepted, off-guide scribble rejected');
+          const dotTest=await ev(`(async()=>{const {drawGuide,evaluateTrace}=await import('/assets/trace-assessment.js?v=1');const img=new Image();img.src='/assets/tracing/arabic-letters/baa-dots.png';await img.decode();const model=document.createElement('canvas'),ink=document.createElement('canvas');model.width=ink.width=600;model.height=ink.height=320;const g=drawGuide(img,model),ctx=ink.getContext('2d');ctx.drawImage(model,0,0);const group=g.groups.filter(x=>x.length<=3).sort((a,b)=>a.length-b.length)[0];if(!group)return {groups:g.groups.map(x=>x.length)};for(const i of group){const [x,y]=g.centers[i];ctx.clearRect(x*2-18,y*2-18,36,36)}return {groups:g.groups.map(x=>x.length),score:evaluateTrace(g,ink,100)}})()`);
+          check(dotTest.score&&!dotTest.score.pass&&!dotTest.score.groupsOK,JSON.stringify(dotTest));console.log('Missing detached Arabic letter dot rejected');
+          for(const width of [360,1280]){
+            await cmd('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width===360});
+            for(const pre of ['','en/']){
+              await nav(pre+'games/trace/?level=1',"document.querySelector('.trace-model') && !document.querySelector('.trace-metrics').textContent.includes('Loading') && !document.querySelector('.trace-metrics').textContent.includes('جاري')");
+              const rect=await ev("(()=>{const c=document.querySelector('.trace-ink');c.scrollIntoView({block:'center'});const r=c.getBoundingClientRect();return {x:r.left,y:r.top,w:r.width,h:r.height}})()");
+              const draw=async(x1,y1,x2,y2)=>{await cmd('Input.dispatchMouseEvent',{type:'mousePressed',x:x1,y:y1,button:'left',buttons:1,clickCount:1});await cmd('Input.dispatchMouseEvent',{type:'mouseMoved',x:x2,y:y2,button:'left',buttons:1});await cmd('Input.dispatchMouseEvent',{type:'mouseReleased',x:x2,y:y2,button:'left',buttons:0,clickCount:1})};
+              await draw(rect.x+10,rect.y+10,rect.x+rect.w-10,rect.y+10);
+              await click('.trace-actions .button-primary');
+              check(await ev("document.querySelector('[data-next]').hidden && document.querySelector('.trace-assessment').dataset.result==='retry'"),'random line incorrectly accepted');
+              await click('.trace-actions button:nth-child(2)');
+              const pts=await ev(`(async()=>{const {makeGuide}=await import('/assets/trace-assessment.js?v=1');const g=makeGuide(document.querySelector('.trace-model'));return g.groups.map(group=>group.map(i=>g.centers[i]).sort((a,b)=>a[1]-b[1]))})()`);
+              const rr=await ev("(()=>{const c=document.querySelector('.trace-ink');c.scrollIntoView({block:'center'});const r=c.getBoundingClientRect();return {x:r.left,y:r.top,w:r.width,h:r.height}})()");
+              for(const g of pts){const px=p=>[rr.x+p[0]*rr.w/300,rr.y+p[1]*rr.h/160];if(g.length===1){const p=px(g[0]);await draw(p[0],p[1],p[0]+.1,p[1]+.1)}else{for(let i=1;i<g.length;i++){const a=px(g[i-1]),b=px(g[i]);await draw(a[0],a[1],b[0],b[1])}}}
+              await click('.trace-actions .button-primary');check(await ev("!document.querySelector('[data-next]').hidden && document.querySelector('.trace-assessment').dataset.result==='pass'"),await ev("document.querySelector('.trace-metrics').textContent"));
+              await ev('localStorage.clear();true');
+              await nav(pre+'games/vowel-drive/?level=1',"document.querySelector('.drive-gate')");
+              check(await ev("document.querySelector('[data-drive-listen]').disabled && !!document.querySelector('[data-drive-prompt] mark')"),'unreviewed audio active');
+              await click('[data-vowel="0"]');check(await ev("!document.querySelector('[data-drive-next]').hidden"),'visual round failed');
+              await ev('localStorage.clear();true');
+              console.log(width,pre||'ar','incorrect drawing rejected, correct tracing accepted, visual drive works');
+            }
+          }
+          await nav('grown-ups/audio-review/',"document.querySelectorAll('.audio-review-card').length===84");
+          check(await ev("document.querySelectorAll('.audio-review-card').length===84 && document.querySelectorAll('option[value=pass]:disabled').length===2"),'review rows');
+          ws.close();console.log('All educational accuracy checks passed');
+          JS
