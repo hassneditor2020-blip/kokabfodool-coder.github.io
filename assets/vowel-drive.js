@@ -1,4 +1,4 @@
-import {approvedClips} from './vowel-audio-review.js?v=1';
+import {approvedClips} from './vowel-audio-review.js?v=2';
 import {pronunciation} from './arabic-pronunciation.js?v=1';
 import {bindJourney, shuffle,totalStars} from './game-progress.js?v=8';
 
@@ -115,7 +115,7 @@ function renderRound(round) {
   drawRoute();
   delete feedback.dataset.state;
   listen.disabled = !isApproved(round);
-  listenLabel.textContent=isApproved(round)?tr('اسمع الحرف وحركته','Listen to the letter and vowel'):round.vowel===3?tr('تحدٍّ بصري: السكون','Visual challenge: sukūn'):tr('تدريب بصري — التسجيلات قيد المراجعة','Visual practice — recordings under review');
+  listenLabel.textContent=isApproved(round)?tr('اسمع الحرف وحركته','Listen to the letter and vowel'):round.vowel===3?tr('تحدٍّ بصري: السكون','Visual challenge: sukūn'):tr('تدريب بصري — التسجيل يحتاج تصحيحًا','Visual practice — recording needs correction');
   adult.open = false;
   adult.hidden = false;
   adultCue.textContent=pronunciation(round.letter,round.vowel,round.example);
