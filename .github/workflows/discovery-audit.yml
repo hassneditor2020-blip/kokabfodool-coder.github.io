@@ -59,7 +59,7 @@ jobs:
               await ev("document.querySelector('.puzzle-reference button').click();true");
               check(await ev("document.querySelector('.discovery-preview').hidden"),'puzzle preview');
               await ev("document.querySelector('.puzzle-reference button').click();true");
-              await ev("(()=>{for(let i=0;i<4;i++){const p=document.querySelector('.extra-piece[data-slot='+i+']');if(Number(p.dataset.piece)!==i){p.click();document.querySelector('.extra-piece[data-piece='+i+']').click()}}return true})()");
+              await ev("(()=>{for(let i=0;i<4;i++){const p=[...document.querySelectorAll('.extra-piece')].find(b=>Number(b.dataset.slot)===i);if(Number(p.dataset.piece)!==i){p.click();[...document.querySelectorAll('.extra-piece')].find(b=>Number(b.dataset.piece)===i).click()}}return true})()");
               check(await ev("!document.querySelector('[data-next]').hidden && document.querySelector('.discovery-summary progress').value===4 && "+fit),'puzzle solve');
               await ev('localStorage.clear();true');
               await nav(pre+'games/word-factory/?level=1',"document.querySelector('.factory-letter')");
