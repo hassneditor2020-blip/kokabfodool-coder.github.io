@@ -589,9 +589,9 @@ ul, ol { margin: 0; }
 
 /* Large, readable artwork without increasing card height. */
 .game-board .game-option .game-picture:not(.match-word){font-size:clamp(2.6rem,10vw,4.2rem);line-height:1.06}
-.game-board .game-option .game-picture-standalone{font-size:clamp(3rem,13vw,5rem);line-height:1;display:block}
+.game-board .game-option .game-picture.game-picture-standalone{font-size:clamp(3rem,13vw,5rem);line-height:1;display:block}
 .game-board .game-picture-choice{padding:.15rem .35rem;min-width:0;overflow:visible}
 .match-card.match-picture .game-picture:not(.match-word){font-size:clamp(2.7rem,10vw,4rem);line-height:1}
 .match-art{width:clamp(64px,19vw,112px);height:clamp(50px,15vw,82px);object-fit:contain}
 .game-clue-picture{font-size:clamp(2.5rem,9vw,4rem)}
-@media(max-width:480px){.game-board .game-option .game-picture-standalone{font-size:clamp(3rem,13vw,4.6rem)}.game-board .game-option .game-picture:not(.game-picture-standalone):not(.match-word){font-size:clamp(2.35rem,9vw,3.3rem)}.game-board .game-options[data-columns="4"]{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.game-board .game-option .game-picture.game-picture-standalone{font-size:clamp(3rem,13vw,4.6rem)}.game-board .game-option .game-picture:not(.game-picture-standalone):not(.match-word){font-size:clamp(2.35rem,9vw,3.3rem)}.game-board .game-options[data-columns="4"]{grid-template-columns:repeat(2,minmax(0,1fr))}}
