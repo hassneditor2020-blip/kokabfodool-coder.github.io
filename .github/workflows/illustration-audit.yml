@@ -1,0 +1,55 @@
+name: Validate illustrated game upgrade
+on:
+  push:
+    branches: [development/illustrated-game-assets]
+    paths: ['.github/workflows/illustration-audit.yml']
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: development/illustrated-game-assets
+      - name: Update game cache references and audit
+        run: |
+          python3 - <<'PY'
+          import pathlib,re,json,xml.etree.ElementTree as ET
+          root=pathlib.Path('.')
+          symbols={x.attrib['id'] for x in ET.parse('assets/learning-art.svg').getroot() if x.tag.endswith('symbol')}
+          mapping=json.loads(re.search(r'const artwork=(.*?);', (root/'assets/learning-art.js').read_text()).group(1))
+          assert len(symbols)==82 and set(mapping.values())<=symbols
+          files=list(root.glob('games/*/index.html'))+list(root.glob('en/games/*/index.html'))
+          assert len(files)==40
+          count={'ar':[0,0],'en':[0,0]}
+          for p in files:
+              s=p.read_text()
+              s=s.replace('/assets/site.css?v=12','/assets/site.css?v=13').replace('/assets/games.js?v=7','/assets/games.js?v=8').replace('/assets/letter-match.js?v=7','/assets/letter-match.js?v=8').replace('/assets/interactive-games.js?v=2','/assets/interactive-games.js?v=3').replace('/assets/planet-adventures.js?v=2','/assets/planet-adventures.js?v=3')
+              s=re.sub(r'(/assets/vowel-drive.css\?v=)\d+',r'\g<1>9',s)
+              m=re.search(r'(<script id="(?:game-data|match-data|drive-data)" type="application/json">)([\s\S]*?)(</script>)',s)
+              assert m,p
+              d=json.loads(m.group(2))
+              lang='en' if p.parts[0]=='en' else 'ar'
+              count[lang][0]+=len(d['levels'])
+              count[lang][1]+=sum(len(l['rounds']) for l in d['levels'])
+              if p.as_posix()=='games/sound-quiz/index.html':
+                  # Red circle was being used to represent a pomegranate; gold medal was used to represent gold.
+                  for l in d['levels'][:6]:
+                      for r in l['rounds']:
+                          r['choices']=[{'🔴':'art:pomegranate','🥇':'art:gold'}.get(v,v) for v in r['choices']]
+                  s=s[:m.start(2)]+json.dumps(d,ensure_ascii=False,separators=(',',':'))+s[m.end(2):]
+              assert 'noindex' not in re.search(r'<head>[\s\S]*?</head>',s).group()
+              p.write_text(s)
+          assert count=={'ar':[275,1579],'en':[275,1579]},count
+          print('82 SVG illustrations and all mapping targets valid; 40 pages, 275 levels and 1579 rounds per language. SEO retained.')
+          PY
+          for f in assets/learning-art.js assets/games.js assets/game-extra.js assets/letter-match.js assets/interactive-games.js assets/planet-adventures.js; do node --input-type=module --check < "$f"; done
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- games en/games
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh illustration cache on all forty game pages"
+            git push origin HEAD:development/illustrated-game-assets
+          fi
