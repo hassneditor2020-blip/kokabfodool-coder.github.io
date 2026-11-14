@@ -14,6 +14,8 @@ const starBadges = [
   [225,'🌟',tr('نجم الكوكب','Planet star')],
   [300,'🏅',tr('مستكشف العوالم','World explorer')],
   [375,'👑',tr('ملك الكوكب','Planet champion')],
+  [450,'🚀',tr('رائد النجوم','Star voyager')],
+  [555,'🏆',tr('بطل جميع العوالم','All-world champion')],
 ];
 
 function read(key) {
@@ -49,7 +51,7 @@ function save(id, levelCount, update) {
   }
 }
 
-const gameCounts = new Map(Object.entries(JSON.parse(document.querySelector('#game-counts')?.textContent ?? '{}')));
+const gameCounts = new Map(Object.entries({...JSON.parse(document.querySelector('#game-counts')?.textContent ?? '{}'), ...{"fudool-shop":15,"word-factory":15,"lumaa-clock":10,"code-robo":20}}));
 const starCount = (scores) => scores.reduce((total, score) => total + score, 0);
 export const totalStars = () => [...gameCounts].reduce((total, [id, count]) => total + starCount(progress(id, count).scores), 0);
 const starText = (score) => tr(`⭐ ${score} من 3`, `⭐ ${score} of 3`);
