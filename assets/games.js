@@ -1,5 +1,6 @@
+import {illustrate} from './learning-art.js?v=1';
 import { bindJourney, shuffle } from './game-progress.js?v=6';
-import {renderExtra,stopSpeech} from './game-extra.js?v=7';
+import {renderExtra,stopSpeech} from './game-extra.js?v=8';
 
 const board = document.querySelector('[data-game]');
 const game = JSON.parse(document.getElementById('game-data').textContent);
@@ -26,7 +27,7 @@ function makeOption(choice, correct) {
   button.type = 'button';
   if (Array.isArray(choice)) {
     const [symbol, ar, en] = choice;
-    const picture = element('span', symbol, 'game-picture');
+    const picture = illustrate(element('span', symbol, 'game-picture'),symbol);
     picture.setAttribute('aria-hidden', 'true');
     const label = element('span', abcGame ? en : ar);
     label.lang = abcGame ? 'en' : 'ar';
@@ -34,12 +35,12 @@ function makeOption(choice, correct) {
     if (!abcGame && lang === 'en') button.append(element('small', en, 'option-gloss'));
   } else {
     const value=String(choice);
-    const emojiOnly=typeof choice==='string' && /^[\p{Extended_Pictographic}\uFE0F\u200D\s]+$/u.test(value.trim());
+    const emojiOnly=typeof choice==='string' && (/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+$/u.test(value.trim())||value.startsWith('art:'));
     if(emojiOnly){
-      const picture=element('span',value,'game-picture game-picture-standalone');
+      const picture=illustrate(element('span',value,'game-picture game-picture-standalone'),value);
       picture.setAttribute('aria-hidden','true');
       button.classList.add('game-picture-choice');
-      button.setAttribute('aria-label',value);button.append(picture);
+      button.setAttribute('aria-label',value==='art:pomegranate'?(lang==='ar'?'رمان':'Pomegranate'):value==='art:gold'?(lang==='ar'?'ذهب':'Gold'):value);button.append(picture);
     }else{
       button.textContent=value;
       if(!countGame)button.lang=abcGame?'en':lang;
@@ -72,7 +73,7 @@ function objectGroup(count, symbol, first, removed = 0) {
   const group = element('ul', '', 'game-count');
   for (let i = 0; i < count; i++) {
     const item = document.createElement('li');
-    const token = element('button', symbol, 'count-token');
+    const token = illustrate(element('button', symbol, 'count-token'),symbol);
     token.type = 'button';
     token.setAttribute('aria-label', `${messages.object} ${first + i}`);
     token.setAttribute('aria-pressed', 'false');
@@ -113,7 +114,7 @@ function renderLetters([letter, choices, answer, mode]) {
   content.lang = abcGame ? 'en' : 'ar';
   if (mode === 'initial') {
     prompt.textContent = messages.initial;
-    const picture = element('span', letter[0], 'game-clue-picture');
+    const picture = illustrate(element('span', letter[0], 'game-clue-picture'),letter[0]);
     picture.setAttribute('aria-hidden', 'true');
     content.prepend(picture, ' ');
   }
