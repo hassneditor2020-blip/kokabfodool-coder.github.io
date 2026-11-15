@@ -31,7 +31,7 @@ for mode in unified; do
   # All assets are bundled; external HTTPS links use Android ACTION_VIEW, not the app network.
   permission="";label="كوكب فضول"
   cat > "$W/AndroidManifest.xml" <<EOF
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="60" android:versionName="6.0.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="61" android:versionName="6.1.0">
 <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="32"/>
 $permission
 <application android:label="$label" android:icon="@drawable/app_icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:usesCleartextTraffic="false">
@@ -89,8 +89,8 @@ with zipfile.ZipFile(apk) as archive:
         assert archive.read(name) == source, name
 release = {'unified': {
     'file': apk.name,
-    'version': '6.0.0',
-    'versionCode': 60,
+    'version': '6.1.0',
+    'versionCode': 61,
     'bytes': apk.stat().st_size,
     'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'certificate_sha256': (output / 'unified-certificate.txt').read_text().strip(),

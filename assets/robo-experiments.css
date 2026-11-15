@@ -1,0 +1,232 @@
+.pwa-native, .pwa-standalone {
+  scroll-padding-block-end: calc(92px + env(safe-area-inset-bottom, 0px));
+}
+.robo-experiments {
+  width: min(100%, 680px);
+  overflow: hidden;
+  text-align: start;
+  border: 1px solid #acdacf;
+  border-radius: 20px;
+  background: #f1fcf9;
+  color: #1c4156;
+}
+.robo-experiments summary {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .65rem .85rem;
+  font-weight: 900;
+  cursor: pointer;
+  list-style: none;
+  background: linear-gradient(135deg, #e1f8f0, #eff5ff);
+}
+.robo-experiments summary::-webkit-details-marker { display: none; }
+.robo-experiments summary::after {
+  content: '+';
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  margin-inline-start: auto;
+  border-radius: 50%;
+  background: #fff;
+  color: #176560;
+}
+.robo-experiments[open] summary::after { content: '−'; }
+.robo-experiments summary img {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+.robo-lab-content { display: grid; gap: .8rem; padding: clamp(.65rem, 3vw, 1rem); }
+.robo-choices, .robo-predictions, .robo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  justify-content: center;
+}
+.robo-choices .button {
+  flex: 1 1 110px;
+  justify-content: center;
+  padding-inline: .5rem;
+}
+.robo-choices .button[aria-pressed=true] {
+  background: #226e68;
+  border-color: #226e68;
+  color: #fff;
+}
+.robo-bench {
+  display: grid;
+  justify-items: center;
+  gap: .65rem;
+  min-width: 0;
+  padding: clamp(.65rem, 3vw, 1rem);
+  border: 1px solid #c9e2df;
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+}
+.robo-bench :is(h3, p) { margin: 0; }
+.robo-step-title { font-size: clamp(1.04rem, 3vw, 1.32rem); }
+.robo-step-prompt, .robo-observation, .robo-recap { font-size: .88rem; }
+.robo-observation { font-weight: 800; color: #176560; }
+.robo-example {
+  display: flex;
+  direction: ltr;
+  align-items: center;
+  gap: .6rem;
+  font-weight: 900;
+  font-size: 1.24rem;
+}
+.robo-example-magnet .fudool-art,
+.robo-moving-magnet .fudool-art {
+  width: 63px;
+  height: 63px;
+}
+.robo-option {
+  display: grid;
+  place-items: center;
+  gap: .25rem;
+  min-width: 0;
+  min-height: 74px;
+  padding: .4rem .6rem;
+  border: 1px solid #bed8d7;
+  border-radius: 12px;
+  background: #f4fbfb;
+  color: #1c4156;
+  font: inherit;
+  font-size: .84rem;
+  font-weight: 800;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.robo-option:hover, .robo-option[data-active] {
+  border-color: #278b80;
+  background: #e3f6f2;
+}
+.robo-option:disabled { opacity: .55; cursor: default; }
+.robo-option:focus-visible, .robo-experiments summary:focus-visible {
+  outline: 3px solid #6850ba;
+  outline-offset: -3px;
+}
+.robo-specimen {
+  display: block;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: var(--sample);
+  box-shadow: inset 0 0 0 1px #24435e21, inset 0 -6px 8px #25314a21;
+}
+.robo-specimen[data-specimen=blue] { --sample: #3196ee; }
+.robo-specimen[data-specimen=yellow] { --sample: #ffc846; }
+.robo-specimen[data-specimen=green] { --sample: #4eb966; }
+.robo-specimen[data-specimen=orange] { --sample: #f88d42; }
+.robo-specimen[data-specimen=purple] { --sample: #9162d3; }
+.robo-specimen[data-specimen=iron] {
+  width: 38px;
+  height: 34px;
+  border-radius: 0;
+  clip-path: polygon(21% 65%, 7% 47%, 20% 34%, 27% 42%, 69% 4%, 89% 4%, 84% 25%, 45% 64%, 55% 75%, 42% 87%);
+  background: linear-gradient(140deg, #f0f5f9, #778899 65%, #b9c8d5);
+}
+.robo-specimen[data-specimen=wood] {
+  width: 37px;
+  height: 30px;
+  border-radius: 6px;
+  transform: rotate(-9deg);
+  background: repeating-linear-gradient(171deg, #dca276 0 4px, #bf855b 4px 6px, #deae88 6px 9px);
+}
+.robo-specimen[data-specimen=plastic] {
+  width: 35px;
+  height: 33px;
+  border-radius: 5px;
+  clip-path: polygon(0 0, 100% 0, 79% 100%, 21% 100%);
+  background: linear-gradient(90deg, #0e919d, #54d6d3 52%, #23b6ba);
+}
+.robo-paint-station {
+  width: min(100%, 370px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  justify-items: center;
+  gap: .65rem;
+  padding: .65rem;
+  border-radius: 12px;
+  background: #edf7fa;
+}
+.robo-beaker {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: clamp(65px, 21vw, 100px);
+  height: 108px;
+  border: 4px solid #87bac8;
+  border-top: 5px solid #add6df;
+  border-radius: 6px 6px 18px 18px;
+  background: #e4f7fc;
+  box-shadow: 0 5px 0 #cce4e9;
+}
+.robo-beaker::after {
+  content: '';
+  position: absolute;
+  inset: .65rem .8rem .85rem auto;
+  width: 7px;
+  border-radius: 8px;
+  background: #fffb;
+}
+.robo-liquid {
+  position: absolute;
+  inset: auto 0 0;
+  height: 0;
+  border-radius: 15% 15% 0 0 / 7px 7px 0 0;
+  transition: height .25s, background-color .25s;
+}
+.robo-beaker[data-fill=blue] .robo-liquid { height: 30%; background: #3196ee; }
+.robo-beaker[data-fill=yellow] .robo-liquid { height: 30%; background: #ffc846; }
+.robo-beaker[data-fill=both] .robo-liquid { height: 62%; background: linear-gradient(#ffc846 50%, #3196ee 50%); }
+.robo-beaker[data-fill=green] .robo-liquid {
+  height: 62%;
+  background: #4eb966;
+  animation: robo-mix .45s ease-out;
+}
+@keyframes robo-mix {
+  45% { transform: skewY(-9deg) scale(1.08); }
+}
+.robo-paint-supplies { display: grid; gap: .35rem; width: 100%; }
+.robo-add-paint { grid-template-columns: auto 1fr; min-height: 48px; }
+.robo-add-paint .robo-specimen { width: 28px; height: 28px; }
+.robo-magnet-station {
+  --magnet-position: 33.333%;
+  position: relative;
+  width: min(100%, 440px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .35rem;
+  padding-block-start: 70px;
+}
+.robo-magnet-station[data-magnet-track="0"] { --magnet-position: 0%; }
+.robo-magnet-station[data-magnet-track="2"] { --magnet-position: 66.667%; }
+.robo-moving-magnet {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: var(--magnet-position);
+  width: 33.333%;
+  display: grid;
+  place-items: center;
+  transition: inset-inline-start .27s ease-out;
+}
+.robo-magnet-piece { padding-inline: .3rem; min-height: 94px; overflow-wrap: anywhere; }
+.robo-magnet-piece[data-active][data-attracted=true] .robo-specimen {
+  transform: translateY(-.45rem);
+  transition: transform .22s;
+}
+.robo-magnet-outcome { color: #176560; min-height: 1em; }
+.robo-recap { border-radius: 12px; padding: .6rem; background: #e7f6f2; }
+@media (prefers-reduced-motion: reduce) {
+  .robo-liquid, .robo-moving-magnet, .robo-magnet-piece .robo-specimen {
+    animation: none;
+    transition: none;
+  }
+}

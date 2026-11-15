@@ -103,6 +103,103 @@ async function validateMaps(browser, language, width) {
   console.log('PASS', language, width, '20 games and 275 saved levels opened');
 }
 
+async function validateDriving(browser, language) {
+  const mobile = language === 'ar';
+  const page = await browser.newPage({viewport: {width: mobile ? 390 : 1280, height: 844}, hasTouch: mobile});
+  const prefix = mobile ? '' : '/en';
+  try {
+    await page.goto(origin + prefix + '/games/vowel-drive/');
+    await page.locator('.world-trail .game-level').first().click();
+    const road = page.locator('.drive-road');
+    const scene = page.locator('[data-drive-scene]');
+    const launch = page.locator('[data-drive-launch]');
+    const feedback = page.locator('[data-drive-feedback]');
+    const correct = await page.locator('.drive-gate[data-vowel="0"]').evaluate(gate =>
+      Array.from(gate.parentElement.children).indexOf(gate));
+    const wrong = correct === 0 ? 2 : 0;
+    const session = mobile ? await page.context().newCDPSession(page) : null;
+
+    async function drag(from, to) {
+      await road.scrollIntoViewIfNeeded();
+      const box = await road.boundingBox();
+      const x = lane => box.x + box.width * [.21, .5, .79][lane];
+      const y = box.y + box.height * .72;
+      if (session) {
+        await session.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: [{x: x(from), y, id: 1}]});
+        await session.send('Input.dispatchTouchEvent', {type: 'touchMove', touchPoints: [{x: x(to), y, id: 1}]});
+        await session.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
+      } else {
+        await page.mouse.move(x(from), y);
+        await page.mouse.down();
+        await page.mouse.move(x(to), y, {steps: 6});
+        await page.mouse.up();
+      }
+      await page.waitForFunction(lane => document.querySelector('[data-drive-scene]').dataset.lane === String(lane), to);
+      assert.equal(await scene.getAttribute('data-steering'), null);
+    }
+
+    await drag(1, wrong);
+    assert.equal(await feedback.getAttribute('data-state'), null);
+    await launch.click();
+    await page.locator('[data-drive-feedback][data-state="wrong"]').waitFor();
+    await drag(wrong, correct);
+    if (!mobile) {
+      await launch.focus();
+      const step = correct === 2 ? 'ArrowLeft' : 'ArrowRight';
+      await page.keyboard.press(step);
+      assert.notEqual(await scene.getAttribute('data-lane'), String(correct));
+      await page.keyboard.press(step === 'ArrowLeft' ? 'ArrowRight' : 'ArrowLeft');
+      assert.equal(await scene.getAttribute('data-lane'), String(correct));
+    }
+    await launch.click();
+    await page.locator('[data-drive-feedback][data-state="correct"]').waitFor();
+    assert(await launch.isDisabled());
+    await page.locator('[data-drive-next]').click();
+    assert.equal(await scene.getAttribute('data-lane'), '1');
+    assert(await launch.isEnabled());
+    console.log('PASS V6.1 driving', language, mobile ? 'touch' : 'mouse and keyboard');
+  } finally {
+    await page.close();
+  }
+}
+
+async function validateRobo(page, language) {
+  const prefix = language === 'ar' ? '' : '/en';
+  await page.goto(origin + prefix + '/games/robo-lab/');
+  const map = page.locator('[data-level-map]');
+  await map.waitFor({state: 'visible'});
+  await map.locator('.robo-experiments summary').click();
+  await page.locator('[data-robo-prediction="purple"]').click();
+  const mix = page.locator('[data-robo-mix]');
+  assert(await mix.isDisabled());
+  await page.locator('[data-robo-add="yellow"]').click();
+  assert(await mix.isDisabled());
+  await page.locator('[data-robo-add="blue"]').click();
+  await page.locator('.robo-beaker[data-fill="both"]').waitFor();
+  const nav = page.locator('.pwa-bottom-nav');
+  if (await nav.isVisible()) {
+    const [control, footer] = await Promise.all([mix.boundingBox(), nav.boundingBox()]);
+    assert(control.y + control.height <= footer.y, 'The Android navigation must not cover Mix');
+  }
+  await mix.click();
+  await page.locator('.robo-beaker[data-fill="green"]').waitFor();
+  assert.match(await page.locator('.robo-observation').textContent(), language === 'ar' ? /الأخضر/ : /green/);
+  const retry = page.locator('[data-robo-bench] .button-white');
+  await retry.click();
+  await page.locator('[data-robo-prediction="green"]').waitFor();
+
+  await page.locator('[data-robo-experiment="magnet"]').click();
+  await page.locator('[data-robo-prediction="wood"]').click();
+  for (const [id, attracted] of [['plastic', false], ['iron', true], ['wood', false]]) {
+    const piece = page.locator('[data-robo-material="' + id + '"]');
+    await piece.click();
+    assert.equal(await piece.getAttribute('data-attracted'), String(attracted));
+  }
+  await page.locator('.robo-recap').waitFor({state: 'visible'});
+  assert(await map.locator('.game-level').nth(1).isDisabled());
+  assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2));
+}
+
 async function validateOffline(browser) {
   const context = await browser.newContext({viewport: {width: 390, height: 844}});
   const page = await context.newPage();
@@ -138,8 +235,9 @@ async function validateOffline(browser) {
   assert(await page.locator('.game-progress').textContent().then(label => label.includes('الجولة 2')));
   await page.locator('.world-play-scenery').evaluate(image => image.decode());
   await page.screenshot({path: 'build/v6-screenshots/vowel-drive-offline.png'});
+  await validateRobo(page, 'ar');
   await context.close();
-  console.log('PASS offline play with packaged world artwork, sound dependencies and progress');
+  console.log('PASS offline game and both Robo experiments');
 }
 
 (async () => {
@@ -156,6 +254,17 @@ async function validateOffline(browser) {
     fs.mkdirSync('build/v6-screenshots', {recursive: true});
     browser = await chromium.launch({headless: true, executablePath: process.env.FUDOOL_CHROMIUM});
     for (const language of ['ar', 'en']) {
+      await validateDriving(browser, language);
+      const labPage = await browser.newPage({
+        viewport: {width: language === 'ar' ? 390 : 1280, height: 844},
+        userAgent: language === 'ar' ? 'Mozilla/5.0 Mobile FudoolAndroidUnified' : undefined,
+      });
+      try {
+        await validateRobo(labPage, language);
+        console.log('PASS V6.1 Robo experiments', language);
+      } finally {
+        await labPage.close();
+      }
       await validateHomeCovers(browser, language, 390);
       await validateHomeCovers(browser, language, 1298);
       await validateMaps(browser, language, 390);

@@ -9,10 +9,10 @@ mkdir -p build/v6-screenshots
 adb shell wm size 390x844
 adb shell wm density 160
 adb shell input keyevent 82
-adb install downloads/apps/Kokab-Fodool-V5.0.5.apk
+adb install downloads/apps/Kokab-Fodool-V6.0.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=60'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.0.0'
+adb shell dumpsys package "$package" | grep -F 'versionCode=61'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.1.0'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -26,28 +26,57 @@ import re
 import subprocess
 import sys
 import time
+import unicodedata
 import xml.etree.ElementTree as ET
 
 label, tap = sys.argv[1:]
-for attempt in range(12):
+def normalize(text):
+    return ''.join(c for c in unicodedata.normalize('NFKD', text) if not unicodedata.combining(c)).strip()
+
+needle = normalize(label)
+visible = []
+for attempt in range(15):
     dump = subprocess.run(['adb','shell','uiautomator','dump','/sdcard/fudool-ui.xml'], capture_output=True)
     if dump.returncode == 0:
         xml = subprocess.check_output(['adb','exec-out','cat','/sdcard/fudool-ui.xml'])
         if xml.startswith(b'<?xml'):
             root = ET.fromstring(xml)
+            candidates = []
+            visible = []
+            behind_navigation = False
             for node in root.iter('node'):
-                caption = node.get('text', '') + ' ' + node.get('content-desc', '')
-                if label not in caption:
-                    continue
                 x1,y1,x2,y2 = map(int,re.findall(r'\d+',node.get('bounds','')))
                 if x2 <= x1 or y2 <= y1:
                     continue
+                captions = [normalize(node.get(key, '')) for key in ('text', 'content-desc')]
+                visible.extend(text for text in captions if text)
+                exact = needle in captions
+                if not any(needle in text for text in captions):
+                    continue
+                clickable = node.get('clickable') == 'true'
+                if tap == 'yes' and not (exact or clickable):
+                    continue
+                center_y = (y1+y2)//2
+                if tap == 'yes' and label != 'الألعاب' and center_y >= 740:
+                    behind_navigation = True
+                    continue
+                priority = (not exact, not clickable)
+                point = (str((x1+x2)//2),str(center_y))
+                candidates.append((priority,point))
+            if candidates:
+                _, point = min(candidates)
                 if tap == 'yes':
-                    subprocess.run(['adb','shell','input','tap',str((x1+x2)//2),str((y1+y2)//2)],check=True)
+                    subprocess.run(['adb','shell','input','tap',*point],check=True)
+                print('Android UI:', label, 'tapped' if tap == 'yes' else 'visible', flush=True)
                 sys.exit(0)
-    if attempt in (4,8):
+            if behind_navigation:
+                subprocess.run(['adb','shell','input','swipe','193','690','193','490','280'],check=True)
+                time.sleep(.5)
+                continue
+    if attempt in (3,6,9,12):
         subprocess.run(['adb','shell','input','swipe','193','725','193','370','350'],check=True)
     time.sleep(1)
+print('Visible controls:', visible, flush=True)
 raise SystemExit('Offline Android view did not display: ' + label)
 PY
 }
@@ -56,5 +85,20 @@ find_label 'الألعاب' yes
 find_label 'سيارة الحركات' yes
 find_label 'من أ إلى ث' yes
 find_label 'الجولة 1' no
+find_label 'انطلق' no
 adb exec-out screencap -p > build/v6-screenshots/android-offline-drive.png
-echo 'PASS Android 6.0.0 upgraded from 5.0.5 and opened a game in airplane mode.'
+
+adb shell input keyevent KEYCODE_BACK
+sleep 1
+adb shell input swipe 193 225 193 720 300
+adb shell input swipe 193 225 193 720 300
+find_label 'التحديات' yes
+find_label 'مختبر روبو' yes
+find_label 'تجارب روبو' yes
+find_label 'البنفسجي' yes
+find_label 'أضف الأزرق' yes
+find_label 'أضف الأصفر' yes
+find_label 'اخلط' yes
+find_label 'ظهر اللون الأخضر' no
+adb exec-out screencap -p > build/v6-screenshots/android-offline-robo.png
+echo 'PASS Android 6.1.0 upgrades from 6.0.0 and opens V6.1 driving and paint controls in airplane mode.'
