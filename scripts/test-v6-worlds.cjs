@@ -12,6 +12,43 @@ const games = Object.fromEntries(fs.readdirSync('games', {withFileTypes: true})
     return [file.name, JSON.parse(data[1]).levels.length];
   }));
 
+async function validateHomeCovers(browser, language, width) {
+  const page = await browser.newPage({viewport: {width, height: 900}});
+  const prefix = language === 'ar' ? '' : '/en';
+  try {
+    await page.goto(origin + prefix + '/', {waitUntil: 'domcontentloaded'});
+    const covers = page.locator('#play .activity-card .fudool-world-cover');
+    await covers.first().waitFor({state: 'visible'});
+    assert.equal(await covers.count(), 20);
+    const cards = await covers.evaluateAll(async thumbnails => {
+      return Promise.all(thumbnails.map(async cover => {
+        const scene = cover.querySelector('.world-cover-scene');
+        const guide = cover.querySelector('.world-cover-guide');
+        for (const image of [scene, guide]) image.loading = 'eager';
+        await Promise.all([scene.decode(), guide.decode()]);
+        const bounds = cover.getBoundingClientRect();
+        const badge = guide.getBoundingClientRect();
+        const card = cover.closest('.activity-card');
+        const style = getComputedStyle(card);
+        const innerWidth = card.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        const fitted = Math.abs(bounds.width - innerWidth) < 2 &&
+          Math.abs(bounds.width - bounds.height * 1.5) < 2 &&
+          getComputedStyle(scene).objectFit === 'cover';
+        const placed = getComputedStyle(guide).position === 'absolute' &&
+          badge.left >= bounds.left && badge.right <= bounds.right &&
+          badge.top >= bounds.top && badge.bottom <= bounds.bottom &&
+          badge.width <= bounds.width * .25;
+        return {id: card.dataset.gameId, fitted, placed};
+      }));
+    });
+    assert.deepEqual(cards.filter(card => !card.fitted || !card.placed), [], 'Home covers ' + language + ' ' + width);
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2));
+    console.log('PASS home thumbnails', language, width, '20 full-width covers with inset character badges');
+  } finally {
+    await page.close();
+  }
+}
+
 async function validateMaps(browser, language, width) {
   const page = await browser.newPage({viewport: {width, height: 844}});
   const errors = [];
@@ -117,6 +154,8 @@ async function validateOffline(browser) {
     fs.mkdirSync('build/v6-screenshots', {recursive: true});
     browser = await chromium.launch({headless: true, executablePath: process.env.FUDOOL_CHROMIUM});
     for (const language of ['ar', 'en']) {
+      await validateHomeCovers(browser, language, 390);
+      await validateHomeCovers(browser, language, 1298);
       await validateMaps(browser, language, 390);
       await validateMaps(browser, language, 1280);
     }
