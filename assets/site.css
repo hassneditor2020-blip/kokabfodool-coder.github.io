@@ -638,3 +638,15 @@ ul, ol { margin: 0; }
 .premium-game-page .game-shell:has(.game-board:not([hidden]):not(.game-levels):not(.game-result)) .premium-game-heading{grid-template-columns:minmax(0,1fr) 90px;padding:10px 12px;margin-bottom:10px}.premium-game-page .game-shell:has(.game-board:not([hidden]):not(.game-levels):not(.game-result)) .premium-game-heading p{display:none}.premium-game-page .game-shell:has(.game-board:not([hidden]):not(.game-levels):not(.game-result)) .premium-game-heading h1{font-size:clamp(1.15rem,4vw,1.55rem)}
 .pwa-native .premium-game-page .site-head,.pwa-native .premium-game-page .crumbs,.pwa-native .premium-game-page .site-foot{display:none}.pwa-native .premium-game-page .game-shell{padding-top:12px}
 @media(max-width:620px){.premium-game-heading{border-radius:21px;grid-template-columns:minmax(0,1fr) minmax(92px,36%);padding:10px;gap:10px}.premium-game-page .game-board{border-radius:22px;padding:12px 9px}.premium-library-page .premium-library-card{border-radius:19px;padding:6px}.premium-game-cover{border-radius:14px}.premium-game-page .game-option,.premium-game-page .match-card{border-radius:14px}}@media(prefers-reduced-motion:reduce){.premium-game-page .game-option,.premium-game-page .match-card{transition:none;transform:none}}
+
+
+/* V6 Fudool Worlds — shared game presentation, offline-safe. */
+.game-board .fudool-art{filter:drop-shadow(0 5px 4px #38215f24);transition:filter .18s ease,transform .18s ease}
+.game-board .game-option:hover .fudool-art,.match-card:hover .fudool-art{transform:scale(1.06);filter:drop-shadow(0 7px 5px #38215f35)}
+.game-board .game-option[data-state=correct] .fudool-art{animation:fudool-v6-pop .38s ease-out}
+@keyframes fudool-v6-pop{0%,100%{transform:scale(1)}45%{transform:scale(1.13)}}
+.premium-game-page .game-board{background:radial-gradient(ellipse at 10% 0%,var(--tone,#eee4ff),transparent 55%),linear-gradient(155deg,#fff,#faf8ff);border:1px solid #e4d9f5;box-shadow:0 6px 0 #e0d5ef,0 18px 38px #49317b16}
+.premium-library-card .premium-game-cover{box-shadow:inset 0 0 0 1px #ffffff80,0 6px 14px #39205e24}
+.premium-game-page .game-result{background:radial-gradient(ellipse at 50% 0%,#fff0bd,transparent 65%),#fff}
+.premium-game-page .game-result-stars{filter:drop-shadow(0 3px 2px #d6a13a44)}
+@media(prefers-reduced-motion:reduce){.game-board .fudool-art{transition:none;animation:none!important;transform:none!important}}
