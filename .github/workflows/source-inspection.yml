@@ -10,21 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Inspect data access and original speech segments
+      - name: Read dataset letter mapping and inspect audio boundaries
         run: |
+          python3 -m pip install -q imageio-ffmpeg remotezip
           python3 - <<'PY'
-          import requests
-          for u in [
-            'https://data.mendeley.com/public-api/datasets/r5fy2dd98g/files?folder_id=root&version=1',
-            'https://data.mendeley.com/public-api/datasets/r5fy2dd98g',
-            'https://www.kaggle.com/api/v1/datasets/view/amnaasif/arabic-short-vowels-audio-dataset',
-            'https://api.datacite.org/dois/10.17632/r5fy2dd98g.1'
-          ]:
-            try:
-              r=requests.get(u,timeout=20);print(u,r.status_code,r.text[:11000])
-            except Exception as e:print(u,type(e).__name__,str(e)[:500])
+          import requests,subprocess,imageio_ffmpeg
+          from remotezip import RemoteZip
+          base='https://data.mendeley.com/public-files/datasets/r5fy2dd98g/files/'
+          for key in ['b5681e28-6cde-4c62-b7d4-02e9b729481a','d79b16bb-5e6f-4be0-b761-c7de35fe9a95','81d29db4-0db2-4dd1-a96e-0ba9b419edfa']:
+              r=requests.get(base+key+'/file_downloaded',timeout=25);r.raise_for_status();print(key,r.text[:4500])
+          url=base+'bc20baae-7152-439a-a56a-73699fa23381/file_downloaded'
+          try:
+              with RemoteZip(url) as z:
+                  print('ZIP',len(z.namelist()),z.namelist()[:20])
+          except Exception as e: print('ZIP ERROR',repr(e))
+          ff=imageio_ffmpeg.get_ffmpeg_exe()
+          for i in [8,11,12,14,22,23,25,35,36,38,52,53,58,70,74,75,80,83]:
+              p=subprocess.run([ff,'-hide_banner','-i',f'assets/vowel-drive-audio-v3/{i}.mp3','-af','silencedetect=noise=-35dB:d=0.18','-f','null','-'],capture_output=True,text=True)
+              print('CLIP',i,p.returncode,' | '.join(l.strip() for l in p.stderr.splitlines() if 'Duration:' in l or 'silence_start' in l or 'silence_end' in l))
           PY
-          for i in 8 11 12 14 22 23 25 35 36 38 52 53 58 70 74 75 80 83; do
-            echo "CLIP $i"
-            ffmpeg -hide_banner -i assets/vowel-drive-audio-v3/$i.mp3 -af silencedetect=noise=-35dB:d=0.18 -f null - 2>&1 | grep -E 'Duration:|silence_start|silence_end'
-          done
