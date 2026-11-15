@@ -17,7 +17,7 @@ permissions:
   contents: read
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +30,7 @@ jobs:
           python3 scripts/verify-v5.py
           node --check assets/app-v5.js
           bash -n scripts/build-android.sh
+      - uses: android-actions/setup-android@v3
       - name: Android SDK
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Prepare signing key
