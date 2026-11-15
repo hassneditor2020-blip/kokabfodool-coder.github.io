@@ -6,15 +6,25 @@ PLATFORM="$(find "$SDK/platforms" -name android.jar | sort -V | tail -1)"
 test -x "$BT/aapt2" && test -f "$PLATFORM"
 echo "SDK $BT $PLATFORM"
 mkdir -p /tmp/fudool-apk downloads/apps
-# Initial test release uses a temporary signing key. Never commit the private key.
-keytool -genkeypair -keystore /tmp/fudool-apk/signing.jks -storepass android -keypass android -alias fudool-preview -keyalg RSA -keysize 2048 -validity 3650 -dname "CN=Kawkab Fudool Preview" >/dev/null 2>&1
+# Require the original signing key; never generate a replacement during an upgrade.
+: "${FUDOOL_KEYSTORE:?Original signing keystore required}"
+: "${FUDOOL_KEY_ALIAS:?Original key alias required}"
+: "${FUDOOL_STORE_PASSWORD:?Signing store password required}"
+: "${FUDOOL_KEY_PASSWORD:?Signing key password required}"
+: "${FUDOOL_CERT_SHA256:?Original published certificate SHA-256 required}"
+test -f "$FUDOOL_KEYSTORE"
+for mode in online offline; do
+  cert=$("$BT/apksigner" verify --print-certs "downloads/apps/kawkab-fudool-$mode.apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
+  test -n "$cert" && test "${cert,,}" = "${FUDOOL_CERT_SHA256,,}" || { echo "Original APK certificate mismatch: $mode" >&2; exit 1; }
+done
+export FUDOOL_STORE_PASSWORD FUDOOL_KEY_PASSWORD
 for mode in online offline; do
   W="/tmp/fudool-apk/$mode";mkdir -p "$W/res/drawable" "$W/classes" "$W/dex" "$W/assets"
   cp assets/app-icon-512.png "$W/res/drawable/app_icon.png"
   permission="";label="كوكب فضول أونلاين"
   if [ "$mode" = online ]; then permission='<uses-permission android:name="android.permission.INTERNET"/>'; else label="كوكب فضول بدون نت"; fi
   cat > "$W/AndroidManifest.xml" <<EOF
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.$mode" android:versionCode="41" android:versionName="4.1">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.$mode" android:versionCode="50" android:versionName="5.0">
 <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="32"/>
 $permission
 <application android:label="$label" android:icon="@drawable/app_icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:usesCleartextTraffic="false">
@@ -41,8 +51,10 @@ PY
   "$BT/d8" --lib "$PLATFORM" --min-api 23 --output "$W/dex" $(find "$W/classes" -name '*.class')
   (cd "$W/dex"; zip -q "$W/base.apk" classes.dex)
   "$BT/zipalign" -f 4 "$W/base.apk" "$W/aligned.apk"
-  "$BT/apksigner" sign --ks /tmp/fudool-apk/signing.jks --ks-key-alias fudool-preview --ks-pass pass:android --key-pass pass:android --out "downloads/apps/kawkab-fudool-$mode.apk" "$W/aligned.apk"
+  "$BT/apksigner" sign --ks "$FUDOOL_KEYSTORE" --ks-key-alias "$FUDOOL_KEY_ALIAS" --ks-pass env:FUDOOL_STORE_PASSWORD --key-pass env:FUDOOL_KEY_PASSWORD --out "downloads/apps/kawkab-fudool-$mode.apk" "$W/aligned.apk"
   "$BT/apksigner" verify --verbose --print-certs "downloads/apps/kawkab-fudool-$mode.apk"
+  cert=$("$BT/apksigner" verify --print-certs "downloads/apps/kawkab-fudool-$mode.apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
+  test "${cert,,}" = "${FUDOOL_CERT_SHA256,,}" || { echo "New APK certificate mismatch: $mode" >&2; exit 1; }
   "$BT/aapt" dump badging "downloads/apps/kawkab-fudool-$mode.apk" | head -8 || true
 done
 python3 - <<'PY'
