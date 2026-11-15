@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:?Android SDK missing}}"
-BT="$(find "$SDK/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
-PLATFORM="$(find "$SDK/platforms" -name android.jar | sort -V | tail -1)"
+BT="${FUDOOL_BUILD_TOOLS:-$SDK/build-tools/35.0.0}"
+PLATFORM="${FUDOOL_PLATFORM_JAR:-$SDK/platforms/android-35/android.jar}"
 test -x "$BT/aapt2" && test -f "$PLATFORM"
 echo "SDK $BT $PLATFORM"
 WORK="$(mktemp -d)"
@@ -63,6 +63,7 @@ PY
   cert=$("$BT/apksigner" verify --print-certs "$OUT/kawkab-fudool-$mode.apk" | sed -nE 's/^(Signer #[0-9]+|V[0-9.]+ Signer):? certificate SHA-256 digest: //p' | sed -n '1p')
   test -n "$cert"
   test -z "${FUDOOL_CERT_SHA256:-}" || test "${cert,,}" = "${FUDOOL_CERT_SHA256,,}" || { echo "New APK certificate mismatch: $mode" >&2; exit 1; }
+  printf "%s\n" "$cert" > "$OUT/$mode-certificate.txt"
   "$BT/aapt" dump badging "$OUT/kawkab-fudool-$mode.apk" | head -8 || true
 done
 python3 - "$OUT" <<'PY'
@@ -79,7 +80,8 @@ for mode in ['online','offline']:
    assert 'assets/site/assets/real-sounds/sheep.mp3' in names
    assert 'assets/site/assets/app-learning-v5.json' in names
    assert len([n for n in names if n.startswith('assets/site/')])>=780
- out[mode]={'file':f.name,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()}
+ out[mode]={'file':f.name,'version':'5.0','versionCode':50,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'certificate_sha256':(p/f'{mode}-certificate.txt').read_text().strip()}
+assert out['online']['certificate_sha256']==out['offline']['certificate_sha256']
 (p/'release.json').write_text(json.dumps(out,indent=2)+'\n')
 print(out)
 PY
