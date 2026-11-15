@@ -76,9 +76,22 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    assert.equal(await page.locator('[data-release-mode="unified"]').count(),1);
    assert.equal(await page.locator('[data-release-mode="offline"], [data-release-mode="online"]').count(),0);
    await page.goto(origin+prefix+'/episodes/',{waitUntil:'networkidle'});
-   const coverCheck=async selector=>await page.locator(selector).evaluateAll(async imgs=>Promise.all(imgs.map(async im=>{im.loading='eager';try{await im.decode()}catch{}return {src:im.getAttribute('src'),ok:im.naturalWidth>0&&im.naturalHeight>0,fit:getComputedStyle(im).objectFit}})));
+   const coverCheck=async selector=>page.locator(selector).evaluateAll(imgs=>Promise.all(imgs.map(async image=>{
+    image.loading='eager';
+    try{await image.decode()}catch{}
+    return {
+     src:image.getAttribute('src'),
+     route:image.closest('.episode-card')?.querySelector('a')?.getAttribute('href'),
+     ok:image.naturalWidth>0&&image.naturalHeight>0,
+     fit:getComputedStyle(image).objectFit,
+    };
+   })));
    const webCovers=await coverCheck('.episode-card .episode-art img');
-   assert(webCovers.length>=54);assert(webCovers.every(x=>x.ok),JSON.stringify(webCovers.filter(x=>!x.ok)));
+   const episodes=catalog.series.flatMap(group=>group[lang].episodes);
+   assert.equal(webCovers.length,episodes.length);
+   assert(webCovers.every(cover=>cover.ok),JSON.stringify(webCovers.filter(cover=>!cover.ok)));
+   assert.deepEqual(Object.fromEntries(webCovers.map(cover=>[cover.route,cover.src])),
+    Object.fromEntries(episodes.map(episode=>[episode.route,episode.image])));
    assert(await page.locator('#english-number-episodes').count());
    await page.goto(origin+prefix+'/play-app/',{waitUntil:'networkidle'});
    for(const group of catalog.series){
@@ -87,7 +100,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
     await cards.first().waitFor();
     await page.waitForFunction(n=>document.querySelectorAll('#v5-series-detail .v5-detail-grid .v5-episode').length===n,group[lang].episodes.length);
     const covers=await coverCheck('#v5-series-detail .v5-detail-grid .v5-episode-art img');
-    assert.equal(covers.length,group[lang].episodes.length);
+    assert.deepEqual(covers.map(cover=>cover.src),group[lang].episodes.map(episode=>episode.image));
     assert(covers.every(x=>x.ok&&x.fit==='contain'),JSON.stringify(covers.filter(x=>!x.ok||x.fit!=='contain')));
    }
    await page.evaluate(()=>location.hash='v5-series-english-numbers');

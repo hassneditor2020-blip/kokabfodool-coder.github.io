@@ -9,10 +9,10 @@ mkdir -p build/v6-screenshots
 adb shell wm size 390x844
 adb shell wm density 160
 adb shell input keyevent 82
-adb install downloads/apps/Kokab-Fodool-V6.1.apk
+adb install downloads/apps/Kokab-Fodool-V6.2.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=62'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.2.0'
+adb shell dumpsys package "$package" | grep -F 'versionCode=63'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.2.1'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -107,4 +107,4 @@ find_label 'أضف الأصفر' yes
 find_label 'اخلط' yes
 find_label 'ظهر اللون الأخضر' no
 adb exec-out screencap -p > build/v6-screenshots/android-offline-robo.png
-echo 'PASS Android 6.2.0 upgrades from 6.1.0, starts the Vowel Drive challenge at level 11 and keeps Robo Lab on its own path in airplane mode.'
+echo 'PASS Android 6.2.1 upgrades from 6.2.0, starts the Vowel Drive challenge at level 11 and keeps Robo Lab on its own path in airplane mode.'
