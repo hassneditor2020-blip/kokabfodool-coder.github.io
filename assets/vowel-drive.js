@@ -1,4 +1,4 @@
-import {approvedClips} from './vowel-audio-review.js?v=2';
+import {driveAudioSource,repairedPartialClips} from './vowel-audio-routing.js?v=2';
 import {pronunciation} from './arabic-pronunciation.js?v=1';
 import {bindJourney, shuffle,totalStars} from './game-progress.js?v=8';
 
@@ -43,7 +43,7 @@ function stopAudio() {
   audio.currentTime=0;
 }
 
-function isApproved(round){return round.vowel!==3&&approvedClips.has(round.audio)}
+function isApproved(round){return round.vowel!==3&&!!driveAudioSource(round.audio)}
 function showVisual(round){
   const base=round.letter==='أ'&&round.vowel===1?'إ':round.letter;
   const parts=round.example.match(/[^\p{Mark}]\p{Mark}*|\p{Mark}+/gu)||[round.example];
@@ -57,7 +57,7 @@ async function hear(){
   if(!target||answered||board.hidden||!isApproved(target))return;
   const request=++playback;
   listenLabel.textContent=tr('جارٍ التحميل…','Loading…');
-  const source='/assets/vowel-drive-audio-v3/'+target.audio+'.mp3';
+  const source=driveAudioSource(target.audio);
   if(audio.getAttribute('src')!==source)audio.src=source;
   audio.currentTime=0;
   try{await audio.play();if(request!==playback)return;listenLabel.textContent=tr('أعد الاستماع','Listen again');adult.open=false;}
@@ -115,14 +115,14 @@ function renderRound(round) {
   drawRoute();
   delete feedback.dataset.state;
   listen.disabled = !isApproved(round);
-  listenLabel.textContent=isApproved(round)?tr('اسمع الحرف وحركته','Listen to the letter and vowel'):round.vowel===3?tr('تحدٍّ بصري: السكون','Visual challenge: sukūn'):tr('تدريب بصري — التسجيل يحتاج تصحيحًا','Visual practice — recording needs correction');
+  listenLabel.textContent=isApproved(round)?(repairedPartialClips.has(round.audio)?tr('اسمع الحرف وحركته واقرأ المثال','Listen to the sound and read the example'):tr('اسمع الحرف وحركته','Listen to the letter and vowel')):round.vowel===3?tr('تحدٍّ بصري: السكون','Visual challenge: sukūn'):tr('تدريب بصري — التسجيل يحتاج تصحيحًا','Visual practice — recording needs correction');
   adult.open = false;
   adult.hidden = false;
   adultCue.textContent=pronunciation(round.letter,round.vowel,round.example);
   next.hidden = true;
   feedback.textContent = '';
   drivePrompt.textContent=tr('اسمع واختر الباب','Listen and choose the gate');
-  if(!isApproved(round)||(round.mode&&round.mode!=='audio'))showVisual(round);
+  if(!isApproved(round)||repairedPartialClips.has(round.audio)||(round.mode&&round.mode!=='audio'))showVisual(round);
   gates.replaceChildren(...shuffle(round.vowel===3?[0,1,3]:[0, 1, 2]).map((vowel, lane) => {
     const button = document.createElement('button');
     button.type = 'button';

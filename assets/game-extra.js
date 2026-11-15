@@ -1,4 +1,5 @@
-import {approvedClips,vowelClipId} from './vowel-audio-review.js?v=2';
+import {vowelClipId} from './vowel-audio-review.js?v=2';
+import {sharedAudioSource} from './vowel-audio-routing.js?v=2';
 import {drawGuide,evaluateTrace} from './trace-assessment.js?v=1';
 import {illustrate} from './learning-art.js?v=1';
 import {shuffle} from './game-progress.js?v=8';
@@ -8,7 +9,7 @@ const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textConten
 let voiceToken=0, toneContext, recording;
 const activeTones=new Set();
 export function stopSpeech(){voiceToken++;recording?.pause();for(const tone of activeTones){try{tone.stop();}catch{}}activeTones.clear();if('speechSynthesis' in window)window.speechSynthesis.cancel();}
-export async function playRecording(src,fallback){stopSpeech();const clipId=vowelClipId(src);if(clipId!==null&&!approvedClips.has(clipId)){fallback?.();return false;}const token=voiceToken;recording??=new Audio();recording.src=src;try{await recording.play();return true;}catch{if(token===voiceToken)fallback?.();return false;}}
+export async function playRecording(src,fallback){stopSpeech();src=sharedAudioSource(src);if(!src){fallback?.();return false;}const token=voiceToken;recording??=new Audio();recording.src=src;try{await recording.play();return true;}catch{if(token===voiceToken)fallback?.();return false;}}
 export function speak(text,lang='ar',fallback){
   stopSpeech();const token=voiceToken;
   if(!('speechSynthesis' in window)){fallback?.();return false;}
