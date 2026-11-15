@@ -13,13 +13,15 @@ if(root){
  '6-7':['🚀','المستكشف الذكي','Smart explorer','الحركات والقراءة والكتابة والحساب التدريجي.','Vowels, reading, writing and early arithmetic.'],
  '8-10':['🏆','بطل الكوكب','Planet champion','الكلمات والحساب والعلوم والذاكرة والتحديات المتقدمة.','Words, arithmetic, science, memory and advanced challenges.']
  };
- const preference='fudool-age-journey-v1';
+ const chosen=(()=>{try{return localStorage.getItem('fudool-active-profile-v1')}catch{return null}})(),profile=(read('fudool-profiles-v1')||[]).find?.(p=>p.id===chosen),profileId=profile?.id||'default';
+ const preference=profileId==='default'?'fudool-age-journey-v1':'fudool-profile-v1:'+profileId+':age';
+ const gamePrefix=profileId==='default'?'fudool-games-v1:':'fudool-profile-v1:'+profileId+':game:';
  function read(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}}
  function saveAge(v){try{localStorage.setItem(preference,JSON.stringify(v))}catch{}}
- function scores(id){const current=read('fudool-games-v1:'+id)?.scores??[], legacy=read('kokab-games-v2')?.[id]??{};return Array.from({length:ranges['8-10'][ids.indexOf(id)][1]},(_,i)=>Math.max(...[current[i],legacy[i],0].filter(v=>Number.isInteger(v)&&v>=0&&v<=3)))}
+ function scores(id){const current=read(gamePrefix+id)?.scores??[], legacy=profileId==='default'?(read('kokab-games-v2')?.[id]??{}):{};return Array.from({length:ranges['8-10'][ids.indexOf(id)][1]},(_,i)=>Math.max(...[current[i],legacy[i],0].filter(v=>Number.isInteger(v)&&v>=0&&v<=3)))}
  const all=[...document.querySelectorAll('.fudool-world')], cards=new Map([...document.querySelectorAll('.fudool-world [data-game-id]')].map(c=>[c.dataset.gameId,c]));
  const tabs=root.querySelector('[data-age-tabs]'), panel=root.querySelector('[data-age-panel]');
- let selected=new URLSearchParams(location.search).get('age')||read(preference)||'all';
+ let selected=new URLSearchParams(location.search).get('age')||read(preference)||profile?.age||'all';
  if(selected!=='all'&&!ranges[selected])selected='all';
  function node(tag,txt,cls){const el=document.createElement(tag);if(txt)el.textContent=txt;if(cls)el.className=cls;return el}
  function link(c,level,label){const a=node('a',label,'button age-journey-link');const url=new URL(c.href);url.searchParams.set('level',String(level));a.href=url.href;return a}
