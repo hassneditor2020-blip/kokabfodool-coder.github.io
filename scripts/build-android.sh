@@ -31,7 +31,7 @@ for mode in online offline; do
   permission="";label="كوكب فضول أونلاين"
   if [ "$mode" = online ]; then permission='<uses-permission android:name="android.permission.INTERNET"/>'; else label="كوكب فضول بدون نت"; fi
   cat > "$W/AndroidManifest.xml" <<EOF
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.$mode" android:versionCode="51" android:versionName="5.0.1">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.$mode" android:versionCode="52" android:versionName="5.0.2">
 <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="32"/>
 $permission
 <application android:label="$label" android:icon="@drawable/app_icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:usesCleartextTraffic="false">
@@ -80,7 +80,7 @@ for mode in ['online','offline']:
    assert 'assets/site/assets/real-sounds/sheep.mp3' in names
    assert 'assets/site/assets/app-learning-v5.json' in names
    assert len([n for n in names if n.startswith('assets/site/')])>=780
- out[mode]={'file':f.name,'version':'5.0.1','versionCode':51,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'certificate_sha256':(p/f'{mode}-certificate.txt').read_text().strip()}
+ out[mode]={'file':f.name,'version':'5.0.2','versionCode':52,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'certificate_sha256':(p/f'{mode}-certificate.txt').read_text().strip()}
 assert out['online']['certificate_sha256']==out['offline']['certificate_sha256']
 (p/'release.json').write_text(json.dumps(out,indent=2)+'\n')
 print(out)

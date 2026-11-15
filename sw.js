@@ -1,5 +1,5 @@
 /* Kawkab Fudool PWA. Offline packs are opt-in, complete and kept separate from the live site. */
-const SHELL='fudool-shell-v5-platform',PACK='fudool-offline-',META='fudool-offline-meta-v1',MARK='/__fudool_pack__';
+const SHELL='fudool-shell-v5-0-2',PACK='fudool-offline-',META='fudool-offline-meta-v1',MARK='/__fudool_pack__';
 const CORE=['/assets/app-learning-v5.json','/assets/arabic-letters-kit-cover.webp','/assets/app-v5.css','/assets/app-v5.js','/assets/hero.webp','/assets/letters.webp','/assets/numbers.webp','/assets/english-round.webp','/assets/robo.webp','/assets/guess.webp','/assets/what-if-cover.webp','/assets/stories-round.webp','/assets/episode-ghayn-cloud.webp','/assets/episode-little-umbrella.webp','/assets/cover-one-apple.webp','/assets/cover-ayn-honey.webp','/offline/','/en/offline/','/app/','/en/app/','/play-app/','/en/play-app/','/app/family/','/en/app/family/','/assets/app-experience.js','/assets/app-experience.css','/assets/profile-state.js','/assets/learning-art.svg','/assets/brand.webp','/assets/lumaa.webp','/assets/robot.webp','/assets/mishal.webp','/assets/site.css','/assets/pwa.css','/assets/pwa.js','/assets/app-icon-192.png','/assets/app-icon-512.png','/manifest.webmanifest'];
 let job=null;
 self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));

@@ -14,6 +14,8 @@ for url in paths:
 assert len(paths)==len(pack['files'])
 catalog=json.loads((root/'assets/app-learning-v5.json').read_text())
 assert len(catalog['series'])==8
+assert '/assets/english-numbers-badge.webp' in paths
+assert all(any(e.get('category')=='numbers' for e in next(g for g in catalog['series'] if g['id']=='english-fun')[lang]['episodes']) for lang in ('ar','en'))
 for lang,prefix in [('ar',''),('en','en/')]:
     pages=list((root/(prefix+'games')).glob('*/index.html'))
     assert len(pages)==20,(lang,len(pages))

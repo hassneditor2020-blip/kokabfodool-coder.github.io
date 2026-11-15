@@ -9,11 +9,11 @@ data=json.loads((src/'release.json').read_text())
 for mode in ('online','offline'):
     row=data[mode]
     path=src/row['file']
-    assert row['version']=='5.0.1' and row['versionCode']==51
+    assert row['version']=='5.0.2' and row['versionCode']==52
     assert row['certificate_sha256']==fingerprint, 'Refuse preview or unknown certificate'
     assert path.stat().st_size==row['bytes']
     assert hashlib.sha256(path.read_bytes()).hexdigest()==row['sha256']
-    name='Kokab-Fodool-V5.0.1-'+mode.title()+'.apk'
+    name='Kokab-Fodool-V5.0.2-'+mode.title()+'.apk'
     shutil.copyfile(path,dst/name)
     shutil.copyfile(path,dst/('kawkab-fudool-'+mode+'.apk'))
     idsig=Path(str(path)+'.idsig')

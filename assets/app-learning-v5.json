@@ -283,7 +283,8 @@
           {
             "route": "/series/english-fun/one-apple/",
             "image": "/assets/cover-one-apple.webp",
-            "title": "الرقم 1 بالإنجليزية مع لُمعة"
+            "title": "الرقم 1 بالإنجليزية مع لُمعة",
+            "category": "numbers"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLU6piO0KbPBw"
@@ -293,7 +294,8 @@
           {
             "route": "/en/series/english-fun/one-apple/",
             "image": "/assets/cover-one-apple.webp",
-            "title": "Number 1 in English with Lumaa"
+            "title": "Number 1 in English with Lumaa",
+            "category": "numbers"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLU6piO0KbPBw"
