@@ -1,23 +1,13 @@
-name: V5 Android preflight and build
+name: Fudool Worlds V6 Android and browser verification
 on:
   push:
-    branches: [v5-education-platform]
-    paths:
-      - '.github/workflows/android-v5.yml'
-      - 'android-app/**'
-      - 'scripts/build-android.sh'
-      - 'scripts/verify-v5.py'
-      - 'scripts/stage-v5-release.py'
-      - 'scripts/test-v5-browser.cjs'
-      - 'app/index.html'
-      - 'en/app/index.html'
-      - 'assets/app-release-info.js'
-      - 'assets/app-v5.*'
-      - 'assets/app-learning-v5.json'
-      - 'play-app/**'
-      - 'en/play-app/**'
-      - 'offline-pack.json'
+    branches: [development/fudool-worlds-v6]
+    paths-ignore:
+      - 'downloads/apps/**'
   workflow_dispatch:
+concurrency:
+  group: fudool-worlds-android-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -73,19 +63,19 @@ jobs:
             echo "FUDOOL_KEY_PASSWORD=$RELEASE_PASS" >> "$GITHUB_ENV"
             echo "kind=release" >> "$GITHUB_OUTPUT"
           else
-            echo 'Release signing secret is required for official V5.0 publication.' >&2
+            echo 'Original release signing secret is required.' >&2
             exit 1
           fi
           chmod 600 "$KEY"
           echo "FUDOOL_KEYSTORE=$KEY" >> "$GITHUB_ENV"
-          echo "FUDOOL_ALLOW_NEW_KEY=1" >> "$GITHUB_ENV"
-      - name: Build both APK editions
+          echo "FUDOOL_CERT_SHA256=ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729" >> "$GITHUB_ENV"
+      - name: Build the signed unified APK
         run: bash scripts/build-android.sh
       - name: Upload APKs and checksums (not website deployment)
         uses: actions/upload-artifact@v4
         with:
-          name: Kokab-Fodool-V5.0-${{ steps.signing.outputs.kind }}
-          path: build/android-v5/
+          name: Kokab-Fodool-V6.0-${{ steps.signing.outputs.kind }}
+          path: build/android-v6/
           if-no-files-found: error
           retention-days: 14
       - name: Remove signing key
@@ -93,10 +83,10 @@ jobs:
         run: rm -f "$RUNNER_TEMP/fudool-signing.jks"
 
   stage:
-    if: needs.build.outputs.kind == 'release' && github.ref_name == 'v5-education-platform'
+    if: needs.build.outputs.kind == 'release' && github.ref_name == 'development/fudool-worlds-v6'
     needs: build
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     permissions:
       contents: write
       actions: read
@@ -108,11 +98,22 @@ jobs:
       - run: npm install --no-save --no-package-lock playwright
       - run: npx playwright install --with-deps chromium
       - run: node scripts/test-v5-browser.cjs
+      - run: node scripts/test-v6-worlds.cjs
       - uses: actions/download-artifact@v4
         with:
-          name: Kokab-Fodool-V5.0-release
-          path: build/android-v5/
-      - name: Stage verified APKs for the release PR
+          name: Kokab-Fodool-V6.0-release
+          path: build/android-v6/
+      - name: Enable emulator hardware acceleration
+        run: sudo chmod a+rw /dev/kvm
+      - name: Verify Android upgrade and offline game launch
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: bash scripts/test-v6-android.sh
+      - name: Stage the verified APK for the release PR
         run: |
           python3 scripts/stage-v5-release.py
           python3 scripts/verify-v5.py
@@ -120,12 +121,14 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add downloads/apps/
           git diff --cached --quiet && exit 0
-          git commit -m "Stage signed Kokab Fodool V5.0 Android release"
-          git push origin HEAD:refs/heads/v5-education-platform
+          git commit -m "Stage signed Kokab Fodool V6.0 Android release"
+          git push origin HEAD:refs/heads/development/fudool-worlds-v6
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: V5-release-visual-screenshots
-          path: build/v5-screenshots/
+          name: V6-release-visual-screenshots
+          path: |
+            build/v5-screenshots/
+            build/v6-screenshots/
           if-no-files-found: ignore
           retention-days: 14

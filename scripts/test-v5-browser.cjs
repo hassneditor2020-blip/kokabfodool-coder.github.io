@@ -9,7 +9,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  let browser;
  try {
   for(let i=0;i<20;i++){try{await fetch(origin);break}catch{await sleep(250)}}
-  browser=await chromium.launch({headless:true});
+  browser=await chromium.launch({headless:true, executablePath:process.env.FUDOOL_CHROMIUM});
   fs.mkdirSync('build/v5-screenshots',{recursive:true});
   for(const lang of ['ar','en']) for(const width of [320,390,768,1280]){
    const page=await browser.newPage({viewport:{width,height:844}});
@@ -19,7 +19,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    const fit=async()=>assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'horizontal overflow '+lang+' '+width);
    await visible('home');await fit();
    assert.equal(await page.locator('.v5-cast-grid .v5-mascot-art').count(),3);
-   assert.equal(await page.locator('.v5-featured-scene svg use').count(),3);
+   assert.equal(await page.locator('.v5-featured-scene .world-cover-scene').count(),3);
    assert.equal(await page.locator('.v5-nav use[href*="fudool-premium-art.svg"]').count(),5);
    assert((await page.locator('.v5-nav a[aria-current="page"]').count())===1);
    assert.equal(await page.locator('.v5-daily use[href*="fudool-premium-art.svg#crown"]').count(),1);
@@ -32,7 +32,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    assert.equal(await page.locator('#v5-series-detail .v5-detail-grid .v5-episode').count(),19);
    await page.locator('.v5-nav a[href="#v5-games"]').click();await visible('games');await fit();
    assert.equal(await page.locator('[data-app-games] .app-game-card').count(),20);
-   assert.equal(await page.locator('[data-app-games] .premium-game-scene use').count(),20);
+   assert.equal(await page.locator('[data-app-games] .world-cover-scene').count(),20);
    await page.screenshot({path:'build/v5-screenshots/'+lang+'-'+width+'-games.png',fullPage:true});
    await page.locator('.v5-nav a[href="#v5-achievements"]').click();await visible('achievements');await fit();
    await page.waitForSelector('.v5-badge');assert.equal(await page.locator('.v5-badge').count(),4);
@@ -49,12 +49,15 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    const page=await browser.newPage({viewport:{width:390,height:844}});
    const prefix=lang==='ar'?'':'/en';
    await page.goto(origin+prefix+'/games/',{waitUntil:'networkidle'});
-   assert.equal(await page.locator('.premium-library-card .premium-game-cover').count(),20);
+   assert.equal(await page.locator('.premium-library-card .world-cover-scene').count(),20);
    for(const id of ids){
     await page.goto(origin+prefix+'/games/'+id+'/',{waitUntil:'domcontentloaded'});
     const map=page.locator('[data-level-map]');
     await map.waitFor({state:'visible',timeout:10000});
-    assert.equal(await page.locator('.premium-game-heading .premium-game-cover svg use').count(),1);
+    const cover=page.locator('.premium-game-heading .world-cover-scene');
+    await cover.waitFor({state:'visible'});
+    assert(await cover.evaluate(async image=>{ await image.decode(); return image.naturalWidth===720; }),id+' cover');
+    assert.equal(await page.locator('.premium-game-heading .world-cover-scene').count(),1);
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'game map overflow '+lang+' '+id);
     await map.locator('button.game-level:not(:disabled)').first().click();
     await page.waitForFunction(()=>[...document.querySelectorAll('.game-board')].some(b=>!b.hidden&&!b.matches('.game-levels,.game-result')));

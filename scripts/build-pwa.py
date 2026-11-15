@@ -24,7 +24,7 @@ for p in root.rglob('index.html'):
 # Refresh dependencies for every game engine and public page, including existing offline clients.
 for p in assets.glob('*.js'):
     s=p.read_text()
-    s=re.sub(r'(game-progress\.js\?v=)\d+',lambda m:m[1]+'9',s)
+    s=re.sub(r'(game-progress\.js\?v=)\d+',lambda m:m[1]+'10',s)
     p.write_text(s)
 for p in root.rglob('index.html'):
     if '.git' in p.parts:continue
@@ -32,7 +32,7 @@ for p in root.rglob('index.html'):
     s=re.sub(r'(/assets/pwa\.(?:js|css))(?:\?v=\d+)?(?=["\'])',lambda m:m[1]+'?v=2',s)
     s=re.sub(r'(/assets/age-journey\.js\?v=)\d+',lambda m:m[1]+'5',s)
     # Bump entry points whose imports were changed.
-    for name,ver in [('games',15),('letter-match',12),('vowel-drive',14),('interactive-games',8),('planet-adventures',7),('sound-world',2),('game-progress',9)]:
+    for name,ver in [('games',16),('letter-match',13),('vowel-drive',15),('interactive-games',9),('planet-adventures',8),('sound-world',3),('game-progress',10)]:
         s=re.sub(r'(/assets/'+name+r'\.js\?v=)\d+',lambda m:m[1]+str(ver),s)
     p.write_text(s)
 # Pack includes the current canonical app/game pages, all local media and code required by the games.

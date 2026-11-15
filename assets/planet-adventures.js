@@ -1,11 +1,26 @@
-import {illustrate} from './learning-art.js?v=1';
-import {bindJourney,shuffle} from './game-progress.js?v=9';
+import {createIllustration, illustrate} from './learning-art.js?v=2';
+import {bindJourney,shuffle} from './game-progress.js?v=10';
 const game=JSON.parse(document.getElementById('game-data').textContent), ar=game.lang==='ar', tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'), cue=board.querySelector('[data-cue]'), options=board.querySelector('[data-options]'), feedback=board.querySelector('[data-feedback]'), next=board.querySelector('[data-next]');
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return illustrate(n,txt)};
 const btn=(txt,cb,cls='game-option')=>{const b=el('button',txt,cls);b.type='button';b.addEventListener('click',cb);return b};
 const spaceTopics=['sun','earth','moon','mercury','venus','mars','jupiter','saturn','uranus','neptune','daynight','astronaut','galaxy','rocket','rocket'];
-function spaceArt(id,cls='space-art'){const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),use=document.createElementNS(ns,'use');svg.setAttribute('class',cls);svg.setAttribute('viewBox','0 0 180 140');svg.setAttribute('aria-hidden','true');use.setAttribute('href','/assets/space-art.svg#'+id);svg.append(use);return svg}
+function spaceArt(id) {
+  if (id !== 'daynight') {
+    const picture = createIllustration(id === 'moon' ? 'full-moon' : id);
+    picture.classList.add('space-art');
+    return picture;
+  }
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  const use = document.createElementNS(ns, 'use');
+  svg.setAttribute('class', 'space-art');
+  svg.setAttribute('viewBox', '0 0 180 140');
+  svg.setAttribute('aria-hidden', 'true');
+  use.setAttribute('href', '/assets/space-art.svg#daynight');
+  svg.append(use);
+  return svg;
+}
 function spaceScene(topic){const panel=el('div','','space-window'),sky=el('div','','space-sky');sky.setAttribute('aria-hidden','true');for(let i=0;i<12;i++){const st=el('i','','space-dot');st.dataset.dot=String(i);sky.append(st)}const badge=el('span',tr('نافذة المستكشف','Explorer window'),'space-window-label');panel.append(sky,spaceArt(topic),badge);return panel}
 const geoShapes={'🔺':['polygon','60,13 108,102 12,102','#f18a9e'],'🟦':['rect',[19,19,82,82],'#78b8ed'],'🔴':['circle',[60,60,43],'#ee7b91'],'🔶':['polygon','60,7 105,60 60,113 15,60','#f4b866'],'▭':['rect',[9,31,102,58],'#91d4b9'],'🟢':['circle',[60,60,43],'#78c99e'],'🟣':['circle',[60,60,43],'#b69bea'],'🟨':['rect',[19,19,82,82],'#f4cf70'],'🔷':['polygon','60,7 105,60 60,113 15,60','#80bfee'],'⬛':['rect',[19,19,82,82],'#4b4660'],'⭐':['polygon','60,7 75,43 114,47 85,74 94,112 60,92 26,112 35,74 6,47 45,43','#ffd269']};
 function engineeringShape(value){const data=geoShapes[value];if(!data)return null;const [kind,coords,color]=data,ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),shape=document.createElementNS(ns,kind);svg.setAttribute('viewBox','0 0 120 120');svg.setAttribute('class','geo-art');svg.setAttribute('aria-hidden','true');const attrs=kind==='polygon'?{points:coords}:kind==='rect'?{x:coords[0],y:coords[1],width:coords[2],height:coords[3]}:{cx:coords[0],cy:coords[1],r:coords[2]};for(const [k,v] of Object.entries({...attrs,fill:color,stroke:'#51416e','stroke-width':3,'stroke-linejoin':'round'}))shape.setAttribute(k,v);svg.append(shape);return svg}

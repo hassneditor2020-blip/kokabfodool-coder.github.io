@@ -1,12 +1,17 @@
-import {bindJourney,shuffle} from './game-progress.js?v=9';
+import {createIllustration} from './learning-art.js?v=2';
+import {bindJourney,shuffle} from './game-progress.js?v=10';
 const game=JSON.parse(document.querySelector('#game-data').textContent),ar=game.lang==='ar',tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'),cue=board.querySelector('[data-cue]'),options=board.querySelector('[data-options]'),prompt=board.querySelector('[data-prompt]'),feedback=board.querySelector('[data-feedback]'),next=board.querySelector('[data-next]'),progress=board.querySelector('[data-progress]');
 const audio=new Audio();audio.preload='none';audio.volume=.7;
 let serial=0;
 function stop(){serial++;audio.pause();audio.currentTime=0;audio.onended=null;audio.onerror=null;audio.ontimeupdate=null;}
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return n};
-const ns='http://www.w3.org/2000/svg',custom=new Set(['cow','rooster','frog','rain','storm','tap','train','bell']);
-function art(id){const svg=document.createElementNS(ns,'svg'),use=document.createElementNS(ns,'use');svg.setAttribute('viewBox','0 0 120 120');svg.setAttribute('aria-hidden','true');svg.setAttribute('class','sound-picture');svg.setAttribute('focusable','false');use.setAttribute('href',(custom.has(id)?'/assets/sound-world-art.svg':'/assets/learning-art.svg')+'#'+id);svg.append(use);return svg;}
+const ns = 'http://www.w3.org/2000/svg';
+function art(id) {
+  const picture = createIllustration(id, '/assets/sound-world-art.svg');
+  picture.classList.add('sound-picture');
+  return picture;
+}
 function render(round){
  stop();let solved=false,heard=false,attempt=0;
  progress.textContent=journey.roundLabel();prompt.textContent=game.prompt;cue.replaceChildren();options.replaceChildren();feedback.textContent='';delete feedback.dataset.state;

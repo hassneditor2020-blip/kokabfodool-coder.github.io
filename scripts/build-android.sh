@@ -7,7 +7,7 @@ test -x "$BT/aapt2" && test -f "$PLATFORM"
 echo "SDK $BT $PLATFORM"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
-OUT="${FUDOOL_OUTPUT_DIR:-build/android-v5}"
+OUT="${FUDOOL_OUTPUT_DIR:-build/android-v6}"
 mkdir -p "$OUT"
 # Use a stable private signing key. A new key requires explicit opt-in; outputs are staged, not published.
 : "${FUDOOL_KEYSTORE:?Original signing keystore required}"
@@ -31,7 +31,7 @@ for mode in unified; do
   # All assets are bundled; external HTTPS links use Android ACTION_VIEW, not the app network.
   permission="";label="كوكب فضول"
   cat > "$W/AndroidManifest.xml" <<EOF
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="55" android:versionName="5.0.5">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="60" android:versionName="6.0.0">
 <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="32"/>
 $permission
 <application android:label="$label" android:icon="@drawable/app_icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:usesCleartextTraffic="false">
@@ -65,20 +65,36 @@ PY
   "$BT/aapt" dump badging "$OUT/kawkab-fudool-$mode.apk" | head -8 || true
 done
 python3 - "$OUT" <<'PY'
-import zipfile,pathlib,json,hashlib,sys
-p=pathlib.Path(sys.argv[1])
-out={}
-for mode in ['unified']:
- f=p/f'kawkab-fudool-{mode}.apk'
- with zipfile.ZipFile(f) as z:
-  names=z.namelist()
-  assert 'classes.dex' in names and 'AndroidManifest.xml' in names
-  assert 'assets/site/play-app/index.html' in names
-  assert 'assets/site/assets/real-sounds/sheep.mp3' in names
-  assert 'assets/site/assets/app-learning-v5.json' in names
-  assert len([n for n in names if n.startswith('assets/site/')])>=780
- out[mode]={'file':f.name,'version':'5.0.5','versionCode':55,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'certificate_sha256':(p/f'{mode}-certificate.txt').read_text().strip()}
-assert list(out)==['unified']
-(p/'release.json').write_text(json.dumps(out,indent=2)+'\n')
-print(out)
+import hashlib
+import json
+import pathlib
+import sys
+import urllib.parse
+import zipfile
+
+output = pathlib.Path(sys.argv[1])
+apk = output / 'kawkab-fudool-unified.apk'
+pack = json.loads(pathlib.Path('offline-pack.json').read_text())
+expected = {
+    'assets/site/' + urllib.parse.unquote(url[1:]) + ('index.html' if url.endswith('/') else '')
+    for url in pack['files']
+}
+with zipfile.ZipFile(apk) as archive:
+    names = set(archive.namelist())
+    assert {'AndroidManifest.xml', 'classes.dex'} <= names
+    assert expected <= names, sorted(expected - names)
+    assert sum(name.startswith('assets/site/assets/worlds/') for name in names) == 32
+    for name in expected:
+        source = pathlib.Path(name.removeprefix('assets/site/')).read_bytes()
+        assert archive.read(name) == source, name
+release = {'unified': {
+    'file': apk.name,
+    'version': '6.0.0',
+    'versionCode': 60,
+    'bytes': apk.stat().st_size,
+    'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
+    'certificate_sha256': (output / 'unified-certificate.txt').read_text().strip(),
+}}
+(output / 'release.json').write_text(json.dumps(release, indent=2) + '\n')
+print(release)
 PY

@@ -83,12 +83,6 @@ document.addEventListener('click', (event) => {
   }));
 });
 
-/* Shared visual layer: no game logic or saved data changes. */
-(()=>{const scenes={"vowel-drive":"car-scene","letter-match":"letters","letter-hunt":"hunt","counting":"count","english-abc":"abc","memory":"memory","trace":"trace","robo-lab":"lab-scene","puzzle":"puzzle","sound-quiz":"sound","fudool-shop":"shop","word-factory":"words","lumaa-clock":"clock","code-robo":"code","world-mishaal":"world","planet-engineer":"engineer","healthy-hero":"health","space-journey":"rocket-scene","spot-differences":"spot","grand-challenge":"challenge"},ns='http://www.w3.org/2000/svg',ar=document.documentElement.lang==='ar',pre=ar?'':'/en',native=/FudoolAndroid/.test(navigator.userAgent);
-function art(id){const wrap=document.createElement('span'),svg=document.createElementNS(ns,'svg'),u=document.createElementNS(ns,'use');wrap.className='premium-game-cover';svg.setAttribute('viewBox','0 0 240 180');svg.setAttribute('aria-hidden','true');u.setAttribute('href','/assets/fudool-premium-art.svg#'+scenes[id]);svg.append(u);wrap.append(svg);return wrap}
-const shell=document.querySelector('.game-shell'),id=location.pathname.match(/\/(?:en\/)?games\/([^/]+)\//)?.[1];
-if(shell&&scenes[id]){document.body.classList.add('premium-game-page');shell.dataset.premiumGame=id;const intro=shell.querySelector('.simple-intro');if(intro){const banner=document.createElement('div');banner.className='premium-game-heading';intro.before(banner);banner.append(intro,art(id));}
-const back=document.createElement('a');back.className='premium-game-back';back.href=native?pre+'/play-app/#v5-games':pre+'/games/';back.textContent=ar?'كل الألعاب':'All games';shell.prepend(back);
-if(native)shell.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;let u;try{u=new URL(a.href)}catch{return}if(u.origin!==location.origin)return;if(/^\/(?:en\/)?(?:series|grown-ups|episodes)\//.test(u.pathname)){e.preventDefault();location.assign('/play-app/external/?url='+encodeURIComponent('https://kokabfodool.com'+u.pathname+u.search+u.hash))}});}
-if(document.querySelector('.games-grid')){document.body.classList.add('premium-library-page');document.querySelectorAll('.activity-card[data-game-id]').forEach(c=>{const id=c.dataset.gameId;if(!scenes[id]||c.querySelector('.premium-game-cover'))return;c.classList.add('premium-library-card');c.prepend(art(id));});}
-})();
+if (document.querySelector('.game-shell, .games-grid')) {
+  import('/assets/world-art.js?v=1').then(({mountWorlds}) => mountWorlds());
+}

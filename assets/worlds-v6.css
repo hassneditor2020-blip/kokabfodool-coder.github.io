@@ -1,0 +1,410 @@
+.fudool-world-cover {
+  position: relative;
+  display: block;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #e6ddf8;
+}
+.world-cover-scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.world-cover-guide {
+  position: absolute;
+  inset-inline-start: 7%;
+  inset-block-end: 9%;
+  width: 24%;
+  max-width: 92px;
+  height: auto;
+  aspect-ratio: 1;
+  padding: 2px;
+  object-fit: contain;
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px #24174765;
+}
+.premium-library-card .fudool-world-cover {
+  grid-column: 1 / -1;
+}
+.premium-library-page .games-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+}
+.premium-library-page .premium-library-card {
+  align-content: start;
+  min-height: 100%;
+  background: #fffdfa;
+}
+.premium-library-card h3 {
+  line-height: 1.35;
+}
+.premium-library-card .round-arrow {
+  min-width: 40px;
+  min-height: 40px;
+}
+.v5-body .app-game-art {
+  display: block;
+  height: auto;
+  aspect-ratio: auto;
+  padding: 5px;
+}
+.v5-body .app-game-art .fudool-world-cover,
+.v5-featured .fudool-world-cover {
+  border-radius: 14px;
+}
+.v5-featured .v5-featured-scene {
+  aspect-ratio: 3 / 2;
+}
+.v5-featured .fudool-world-cover .world-cover-guide {
+  inset-inline-start: 5%;
+  inset-block-end: 7%;
+}
+.app-resume [data-resume-art] .fudool-world-cover {
+  border-radius: 11px;
+}
+
+.premium-game-heading {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: end;
+  min-height: clamp(170px, 32vw, 300px);
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(13px, 3vw, 27px);
+  background: #4a3973;
+}
+.premium-game-heading .fudool-world-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  z-index: -2;
+}
+.premium-game-heading .world-cover-guide {
+  inset-inline-start: auto;
+  inset-inline-end: 4%;
+  inset-block-end: 10%;
+  width: clamp(48px, 13vw, 108px);
+  max-width: 108px;
+}
+.premium-game-heading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, #1f163ee8, #231b4469 54%, transparent 95%);
+}
+.premium-game-heading .simple-intro {
+  width: 76%;
+  padding: 0;
+  background: none;
+}
+.premium-game-heading h1,
+.premium-game-heading p,
+.premium-game-heading .eyebrow {
+  color: white;
+  text-shadow: 0 1px 4px #1c124d;
+}
+.premium-game-page .game-shell:has(.game-board:not([hidden]):not(.game-levels):not(.game-result)) .premium-game-heading {
+  min-height: 77px;
+  grid-template-columns: 1fr;
+}
+.premium-game-page .game-shell:has(.game-board:not([hidden]):not(.game-levels):not(.game-result)) .world-cover-guide {
+  display: none;
+}
+.premium-game-page .game-shell:has(.game-board:not([hidden]):not(.game-levels):not(.game-result)) .premium-game-heading .simple-intro {
+  width: 100%;
+}
+
+.premium-game-page .game-board[data-level-map] {
+  position: relative;
+  border-color: #fff;
+  background: linear-gradient(180deg, var(--rw-pale), #fff 14rem);
+}
+.premium-game-page .game-board[data-level-map] .game-level-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+}
+.premium-game-page .game-board[data-level-map] .fudool-level-world {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: clamp(10px, 2.2vw, 19px);
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--rw-line);
+  border-radius: 20px;
+}
+.fudool-level-world .world-trail-scenery {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .17;
+  pointer-events: none;
+}
+.world-trail {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: start;
+  gap: 8px;
+}
+.world-trail::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 28px 10% auto;
+  border-top: 4px dotted var(--rw);
+  opacity: .65;
+}
+.premium-game-page .game-board[data-level-map] .world-trail .game-level {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  min-height: 132px;
+  gap: .24rem;
+  padding: .2rem;
+  text-align: center;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+.premium-game-page .game-board[data-level-map] .world-trail .game-level .reward-level-orb {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  font-size: 1.25rem;
+  border: 3px solid white;
+  direction: ltr;
+  box-shadow: 0 4px 0 #39256336, 0 6px 10px #291a3425;
+}
+.world-trail .game-level[data-reward-state=available] .reward-level-orb {
+  background: var(--rw);
+  color: #fff;
+}
+.world-trail .game-level[data-reward-state=locked] .reward-level-orb {
+  background: #f1eef5;
+  color: #635b70;
+}
+.world-trail .game-level[data-reward-state=complete] .reward-level-orb {
+  background: linear-gradient(#fff1a4, #f6c555);
+  color: #644117;
+}
+.premium-game-page .game-board[data-level-map] .world-trail .reward-level-title {
+  margin-top: 4px;
+  max-width: 100%;
+  padding: .2rem .42rem;
+  line-height: 1.35;
+  font-size: clamp(.71rem, 2vw, .9rem);
+  font-weight: 850;
+  color: #251943;
+  background: #ffffffea;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.premium-game-page .game-board[data-level-map] .world-trail small {
+  max-width: 100%;
+  color: #3e3151;
+  line-height: 1.35;
+}
+.world-trail .game-level:focus-visible {
+  outline: 3px solid var(--rw-deep);
+  outline-offset: 2px;
+}
+.world-trail .game-level:not(:disabled):hover .reward-level-orb {
+  scale: 1.07;
+}
+
+.premium-game-page .game-board[data-game],
+.premium-game-page .game-board[data-drive] {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #f6f2fc;
+  border: 2px solid white;
+}
+.world-play-scenery {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .22;
+  pointer-events: none;
+}
+.premium-game-page .game-board[data-game] .game-cue:not(:empty),
+.premium-game-page .game-board[data-drive] .drive-listen {
+  box-shadow: 0 4px 0 var(--rw-line), 0 8px 20px #38205c12;
+}
+.premium-game-page .game-board[data-game] .game-cue:not(:empty) {
+  background: #fffc;
+}
+.premium-game-page .game-board[data-game] .game-option {
+  background: #fffdf7;
+}
+.premium-game-page .game-board[data-game] .game-option[data-state=correct] {
+  background: #d5f6e2;
+}
+.premium-game-page .game-board[data-game] .game-option[data-state=wrong] {
+  background: #ffe1e7;
+}
+.world-reward-trophy {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+}
+.reward-animate .world-reward-trophy {
+  animation: reward-star-pop .6s ease-out both;
+}
+
+.fudool-art[data-atlas] {
+  background-image: var(--atlas-image);
+  background-size: 400% 400%;
+  background-position: var(--atlas-x) var(--atlas-y);
+  background-repeat: no-repeat;
+}
+img.fudool-art {
+  object-fit: contain;
+}
+.world-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.6rem;
+  height: 1.6rem;
+  filter: none;
+}
+.fudool-art[data-art-shape] {
+  width: 82%;
+  height: 82%;
+  margin: auto;
+  background: var(--shape-fill);
+  border-radius: 50%;
+}
+.fudool-art[data-art-shape=disc-yellow] { --shape-fill: #f7c744; }
+.fudool-art[data-art-shape=disc-orange] { --shape-fill: #e9842b; }
+.fudool-art[data-art-shape=up-arrow] {
+  --shape-fill: #493380;
+  clip-path: polygon(50% 6%, 92% 49%, 67% 49%, 67% 92%, 33% 92%, 33% 49%, 8% 49%);
+  border-radius: 0;
+}
+.space-window .space-art[data-atlas] {
+  width: clamp(110px, 34vw, 170px);
+  height: auto;
+  aspect-ratio: 1;
+}
+.game-board .game-cue .space-window {
+  background: linear-gradient(#21194356, #211943b3),
+    url('/assets/worlds/space-journey.webp') center / cover;
+}
+[data-premium-game=robo-lab] .game-cue:not(:empty) {
+  border: 2px solid #b1e6d9;
+  background: linear-gradient(180deg, #e0fff8, #fff);
+  box-shadow: inset 0 0 0 4px #fff, 0 4px 0 #b3ded0;
+}
+[data-premium-game=fudool-shop] .market-item,
+[data-premium-game=word-factory] .factory-letter {
+  box-shadow: 0 4px 0 #3925632c;
+}
+.game-badges .world-icon,
+[data-result-badges] .world-icon {
+  margin-inline-end: .35rem;
+}
+
+.premium-game-page .drive-landscape {
+  background: url('/assets/worlds/drive-track.webp') center / cover no-repeat;
+}
+.premium-game-page .drive-scene[data-skin=space] .drive-landscape {
+  background-image: url('/assets/worlds/space-journey.webp');
+}
+.premium-game-page .drive-car {
+  bottom: 4%;
+  width: clamp(68px, 16vw, 122px);
+  aspect-ratio: 1.2;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: url('/assets/worlds/drive-kart.webp') center / contain no-repeat;
+  filter: hue-rotate(var(--car-hue, 0deg)) drop-shadow(0 6px 4px #1c1b3899);
+}
+.premium-game-page .drive-car::after,
+.premium-game-page .drive-car-glass,
+.premium-game-page .drive-car-lights {
+  display: none;
+}
+.drive-scene[data-skin=blue] { --car-hue: 187deg; }
+.drive-scene[data-skin=mint] { --car-hue: 121deg; }
+.drive-scene[data-skin=gold] { --car-hue: 48deg; }
+.drive-scene[data-skin=space] { --car-hue: 246deg; }
+.premium-game-page .drive-road {
+  inset-block-start: 47%;
+  background: linear-gradient(180deg, #565b7a, #262845);
+}
+.premium-game-page .drive-gate {
+  min-height: clamp(85px, 23vw, 150px);
+  border-radius: 36% 36% 12px 12px / 22% 22% 12px 12px;
+}
+
+@media (max-width: 590px) {
+  .premium-library-page .games-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+  }
+  .premium-library-page .premium-library-card {
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    padding: 5px;
+  }
+  .premium-library-card > div { padding-inline: 4px; }
+  .premium-library-card h3 { font-size: .9rem; }
+  .premium-library-card p { font-size: .75rem; line-height: 1.45; }
+  .premium-library-card .round-arrow { align-self: end; margin-top: auto; }
+  .fudool-world-cover { border-radius: 13px; }
+  .world-trail { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .world-trail::before { inset-inline: 16%; }
+  .world-trail:has(.game-level:nth-child(4))::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset-block-start: 28px;
+    inset-inline: 50% 16%;
+    height: 50%;
+    border-inline-end: 4px dotted var(--rw);
+    border-block-end: 4px dotted var(--rw);
+    border-end-end-radius: 16px;
+    opacity: .65;
+  }
+  .world-trail .game-level:nth-child(4) { grid-row: 2; grid-column: 3; }
+  .world-trail .game-level:nth-child(5) { grid-row: 2; grid-column: 2; }
+  .premium-game-page .game-board[data-level-map] .world-trail .game-level {
+    min-height: 108px;
+  }
+  .premium-game-page .game-board[data-level-map] .world-trail .game-level .reward-level-orb {
+    width: 47px;
+    height: 47px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reward-animate .world-reward-trophy { animation: none; }
+  .world-trail .game-level:not(:disabled):hover .reward-level-orb { scale: 1; }
+}
