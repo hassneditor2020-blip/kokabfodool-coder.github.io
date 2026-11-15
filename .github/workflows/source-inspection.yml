@@ -15,7 +15,7 @@ jobs:
       - name: Extract and assemble matching human syllables
         run: |
           python3 -m pip install -q imageio-ffmpeg remotezip numpy requests
-          python3 scripts/repair-vowel-audio.py
+          python3 -u scripts/repair-vowel-audio.py
       - name: Commit repaired local audio
         run: |
           git config user.name 'github-actions[bot]'
