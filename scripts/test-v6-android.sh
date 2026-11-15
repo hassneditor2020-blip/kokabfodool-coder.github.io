@@ -9,10 +9,10 @@ mkdir -p build/v6-screenshots
 adb shell wm size 390x844
 adb shell wm density 160
 adb shell input keyevent 82
-adb install downloads/apps/Kokab-Fodool-V6.0.apk
+adb install downloads/apps/Kokab-Fodool-V6.1.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=61'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.1.0'
+adb shell dumpsys package "$package" | grep -F 'versionCode=62'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.2.0'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -83,7 +83,12 @@ PY
 
 find_label 'الألعاب' yes
 find_label 'سيارة الحركات' yes
-find_label 'من أ إلى ث' yes
+find_label 'ابدأ المستوى 1' no
+find_label 'أصعب' yes
+find_label 'ابدأ المستوى 4' no
+find_label 'أصعب' yes
+find_label 'ابدأ المستوى 11' yes
+find_label 'المستوى 11' no
 find_label 'الجولة 1' no
 find_label 'انطلق' no
 adb exec-out screencap -p > build/v6-screenshots/android-offline-drive.png
@@ -94,6 +99,7 @@ adb shell input swipe 193 225 193 720 300
 adb shell input swipe 193 225 193 720 300
 find_label 'التحديات' yes
 find_label 'مختبر روبو' yes
+find_label 'ابدأ المستوى 1' no
 find_label 'تجارب روبو' yes
 find_label 'البنفسجي' yes
 find_label 'أضف الأزرق' yes
@@ -101,4 +107,4 @@ find_label 'أضف الأصفر' yes
 find_label 'اخلط' yes
 find_label 'ظهر اللون الأخضر' no
 adb exec-out screencap -p > build/v6-screenshots/android-offline-robo.png
-echo 'PASS Android 6.1.0 upgrades from 6.0.0 and opens V6.1 driving and paint controls in airplane mode.'
+echo 'PASS Android 6.2.0 upgrades from 6.1.0, starts the Vowel Drive challenge at level 11 and keeps Robo Lab on its own path in airplane mode.'

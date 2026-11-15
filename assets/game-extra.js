@@ -2,7 +2,7 @@ import {vowelClipId} from './vowel-audio-review.js?v=2';
 import {sharedAudioSource} from './vowel-audio-routing.js?v=2';
 import {drawGuide,evaluateTrace} from './trace-assessment.js?v=1';
 import {illustrate} from './learning-art.js?v=2';
-import {shuffle} from './game-progress.js?v=10';
+import {shuffle} from './game-progress.js?v=11';
 const ar=document.documentElement.lang==='ar';
 const tr=(a,b)=>ar?a:b;
 const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};
@@ -35,7 +35,7 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
       const visualFallback=()=>{if(!cue.querySelector('.audio-fallback')){const parts=String(round.speech||'').split(/\s+\.\s+/);cue.append(el('strong',parts.at(-1)||'', 'audio-fallback'));say(tr('اقرأ المثال واختر الإجابة.','Read the example and choose the answer.'))}};
       const play=button(tr('🔊 استمع','🔊 Listen'),async()=>{cue.querySelector('.audio-fallback')?.remove();if(reviewedSource){await playRecording(reviewedSource,visualFallback);return}if(round.tones){if(!await tones(round.tones))say(tr('الصوت غير متاح على هذا الجهاز.','Sound is unavailable on this device.'));}else if(round.audio)playRecording(round.audio,()=>round.speech&&!round.audio.startsWith('/assets/game-sound-effects/')?speak(round.speech,round.speechLang||'ar-SA',fallback):fallback());else speak(round.speech,round.speechLang,()=>round.audioFallback?playRecording(round.audioFallback,fallback):fallback());},'button button-white');cue.append(play);
     }
-    const buttons=round.choices.map((v,i)=>makeOption(v,i===round.answer));options.dataset.columns=Math.min(4,round.choices.length);options.replaceChildren(...shuffle(buttons));const hint=button(tr('💡 تلميح','💡 Hint'),()=>{if(next.hidden){buttons[round.answer].dataset.hint='true';say(tr('جرّب الاختيار المضيء.','Try the highlighted choice.'));}},'button button-white');cue.append(hint);return;
+    const buttons=round.choices.map((v,i)=>makeOption(v,i===round.answer,round.explanation));options.dataset.columns=Math.min(4,round.choices.length);options.replaceChildren(...shuffle(buttons));const hint=button(tr('💡 تلميح','💡 Hint'),()=>{if(next.hidden){buttons[round.answer].dataset.hint='true';say(tr('جرّب الاختيار المضيء.','Try the highlighted choice.'));}},'button button-white');cue.append(hint);return;
   }
   options.dataset.columns='1';
   if(kind==='order'){

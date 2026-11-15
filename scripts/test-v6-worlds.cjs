@@ -200,6 +200,132 @@ async function validateRobo(page, language) {
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2));
 }
 
+async function validateAgePaths(browser, language) {
+  const arabic = language === 'ar';
+  const prefix = arabic ? '' : '/en';
+  const page = await browser.newPage({viewport: {width: arabic ? 320 : 1280, height: 844}});
+  const drive = origin + prefix + '/games/vowel-drive/';
+  const lab = origin + prefix + '/games/robo-lab/';
+  const stateKey = 'fudool-profile-v1:p-older:game:vowel-drive';
+  const map = page.locator('[data-level-map]');
+  const choice = map.locator('[data-game-paths]');
+  const play = choice.locator('[data-path-play]');
+  const label = page.locator('.game-progress');
+  const levelButton = number => map.locator('[data-level-number="' + number + '"]');
+  const gameLevel = number => arabic ? new RegExp('المستوى ' + number + ' ·') : new RegExp('Level ' + number + ' ·');
+  const state = () => page.evaluate(key => JSON.parse(localStorage.getItem(key)), stateKey);
+  async function expectPlay(number) {
+    await play.waitFor({state: 'visible'});
+    assert.match(await play.textContent(), new RegExp(' ' + number + '$'));
+  }
+  async function answerDrive(index) {
+    const rounds = await page.locator('#drive-data').evaluate((source, level) =>
+      JSON.parse(source.textContent).levels[level - 1].rounds, index);
+    for (const {vowel} of rounds) {
+      await page.locator('.drive-gate[data-vowel="' + vowel + '"]').click();
+      await page.locator('[data-drive-next]').click();
+    }
+  }
+
+  try {
+    await page.goto(origin + prefix + '/play-app/');
+    await page.evaluate(() => {
+      localStorage.setItem('fudool-profiles-v1', JSON.stringify([
+        {id: 'p-older', name: 'Older', avatar: 'robot', age: '8-10'},
+        {id: 'p-younger', name: 'Younger', avatar: 'lumaa', age: '3-5'},
+      ]));
+      localStorage.setItem('fudool-active-profile-v1', 'p-older');
+    });
+    await page.goto(origin + prefix + '/games/?age=8-10');
+    const ageLink = page.locator('.age-journey-card[data-game-id="vowel-drive"] .age-journey-link');
+    const target = new URL(await ageLink.getAttribute('href'));
+    assert.equal(target.searchParams.get('level'), '11');
+    assert.equal(target.searchParams.get('path'), '8-10');
+    await ageLink.click();
+    await label.waitFor({state: 'visible'});
+    assert.match(await label.textContent(), gameLevel(11));
+
+    await page.locator('[data-drive] [data-level-menu]').click();
+    await expectPlay(11);
+    assert(await levelButton(11).isEnabled());
+    assert(await levelButton(12).isDisabled());
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2));
+    assert((await state()).scores.every(score => score === 0));
+    await page.goto(drive + '?path=8-10&level=13');
+    await expectPlay(11);
+    await choice.locator('[data-path-action="easier"]').click();
+    await expectPlay(4);
+    assert.equal(await choice.getAttribute('data-game-paths'), '6-7');
+    await page.reload();
+    await expectPlay(4);
+    await page.goto(lab);
+    await expectPlay(7);
+    await page.evaluate(() => {
+      const levels = JSON.parse(document.querySelector('#game-data').textContent).levels;
+      const round = levels[6].rounds.findIndex(question => question.explanation);
+      localStorage.setItem('fudool-profile-v1:p-older:game:robo-lab',
+        JSON.stringify({checkpoints: {6: {round, mistakes: 0}}}));
+    });
+    await play.click();
+    assert.match(await page.locator('[data-prompt]').textContent(), arabic ? /تتوقّع/ : /predict/i);
+    await page.locator('[data-options] button[aria-label="👃"]').click();
+    assert.match(await page.locator('[data-feedback]').textContent(),
+      arabic ? /يساعدك الأنف/ : /Your nose helps/i);
+    await page.goto(drive);
+    await expectPlay(4);
+    await choice.locator('[data-path-action="age"]').click();
+    await expectPlay(11);
+    await play.click();
+    assert.match(await label.textContent(), gameLevel(11));
+    await answerDrive(11);
+    assert(await page.locator('[data-level-next]').isVisible());
+    let saved = await state();
+    assert.equal(saved.scores[10], 3);
+    assert.equal(saved.scores.filter(Boolean).length, 1);
+    await map.waitFor({state: 'hidden'});
+    await page.locator('[data-level-result] [data-level-menu]').click();
+    await expectPlay(12);
+    assert(await levelButton(12).isEnabled());
+    assert(await levelButton(13).isDisabled());
+    await play.click();
+    const vowel = await page.locator('#drive-data').evaluate(source =>
+      JSON.parse(source.textContent).levels[11].rounds[0].vowel);
+    await page.locator('.drive-gate[data-vowel="' + vowel + '"]').click();
+    await page.goto(drive + '?continue=1');
+    await label.waitFor({state: 'visible'});
+    assert.match(await label.textContent(), gameLevel(12));
+    assert.match(await label.textContent(), arabic ? /الجولة 2 من/ : /Round 2 of/);
+    await page.evaluate(key => {
+      const saved = JSON.parse(localStorage.getItem(key));
+      for (const index of [11, 12, 13]) saved.scores[index] = 3;
+      localStorage.setItem(key, JSON.stringify(saved));
+    }, stateKey);
+    await page.goto(drive + '?level=15');
+    await label.waitFor({state: 'visible'});
+    await answerDrive(15);
+    assert.match(await page.locator('[data-level-result] h2').textContent(),
+      arabic ? /أكملت مسار التحدّي/ : /Challenge path complete/);
+    assert(await page.locator('[data-level-next]').isHidden());
+    saved = await state();
+    assert(saved.scores.slice(0, 10).every(score => score === 0));
+    assert.equal(saved.scores.slice(10).filter(Boolean).length, 5);
+
+    await page.evaluate(() => localStorage.setItem('fudool-active-profile-v1', 'p-younger'));
+    await page.goto(drive);
+    await expectPlay(1);
+    assert(await levelButton(11).isDisabled());
+    await choice.locator('[data-path-action="harder"]').click();
+    await expectPlay(4);
+    await page.goto(lab);
+    await expectPlay(1);
+    await play.click();
+    assert.match(await label.textContent(), gameLevel(1));
+    console.log('PASS V6.2 age-based entry, game/profile isolation, sequential unlocks, stars and resume', language);
+  } finally {
+    await page.close();
+  }
+}
+
 async function validateOffline(browser) {
   const context = await browser.newContext({viewport: {width: 390, height: 844}});
   const page = await context.newPage();
@@ -236,8 +362,12 @@ async function validateOffline(browser) {
   await page.locator('.world-play-scenery').evaluate(image => image.decode());
   await page.screenshot({path: 'build/v6-screenshots/vowel-drive-offline.png'});
   await validateRobo(page, 'ar');
+  await page.evaluate(() => localStorage.setItem('fudool-age-journey-v1', '"8-10"'));
+  await page.goto(origin + '/games/robo-lab/');
+  await page.locator('[data-path-play]').click();
+  assert.match(await page.locator('[data-game] .game-progress').textContent(), /المستوى 7 ·/);
   await context.close();
-  console.log('PASS offline game and both Robo experiments');
+  console.log('PASS offline game, Robo experiments and V6.2 age-based entry');
 }
 
 (async () => {
@@ -254,6 +384,7 @@ async function validateOffline(browser) {
     fs.mkdirSync('build/v6-screenshots', {recursive: true});
     browser = await chromium.launch({headless: true, executablePath: process.env.FUDOOL_CHROMIUM});
     for (const language of ['ar', 'en']) {
+      await validateAgePaths(browser, language);
       await validateDriving(browser, language);
       const labPage = await browser.newPage({
         viewport: {width: language === 'ar' ? 390 : 1280, height: 844},
