@@ -26,6 +26,8 @@ public class MainActivity extends Activity {
         getWindow().setStatusBarColor(Color.rgb(73,48,143));
         getWindow().setNavigationBarColor(Color.WHITE);
         web=new WebView(this);
+        web.setFocusableInTouchMode(true);
+        getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         web.setBackgroundColor(Color.rgb(248,246,255));
         WebSettings s=web.getSettings();
         s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);
@@ -40,7 +42,7 @@ public class MainActivity extends Activity {
         web.setWebViewClient(new WebViewClient(){
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest req){
                 Uri u=req.getUrl();String p=u.getPath();
-                if(req.isForMainFrame() && !offline && "https".equals(u.getScheme()) && host.equals(u.getHost()) && "/play-app/external/".equals(p)){openParentLink(u.getQueryParameter("url"));return true;}
+                if(req.isForMainFrame() && "https".equals(u.getScheme()) && host.equals(u.getHost()) && "/play-app/external/".equals(p)){openParentLink(u.getQueryParameter("url"));return true;}
                 if("https".equals(u.getScheme())&&host.equals(u.getHost())&&allowedPage(p))return false;
                 if(req.isForMainFrame())Toast.makeText(MainActivity.this,"هذه النسخة مخصصة للألعاب | Games edition",Toast.LENGTH_SHORT).show();
                 return true;
@@ -61,8 +63,8 @@ public class MainActivity extends Activity {
     private void openParentLink(String value){
         if(value==null)return;
         Uri u=Uri.parse(value);String h=u.getHost();
-        if(!"https".equals(u.getScheme())||!("kokabfodool.com".equals(h)||"www.youtube.com".equals(h)||"www.instagram.com".equals(h)))return;
-        new AlertDialog.Builder(this).setTitle("للأهل فقط").setMessage("فتح هذا الرابط خارج التطبيق؟").setNegativeButton("إلغاء",null).setPositiveButton("فتح",(d,w)->{try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception e){Toast.makeText(this,"لا يمكن فتح الرابط",Toast.LENGTH_SHORT).show();}}).show();
+        if(!"https".equals(u.getScheme())||u.getUserInfo()!=null||(u.getPort()!=-1&&u.getPort()!=443)||!("kokabfodool.com".equals(h)||"www.youtube.com".equals(h)||"www.instagram.com".equals(h)))return;
+        new AlertDialog.Builder(this).setTitle("للأهل فقط").setMessage("فتح هذا الرابط خارج التطبيق؟ تحتاج المشاهدة والتصفح إلى الإنترنت.\nOpen outside the app? Internet is required.").setNegativeButton("إلغاء",null).setPositiveButton("فتح",(d,w)->{try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception e){Toast.makeText(this,"لا يمكن فتح الرابط",Toast.LENGTH_SHORT).show();}}).show();
     }
     private boolean allowedPage(String p){
         if(p==null)return false;
