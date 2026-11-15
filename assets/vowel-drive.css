@@ -137,6 +137,35 @@
 
 .drive-scene[data-lane="0"] .drive-car { left: 21%; }
 .drive-scene[data-lane="2"] .drive-car { left: 79%; }
+.drive-road {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+.drive-scene[data-steering] .drive-road { cursor: grabbing; }
+.drive-scene[data-steering] .drive-car {
+  left: var(--drive-steering-x, 50%);
+  transition: none;
+}
+.drive-gate[data-selected]:not([data-result]) {
+  outline: 3px solid #fff2aa;
+  outline-offset: 3px;
+}
+.drive-controls {
+  width: min(100%, 540px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem .8rem;
+  align-items: center;
+  justify-content: center;
+}
+.drive-controls p {
+  font-size: .84rem;
+  font-weight: 700;
+  margin: 0;
+}
+.drive-controls .button { min-width: 102px; min-height: 44px; }
+.drive-controls .button:disabled { opacity: .55; cursor: default; }
 .drive-scene[data-drive-state="pass"] .drive-car { bottom: 52%; transform: translateX(-50%) scale(.48); }
 
 .drive-board .game-feedback {

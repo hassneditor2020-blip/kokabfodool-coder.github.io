@@ -6,6 +6,8 @@ const data = JSON.parse(document.querySelector('#drive-data').textContent);
 const board = document.querySelector('[data-drive]');
 const scene = board.querySelector('[data-drive-scene]');
 const gates = board.querySelector('[data-drive-gates]');
+const road = scene.querySelector('.drive-road');
+const launch = board.querySelector('[data-drive-launch]');
 const feedback = board.querySelector('[data-drive-feedback]');
 const listen = board.querySelector('[data-drive-listen]');
 const listenLabel = listen.querySelector('[data-drive-listen-label]');
@@ -25,6 +27,8 @@ const vowels = [
 
 let target;
 let answered = false;
+let selectedLane = 1;
+let steeringPointer = null;
 const audio = new Audio();
 audio.preload = 'none';
 let playback = 0;
@@ -64,9 +68,70 @@ async function hear(){
   catch{if(request!==playback)return;listen.disabled=true;listenLabel.textContent=tr('الصوت غير متاح — تدريب بصري','Audio unavailable — visual practice');showVisual(target);adult.open=true;}
 }
 
+function selectLane(lane) {
+  selectedLane = lane;
+  scene.dataset.lane = String(lane);
+  Array.from(gates.children).forEach((gate, index) => {
+    gate.toggleAttribute('data-selected', index === lane);
+  });
+  const letter = gates.children[lane].querySelector('.drive-gate-letter').textContent;
+  launch.setAttribute('aria-label', tr('انطلق نحو ' + letter, 'Drive to ' + letter));
+}
+
+function followPointer(event) {
+  const bounds = scene.getBoundingClientRect();
+  const position = (event.clientX - bounds.left) / bounds.width;
+  const percent = Math.max(21, Math.min(79, position * 100));
+  scene.style.setProperty('--drive-steering-x', percent + '%');
+  const lane = Math.max(0, Math.min(2, Math.floor(position * 3)));
+  if (lane !== selectedLane) selectLane(lane);
+}
+
+function stopSteering() {
+  const pointer = steeringPointer;
+  steeringPointer = null;
+  if (pointer !== null && road.hasPointerCapture(pointer)) road.releasePointerCapture(pointer);
+  delete scene.dataset.steering;
+  scene.style.removeProperty('--drive-steering-x');
+}
+
+road.addEventListener('pointerdown', event => {
+  if (answered || steeringPointer !== null || event.button !== 0) return;
+  steeringPointer = event.pointerId;
+  road.setPointerCapture(event.pointerId);
+  scene.dataset.steering = '';
+  followPointer(event);
+});
+road.addEventListener('pointermove', event => {
+  if (event.pointerId === steeringPointer) followPointer(event);
+});
+road.addEventListener('pointerup', event => {
+  if (event.pointerId !== steeringPointer) return;
+  followPointer(event);
+  stopSteering();
+});
+for (const type of ['pointercancel', 'lostpointercapture']) {
+  road.addEventListener(type, event => {
+    if (event.pointerId === steeringPointer) stopSteering();
+  });
+}
+
+launch.addEventListener('keydown', event => {
+  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+  event.preventDefault();
+  const step = event.key === 'ArrowLeft' ? -1 : 1;
+  selectLane(Math.max(0, Math.min(2, selectedLane + step)));
+});
+launch.addEventListener('click', () => {
+  const gate = gates.children[selectedLane];
+  choose(gate, selectedLane, Number(gate.dataset.vowel));
+  if (answered) next.focus({preventScroll: true});
+});
+
 function choose(button, lane, vowel) {
   if (answered) return;
-  scene.dataset.lane = lane;
+  stopSteering();
+  selectLane(lane);
   gates.querySelectorAll('[data-result]').forEach((gate) => delete gate.dataset.result);
 
   if (vowel !== target.vowel) {
@@ -82,6 +147,7 @@ function choose(button, lane, vowel) {
   stopAudio();
   button.dataset.result = 'correct';
   for (const gate of gates.children) gate.setAttribute('aria-disabled', 'true');
+  launch.disabled = true;
   listen.disabled = true;
   adult.open = false;
   adult.hidden = true;
@@ -106,10 +172,10 @@ function choose(button, lane, vowel) {
 
 function renderRound(round) {
   stopAudio();
+  stopSteering();
   window.clearTimeout(driveTimer);
   target = round;
   answered = false;
-  delete scene.dataset.lane;
   delete scene.dataset.driveState;
   counter.textContent = journey.roundLabel();
   drawRoute();
@@ -140,13 +206,20 @@ function renderRound(round) {
     button.addEventListener('click', () => choose(button, lane, vowel));
     return button;
   }));
+  selectLane(1);
+  launch.disabled = false;
 }
 
 const journey = bindJourney(data, board, renderRound);
 listen.addEventListener('click', hear);
 next.addEventListener('click', () => journey.advance());
-board.querySelector('[data-level-menu]').addEventListener('click', stopAudio);
-window.addEventListener('pagehide', stopAudio);
+function leaveTrack() {
+  stopSteering();
+  stopAudio();
+  window.clearTimeout(driveTimer);
+}
+board.querySelector('[data-level-menu]').addEventListener('click', leaveTrack);
+window.addEventListener('pagehide', leaveTrack);
 
 const garage=document.querySelector('[data-drive-garage]');
 const styles=[['classic',0,'السيارة الحمراء','Red car'],['blue',20,'السيارة الزرقاء','Blue car'],['mint',40,'السيارة الخضراء','Green car'],['gold',75,'السيارة الذهبية','Gold car'],['space',150,'سيارة الفضاء','Space car']];

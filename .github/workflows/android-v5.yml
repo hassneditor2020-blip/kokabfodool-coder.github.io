@@ -1,7 +1,7 @@
-name: Fudool Worlds V6 Android and browser verification
+name: Fudool Worlds V6.1 Android and browser verification
 on:
   push:
-    branches: [development/fudool-worlds-v6]
+    branches: [development/fudool-worlds-v6-1]
     paths-ignore:
       - 'downloads/apps/**'
   workflow_dispatch:
@@ -74,7 +74,7 @@ jobs:
       - name: Upload APKs and checksums (not website deployment)
         uses: actions/upload-artifact@v4
         with:
-          name: Kokab-Fodool-V6.0-${{ steps.signing.outputs.kind }}
+          name: Kokab-Fodool-V6.1-${{ steps.signing.outputs.kind }}
           path: build/android-v6/
           if-no-files-found: error
           retention-days: 14
@@ -83,7 +83,7 @@ jobs:
         run: rm -f "$RUNNER_TEMP/fudool-signing.jks"
 
   stage:
-    if: needs.build.outputs.kind == 'release' && github.ref_name == 'development/fudool-worlds-v6'
+    if: needs.build.outputs.kind == 'release' && github.ref_name == 'development/fudool-worlds-v6-1'
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -101,7 +101,7 @@ jobs:
       - run: node scripts/test-v6-worlds.cjs
       - uses: actions/download-artifact@v4
         with:
-          name: Kokab-Fodool-V6.0-release
+          name: Kokab-Fodool-V6.1-release
           path: build/android-v6/
       - name: Enable emulator hardware acceleration
         run: sudo chmod a+rw /dev/kvm
@@ -121,12 +121,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add downloads/apps/
           git diff --cached --quiet && exit 0
-          git commit -m "Stage signed Kokab Fodool V6.0 Android release"
-          git push origin HEAD:refs/heads/development/fudool-worlds-v6
+          git commit -m "Stage signed Kokab Fodool V6.1 Android release"
+          git push origin HEAD:refs/heads/development/fudool-worlds-v6-1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: V6-release-visual-screenshots
+          name: V6.1-release-visual-screenshots
           path: |
             build/v5-screenshots/
             build/v6-screenshots/

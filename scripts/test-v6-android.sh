@@ -9,10 +9,10 @@ mkdir -p build/v6-screenshots
 adb shell wm size 390x844
 adb shell wm density 160
 adb shell input keyevent 82
-adb install downloads/apps/Kokab-Fodool-V5.0.5.apk
+adb install downloads/apps/Kokab-Fodool-V6.0.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=60'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.0.0'
+adb shell dumpsys package "$package" | grep -F 'versionCode=61'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.1.0'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -56,5 +56,18 @@ find_label 'الألعاب' yes
 find_label 'سيارة الحركات' yes
 find_label 'من أ إلى ث' yes
 find_label 'الجولة 1' no
+find_label 'انطلق' no
 adb exec-out screencap -p > build/v6-screenshots/android-offline-drive.png
-echo 'PASS Android 6.0.0 upgraded from 5.0.5 and opened a game in airplane mode.'
+
+adb shell am force-stop "$package"
+adb shell am start -W -n "$activity"
+find_label 'الألعاب' yes
+find_label 'مختبر روبو' yes
+find_label 'تجارب روبو' yes
+find_label 'البنفسجي' yes
+find_label 'أضف الأزرق' yes
+find_label 'أضف الأصفر' yes
+find_label 'اخلط' yes
+find_label 'ظهر اللون الأخضر' no
+adb exec-out screencap -p > build/v6-screenshots/android-offline-robo.png
+echo 'PASS Android 6.1.0 upgrades from 6.0.0 and opens V6.1 driving and paint controls in airplane mode.'
