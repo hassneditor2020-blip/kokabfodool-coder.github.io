@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
         web.setWebViewClient(new WebViewClient(){
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest req){
                 Uri u=req.getUrl();String p=u.getPath();
-                if(req.isForMainFrame() && "https".equals(u.getScheme()) && host.equals(u.getHost()) && "/play-app/external/".equals(p)){openParentLink(u.getQueryParameter("url"));return true;}
+                if(req.isForMainFrame() && "https".equals(u.getScheme()) && host.equals(u.getHost()) && "/play-app/external/".equals(p)){openExternalLink(u.getQueryParameter("url"));return true;}
                 if("https".equals(u.getScheme())&&host.equals(u.getHost())&&allowedPage(p))return false;
                 if(req.isForMainFrame())Toast.makeText(MainActivity.this,"هذه النسخة مخصصة للألعاب | Games edition",Toast.LENGTH_SHORT).show();
                 return true;
@@ -60,11 +60,11 @@ public class MainActivity extends Activity {
         setContentView(web);
         if(state==null)web.loadUrl(home);else if(web.restoreState(state)==null)web.loadUrl(home);
     }
-    private void openParentLink(String value){
+    private void openExternalLink(String value){
         if(value==null)return;
         Uri u=Uri.parse(value);String h=u.getHost();
         if(!"https".equals(u.getScheme())||u.getUserInfo()!=null||(u.getPort()!=-1&&u.getPort()!=443)||!("kokabfodool.com".equals(h)||"www.youtube.com".equals(h)||"www.instagram.com".equals(h)))return;
-        new AlertDialog.Builder(this).setTitle("للأهل فقط").setMessage("فتح هذا الرابط خارج التطبيق؟ تحتاج المشاهدة والتصفح إلى الإنترنت.\nOpen outside the app? Internet is required.").setNegativeButton("إلغاء",null).setPositiveButton("فتح",(d,w)->{try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception e){Toast.makeText(this,"لا يمكن فتح الرابط",Toast.LENGTH_SHORT).show();}}).show();
+        try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception e){Toast.makeText(this,"لا يمكن فتح الرابط | Unable to open link",Toast.LENGTH_SHORT).show();}
     }
     private boolean allowedPage(String p){
         if(p==null)return false;

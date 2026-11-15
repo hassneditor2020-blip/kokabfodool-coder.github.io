@@ -34,6 +34,7 @@ for lang,prefix in [('ar',''),('en','en/')]:
     for group in catalog['series']:
         for ep in group[lang]['episodes']:
             assert file_for(ep['route']).is_file(),ep['route']
+            assert re.fullmatch(r'https://www\.youtube\.com/(?:shorts/|watch\?v=)[A-Za-z0-9_-]{11}',ep['video']),ep['video']
             assert ep['image'] in paths,ep['image']
             assert file_for(ep['image']).is_file()
             count+=1
