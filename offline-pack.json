@@ -1,6 +1,6 @@
 {
-  "version": "v5-visual-7125433055ea",
-  "bytes": 13054753,
+  "version": "v5-platform-32457f091962",
+  "bytes": 13096960,
   "files": [
     "/",
     "/app/",
@@ -12,7 +12,10 @@
     "/assets/app-experience.js",
     "/assets/app-icon-192.png",
     "/assets/app-icon-512.png",
+    "/assets/app-learning-v5.json",
     "/assets/app-maskable-512.png",
+    "/assets/app-v5.css",
+    "/assets/app-v5.js",
     "/assets/arabic-letters-kit-cover.webp",
     "/assets/arabic-pronunciation.js",
     "/assets/audio-retest-page.js",
@@ -786,8 +789,6 @@
     "/manifest.webmanifest",
     "/offline/",
     "/play-app/",
-    "/privacy/",
-    "/assets/app-v5.css",
-    "/assets/app-v5.js"
+    "/privacy/"
   ]
 }
