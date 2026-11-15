@@ -1,0 +1,648 @@
+{
+  "series": [
+    {
+      "id": "arabic-letters",
+      "ar": {
+        "episodes": [
+          {
+            "route": "/series/arabic-letters/alif-lion/",
+            "image": "/assets/cover-alif-lion.webp",
+            "title": "حرف الألف أَ مع أَسَد"
+          },
+          {
+            "route": "/series/arabic-letters/baa-duck/",
+            "image": "/assets/cover-baa-duck.webp",
+            "title": "حرف الباء بَ مع بَطَّة"
+          },
+          {
+            "route": "/series/arabic-letters/taa-crown/",
+            "image": "/assets/cover-taa-crown.webp",
+            "title": "حرف التاء تَ مع تَاج"
+          },
+          {
+            "route": "/series/arabic-letters/thaa-fox/",
+            "image": "/assets/cover-thaa-fox.webp",
+            "title": "حرف الثاء ثَ مع ثَعْلَب"
+          },
+          {
+            "route": "/series/arabic-letters/jeem-camel/",
+            "image": "/assets/cover-jeem-camel.webp",
+            "title": "حرف الجيم جَ مع جَمَل"
+          },
+          {
+            "route": "/series/arabic-letters/haa-dove/",
+            "image": "/assets/cover-haa-dove.webp",
+            "title": "حرف الحاء حَ مع حَمَامَة"
+          },
+          {
+            "route": "/series/arabic-letters/khaa-sheep/",
+            "image": "/assets/cover-khaa-sheep.webp",
+            "title": "حرف الخاء خَ مع خَرُوف"
+          },
+          {
+            "route": "/series/arabic-letters/daal-chicken/",
+            "image": "/assets/cover-daal-chicken.webp",
+            "title": "حرف الدال دَ مع دَجَاجَة"
+          },
+          {
+            "route": "/series/arabic-letters/dhaal-gold/",
+            "image": "/assets/episode-dhaal-gold.webp",
+            "title": "حرف الذال ذَ مع ذَهَب"
+          },
+          {
+            "route": "/series/arabic-letters/raa-bread/",
+            "image": "/assets/cover-raa-bread.webp",
+            "title": "حرف الراء رَ مع رَغِيف"
+          },
+          {
+            "route": "/series/arabic-letters/zay-giraffe/",
+            "image": "/assets/cover-zay-giraffe.webp",
+            "title": "حرف الزاي زَ مع زَرَافَة"
+          },
+          {
+            "route": "/series/arabic-letters/seen-fish/",
+            "image": "/assets/cover-seen-fish.webp",
+            "title": "حرف السين سَ مع سَمَكَة"
+          },
+          {
+            "route": "/series/arabic-letters/sheen-sun/",
+            "image": "/assets/cover-sheen-sun.webp",
+            "title": "حرف الشين شَ مع شَمْس"
+          },
+          {
+            "route": "/series/arabic-letters/saad-rocket/",
+            "image": "/assets/cover-saad-rocket.webp",
+            "title": "حرف الصاد صَ مع صَارُوخ"
+          },
+          {
+            "route": "/series/arabic-letters/dad-light/",
+            "image": "/assets/cover-dad-light.webp",
+            "title": "حرف الضاد ضَ مع ضَوْء"
+          },
+          {
+            "route": "/series/arabic-letters/taa-peacock/",
+            "image": "/assets/cover-taa-peacock.webp",
+            "title": "حرف الطاء طَ مع طَاوُوس"
+          },
+          {
+            "route": "/series/arabic-letters/dhaa-gazelle/",
+            "image": "/assets/cover-dhaa-gazelle.webp",
+            "title": "حرف الظاء ظَ مع ظَبْي"
+          },
+          {
+            "route": "/series/arabic-letters/ayn-honey/",
+            "image": "/assets/cover-ayn-honey.webp",
+            "title": "حرف العين عَ مع عَسَل"
+          },
+          {
+            "route": "/series/arabic-letters/ghayn-cloud/",
+            "image": "/assets/episode-ghayn-cloud.webp",
+            "title": "حرف الغين غَ مع غَيْمَة"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLCpjZ-qYSMDw"
+      },
+      "en": {
+        "episodes": [
+          {
+            "route": "/en/series/arabic-letters/alif-lion/",
+            "image": "/assets/cover-alif-lion.webp",
+            "title": "Arabic letter Alif with a lion"
+          },
+          {
+            "route": "/en/series/arabic-letters/baa-duck/",
+            "image": "/assets/cover-baa-duck.webp",
+            "title": "Arabic letter Baa with a duck"
+          },
+          {
+            "route": "/en/series/arabic-letters/taa-crown/",
+            "image": "/assets/cover-taa-crown.webp",
+            "title": "Arabic letter Taa with a crown"
+          },
+          {
+            "route": "/en/series/arabic-letters/thaa-fox/",
+            "image": "/assets/cover-thaa-fox.webp",
+            "title": "Arabic letter Thaa with a fox"
+          },
+          {
+            "route": "/en/series/arabic-letters/jeem-camel/",
+            "image": "/assets/cover-jeem-camel.webp",
+            "title": "Arabic letter Jeem with a camel"
+          },
+          {
+            "route": "/en/series/arabic-letters/haa-dove/",
+            "image": "/assets/cover-haa-dove.webp",
+            "title": "Arabic letter Ḥaa with a dove"
+          },
+          {
+            "route": "/en/series/arabic-letters/khaa-sheep/",
+            "image": "/assets/cover-khaa-sheep.webp",
+            "title": "Arabic letter Khaa with a sheep"
+          },
+          {
+            "route": "/en/series/arabic-letters/daal-chicken/",
+            "image": "/assets/cover-daal-chicken.webp",
+            "title": "Arabic letter Daal with a hen"
+          },
+          {
+            "route": "/en/series/arabic-letters/dhaal-gold/",
+            "image": "/assets/episode-dhaal-gold.webp",
+            "title": "Arabic letter Dhaal with gold"
+          },
+          {
+            "route": "/en/series/arabic-letters/raa-bread/",
+            "image": "/assets/cover-raa-bread.webp",
+            "title": "Arabic letter Raa with a loaf of bread"
+          },
+          {
+            "route": "/en/series/arabic-letters/zay-giraffe/",
+            "image": "/assets/cover-zay-giraffe.webp",
+            "title": "Arabic letter Zay with a giraffe"
+          },
+          {
+            "route": "/en/series/arabic-letters/seen-fish/",
+            "image": "/assets/cover-seen-fish.webp",
+            "title": "Arabic letter Seen with a fish"
+          },
+          {
+            "route": "/en/series/arabic-letters/sheen-sun/",
+            "image": "/assets/cover-sheen-sun.webp",
+            "title": "Arabic letter Sheen with the sun"
+          },
+          {
+            "route": "/en/series/arabic-letters/saad-rocket/",
+            "image": "/assets/cover-saad-rocket.webp",
+            "title": "Arabic letter Saad with a rocket"
+          },
+          {
+            "route": "/en/series/arabic-letters/dad-light/",
+            "image": "/assets/cover-dad-light.webp",
+            "title": "Arabic letter Daad and light"
+          },
+          {
+            "route": "/en/series/arabic-letters/taa-peacock/",
+            "image": "/assets/cover-taa-peacock.webp",
+            "title": "Arabic letter Ṭaa with a peacock"
+          },
+          {
+            "route": "/en/series/arabic-letters/dhaa-gazelle/",
+            "image": "/assets/cover-dhaa-gazelle.webp",
+            "title": "Arabic letter Ẓaa with a gazelle"
+          },
+          {
+            "route": "/en/series/arabic-letters/ayn-honey/",
+            "image": "/assets/cover-ayn-honey.webp",
+            "title": "Arabic letter Ayn with honey"
+          },
+          {
+            "route": "/en/series/arabic-letters/ghayn-cloud/",
+            "image": "/assets/episode-ghayn-cloud.webp",
+            "title": "Arabic letter Ghayn with a cloud"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLCpjZ-qYSMDw"
+      }
+    },
+    {
+      "id": "arabic-numbers",
+      "ar": {
+        "episodes": [
+          {
+            "route": "/series/arabic-numbers/one/",
+            "image": "/assets/episode-one.webp",
+            "title": "الرقم ١ | واحد"
+          },
+          {
+            "route": "/series/arabic-numbers/two-pencils/",
+            "image": "/assets/cover-two-pencils.webp",
+            "title": "الرقم ٢ مع قلمين"
+          },
+          {
+            "route": "/series/arabic-numbers/three-pencils/",
+            "image": "/assets/cover-three-pencils.webp",
+            "title": "الرقم ٣ مع ثلاثة أقلام"
+          },
+          {
+            "route": "/series/arabic-numbers/four-balloons/",
+            "image": "/assets/episode-four-balloons.webp",
+            "title": "الرقم ٤ مع أربعة بالونات"
+          },
+          {
+            "route": "/series/arabic-numbers/five-stars/",
+            "image": "/assets/cover-five-stars.webp",
+            "title": "الرقم ٥ مع خمس نجوم"
+          },
+          {
+            "route": "/series/arabic-numbers/six-cubes/",
+            "image": "/assets/cover-six-cubes.webp",
+            "title": "الرقم ٦ مع ستة مكعبات"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLCpjZ-qYSMDw"
+      },
+      "en": {
+        "episodes": [
+          {
+            "route": "/en/series/arabic-numbers/one/",
+            "image": "/assets/episode-one.webp",
+            "title": "Arabic number 1 | One"
+          },
+          {
+            "route": "/en/series/arabic-numbers/two-pencils/",
+            "image": "/assets/cover-two-pencils.webp",
+            "title": "Arabic number 2 with two pencils"
+          },
+          {
+            "route": "/en/series/arabic-numbers/three-pencils/",
+            "image": "/assets/cover-three-pencils.webp",
+            "title": "Arabic number 3 with three pencils"
+          },
+          {
+            "route": "/en/series/arabic-numbers/four-balloons/",
+            "image": "/assets/episode-four-balloons.webp",
+            "title": "Arabic number 4 with four balloons"
+          },
+          {
+            "route": "/en/series/arabic-numbers/five-stars/",
+            "image": "/assets/cover-five-stars.webp",
+            "title": "Arabic number 5 with five stars"
+          },
+          {
+            "route": "/en/series/arabic-numbers/six-cubes/",
+            "image": "/assets/cover-six-cubes.webp",
+            "title": "Arabic number 6 with six cubes"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLCpjZ-qYSMDw"
+      }
+    },
+    {
+      "id": "english-fun",
+      "ar": {
+        "episodes": [
+          {
+            "route": "/series/english-fun/one-apple/",
+            "image": "/assets/cover-one-apple.webp",
+            "title": "الرقم 1 بالإنجليزية مع لُمعة"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLU6piO0KbPBw"
+      },
+      "en": {
+        "episodes": [
+          {
+            "route": "/en/series/english-fun/one-apple/",
+            "image": "/assets/cover-one-apple.webp",
+            "title": "Number 1 in English with Lumaa"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLU6piO0KbPBw"
+      }
+    },
+    {
+      "id": "mishal",
+      "ar": {
+        "episodes": [
+          {
+            "route": "/series/mishal/protect-our-environment/",
+            "image": "/assets/episode-protect-our-environment.webp",
+            "title": "كيف نحافظ على بيئتنا؟"
+          },
+          {
+            "route": "/series/mishal/sheikh-zayed/",
+            "image": "/assets/episode-sheikh-zayed.webp",
+            "title": "لغز الصندوق والشيخ زايد"
+          },
+          {
+            "route": "/series/mishal/road-to-union/",
+            "image": "/assets/episode-road-to-union.webp",
+            "title": "التعاون والطريق إلى اتحاد الإمارات"
+          },
+          {
+            "route": "/series/mishal/uae-constitution/",
+            "image": "/assets/episode-uae-constitution.webp",
+            "title": "ما الدستور الإماراتي؟"
+          },
+          {
+            "route": "/series/mishal/longitude/",
+            "image": "/assets/episode-longitude.webp",
+            "title": "ما خطوط الطول؟"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLP9OXkUK0ZbI"
+      },
+      "en": {
+        "episodes": [
+          {
+            "route": "/en/series/mishal/protect-our-environment/",
+            "image": "/assets/episode-protect-our-environment.webp",
+            "title": "How can we protect our environment?"
+          },
+          {
+            "route": "/en/series/mishal/sheikh-zayed/",
+            "image": "/assets/episode-sheikh-zayed.webp",
+            "title": "The mystery box and Sheikh Zayed"
+          },
+          {
+            "route": "/en/series/mishal/road-to-union/",
+            "image": "/assets/episode-road-to-union.webp",
+            "title": "Working together on the road to UAE union"
+          },
+          {
+            "route": "/en/series/mishal/uae-constitution/",
+            "image": "/assets/episode-uae-constitution.webp",
+            "title": "What is the UAE Constitution?"
+          },
+          {
+            "route": "/en/series/mishal/longitude/",
+            "image": "/assets/episode-longitude.webp",
+            "title": "What are lines of longitude?"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLP9OXkUK0ZbI"
+      }
+    },
+    {
+      "id": "robo",
+      "ar": {
+        "episodes": [
+          {
+            "route": "/series/robo/mixing-green/",
+            "image": "/assets/cover-mixing-green.webp",
+            "title": "كيف نصنع اللون الأخضر؟"
+          },
+          {
+            "route": "/series/robo/melting-ice/",
+            "image": "/assets/cover-melting-ice.webp",
+            "title": "لماذا يذوب الثلج؟"
+          },
+          {
+            "route": "/series/robo/magnets/",
+            "image": "/assets/cover-magnets.webp",
+            "title": "كيف يعمل المغناطيس؟"
+          },
+          {
+            "route": "/series/robo/static-balloon/",
+            "image": "/assets/episode-static-balloon.webp",
+            "title": "لماذا ينجذب الورق إلى البالون؟"
+          },
+          {
+            "route": "/series/robo/pepper-and-soap/",
+            "image": "/assets/cover-pepper-and-soap.webp",
+            "title": "لماذا يتحرّك الفلفل مع الصابون؟"
+          },
+          {
+            "route": "/series/robo/ball-and-feather/",
+            "image": "/assets/episode-ball-and-feather.webp",
+            "title": "أيهما يسقط أولًا، الكرة أم الريشة؟"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLQd2O1Icr8f8"
+      },
+      "en": {
+        "episodes": [
+          {
+            "route": "/en/series/robo/mixing-green/",
+            "image": "/assets/cover-mixing-green.webp",
+            "title": "How do we make green?"
+          },
+          {
+            "route": "/en/series/robo/melting-ice/",
+            "image": "/assets/cover-melting-ice.webp",
+            "title": "Why does ice melt?"
+          },
+          {
+            "route": "/en/series/robo/magnets/",
+            "image": "/assets/cover-magnets.webp",
+            "title": "How does a magnet work?"
+          },
+          {
+            "route": "/en/series/robo/static-balloon/",
+            "image": "/assets/episode-static-balloon.webp",
+            "title": "Why does paper stick to a balloon?"
+          },
+          {
+            "route": "/en/series/robo/pepper-and-soap/",
+            "image": "/assets/cover-pepper-and-soap.webp",
+            "title": "Why does pepper move when soap touches water?"
+          },
+          {
+            "route": "/en/series/robo/ball-and-feather/",
+            "image": "/assets/episode-ball-and-feather.webp",
+            "title": "Which falls first, the ball or the feather?"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLQd2O1Icr8f8"
+      }
+    },
+    {
+      "id": "guess",
+      "ar": {
+        "episodes": [
+          {
+            "route": "/series/guess/mystery-tail/",
+            "image": "/assets/cover-mystery-tail.webp",
+            "title": "من صاحب هذا الذيل؟"
+          },
+          {
+            "route": "/series/guess/missing-star/",
+            "image": "/assets/episode-missing-star.webp",
+            "title": "أين اختفت النجمة؟"
+          },
+          {
+            "route": "/series/guess/mystery-sound/",
+            "image": "/assets/cover-mystery-sound.webp",
+            "title": "من صاحب هذا الصوت؟"
+          },
+          {
+            "route": "/series/guess/missing-car-part/",
+            "image": "/assets/episode-missing-car-part.webp",
+            "title": "ما القطعة الناقصة في السيارة؟"
+          },
+          {
+            "route": "/series/guess/treasure-door/",
+            "image": "/assets/cover-treasure-door.webp",
+            "title": "أي باب يخفي الكنز؟"
+          },
+          {
+            "route": "/series/guess/mystery-footprints/",
+            "image": "/assets/episode-mystery-footprints.webp",
+            "title": "من ترك هذه الآثار؟"
+          },
+          {
+            "route": "/series/guess/behind-the-curtain/",
+            "image": "/assets/episode-behind-the-curtain.webp",
+            "title": "من يختبئ خلف الستار؟"
+          },
+          {
+            "route": "/series/guess/white-light/",
+            "image": "/assets/episode-white-light.webp",
+            "title": "ماذا يخفي الضوء الأبيض؟"
+          },
+          {
+            "route": "/series/guess/glow-in-the-dark/",
+            "image": "/assets/episode-glow-in-the-dark.webp",
+            "title": "من يضيء في الظلام؟"
+          },
+          {
+            "route": "/series/guess/three-hearts/",
+            "image": "/assets/cover-three-hearts.webp",
+            "title": "أي حيوان لديه ثلاثة قلوب؟"
+          },
+          {
+            "route": "/series/guess/upside-down-bat/",
+            "image": "/assets/cover-upside-down-bat.webp",
+            "title": "أي حيوان يستريح بالمقلوب؟"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLLROQvcofPTI"
+      },
+      "en": {
+        "episodes": [
+          {
+            "route": "/en/series/guess/mystery-tail/",
+            "image": "/assets/cover-mystery-tail.webp",
+            "title": "Whose tail is this?"
+          },
+          {
+            "route": "/en/series/guess/missing-star/",
+            "image": "/assets/episode-missing-star.webp",
+            "title": "Where did the star go?"
+          },
+          {
+            "route": "/en/series/guess/mystery-sound/",
+            "image": "/assets/cover-mystery-sound.webp",
+            "title": "Which animal made that sound?"
+          },
+          {
+            "route": "/en/series/guess/missing-car-part/",
+            "image": "/assets/episode-missing-car-part.webp",
+            "title": "What part is missing from the car?"
+          },
+          {
+            "route": "/en/series/guess/treasure-door/",
+            "image": "/assets/cover-treasure-door.webp",
+            "title": "Which door hides the treasure?"
+          },
+          {
+            "route": "/en/series/guess/mystery-footprints/",
+            "image": "/assets/episode-mystery-footprints.webp",
+            "title": "Who left these footprints?"
+          },
+          {
+            "route": "/en/series/guess/behind-the-curtain/",
+            "image": "/assets/episode-behind-the-curtain.webp",
+            "title": "Who is hiding behind the curtain?"
+          },
+          {
+            "route": "/en/series/guess/white-light/",
+            "image": "/assets/episode-white-light.webp",
+            "title": "What is hidden in white light?"
+          },
+          {
+            "route": "/en/series/guess/glow-in-the-dark/",
+            "image": "/assets/episode-glow-in-the-dark.webp",
+            "title": "What glows in the dark?"
+          },
+          {
+            "route": "/en/series/guess/three-hearts/",
+            "image": "/assets/cover-three-hearts.webp",
+            "title": "Which animal has three hearts?"
+          },
+          {
+            "route": "/en/series/guess/upside-down-bat/",
+            "image": "/assets/cover-upside-down-bat.webp",
+            "title": "Which animal rests upside down?"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLLROQvcofPTI"
+      }
+    },
+    {
+      "id": "what-if",
+      "ar": {
+        "episodes": [
+          {
+            "route": "/series/what-if/no-gravity/",
+            "image": "/assets/cover-no-gravity.webp",
+            "title": "ماذا لو اختفت الجاذبية؟"
+          },
+          {
+            "route": "/series/what-if/ant-size/",
+            "image": "/assets/cover-ant-size.webp",
+            "title": "ماذا لو أصبحت بحجم نملة؟"
+          },
+          {
+            "route": "/series/what-if/walking-on-clouds/",
+            "image": "/assets/episode-walking-on-clouds.webp",
+            "title": "ماذا لو مشيت فوق الغيوم؟"
+          },
+          {
+            "route": "/series/what-if/no-friction/",
+            "image": "/assets/cover-no-friction.webp",
+            "title": "ماذا لو اختفى الاحتكاك؟"
+          },
+          {
+            "route": "/series/what-if/no-colors/",
+            "image": "/assets/episode-no-colors.webp",
+            "title": "ماذا لو اختفت الألوان؟"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLUj7wVfSWIE8"
+      },
+      "en": {
+        "episodes": [
+          {
+            "route": "/en/series/what-if/no-gravity/",
+            "image": "/assets/cover-no-gravity.webp",
+            "title": "What if gravity disappeared?"
+          },
+          {
+            "route": "/en/series/what-if/ant-size/",
+            "image": "/assets/cover-ant-size.webp",
+            "title": "What if you were the size of an ant?"
+          },
+          {
+            "route": "/en/series/what-if/walking-on-clouds/",
+            "image": "/assets/episode-walking-on-clouds.webp",
+            "title": "What if you could walk on clouds?"
+          },
+          {
+            "route": "/en/series/what-if/no-friction/",
+            "image": "/assets/cover-no-friction.webp",
+            "title": "What if friction disappeared?"
+          },
+          {
+            "route": "/en/series/what-if/no-colors/",
+            "image": "/assets/episode-no-colors.webp",
+            "title": "What if colors disappeared?"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLUj7wVfSWIE8"
+      }
+    },
+    {
+      "id": "short-stories",
+      "ar": {
+        "episodes": [
+          {
+            "route": "/series/short-stories/little-umbrella/",
+            "image": "/assets/episode-little-umbrella.webp",
+            "title": "المظلّة الصغيرة"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLMGFo8Uo4eIw"
+      },
+      "en": {
+        "episodes": [
+          {
+            "route": "/en/series/short-stories/little-umbrella/",
+            "image": "/assets/episode-little-umbrella.webp",
+            "title": "The Little Umbrella"
+          }
+        ],
+        "playlist": "https://www.youtube.com/playlist?list=PLMGFo8Uo4eIw"
+      }
+    }
+  ]
+}
