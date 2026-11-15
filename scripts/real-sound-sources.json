@@ -1,0 +1,326 @@
+{
+  "source": [
+    [
+      "sheep",
+      "خروف",
+      "Sheep",
+      "sheep",
+      "Sheep bleat.ogg",
+      "Eviatar Bach",
+      "CC0-1.0",
+      0,
+      0
+    ],
+    [
+      "sheep-field",
+      "خروف",
+      "Sheep",
+      "sheep",
+      "Sheep bleating.ogg",
+      "earthcalling",
+      "PD",
+      0,
+      0
+    ],
+    [
+      "cow",
+      "بقرة",
+      "Cow",
+      "cow",
+      "Mudchute cow 1.ogg",
+      "Secretlondon",
+      "CC-BY-SA-3.0",
+      0,
+      0
+    ],
+    [
+      "cat",
+      "قطة",
+      "Cat",
+      "cat",
+      "Meow.ogg",
+      "Dan Crosby (Dcrosby)",
+      "CC-BY-SA-3.0",
+      0,
+      0
+    ],
+    [
+      "dog",
+      "كلب",
+      "Dog",
+      "dog",
+      "Barking of a dog.ogg",
+      "Amada44",
+      "CC-BY-SA-3.0",
+      0,
+      0
+    ],
+    [
+      "dog-alt",
+      "كلب",
+      "Dog",
+      "dog",
+      "Barking of a dog 2.ogg",
+      "Amada44",
+      "CC-BY-SA-3.0",
+      0,
+      0
+    ],
+    [
+      "rooster",
+      "ديك",
+      "Rooster",
+      "rooster",
+      "Young rooster crowing.ogg",
+      "Filo gèn'",
+      "CC-BY-SA-4.0",
+      0,
+      0
+    ],
+    [
+      "horse",
+      "حصان",
+      "Horse",
+      "horse",
+      "Wiehern.ogg",
+      "Hü.",
+      "PD",
+      0,
+      0
+    ],
+    [
+      "frog",
+      "ضفدع",
+      "Frog",
+      "frog",
+      "Frog sounds.ogg",
+      "Hughesdarren",
+      "CC-BY-SA-4.0",
+      1,
+      6
+    ],
+    [
+      "bird",
+      "عصفور",
+      "Bird",
+      "bird",
+      "Bird singing.ogg",
+      "jc",
+      "PD",
+      2,
+      6
+    ],
+    [
+      "rain",
+      "مطر",
+      "Rain",
+      "rain",
+      "Rain.ogg",
+      "ジダネ",
+      "PD",
+      0,
+      6
+    ],
+    [
+      "water",
+      "صنبور ماء",
+      "Running tap",
+      "tap",
+      "Tapsinkwaternoise.ogg",
+      "Secretlondon",
+      "CC-BY-SA-3.0",
+      2,
+      6
+    ],
+    [
+      "waves",
+      "أمواج البحر",
+      "Sea waves",
+      "waves",
+      "Sea waves.wav",
+      "Ganesh Mohan T",
+      "CC-BY-SA-4.0",
+      2,
+      6
+    ],
+    [
+      "storm",
+      "عاصفة رعدية",
+      "Thunderstorm",
+      "storm",
+      "Rain and thunder.ogg",
+      "Caesar",
+      "PD",
+      0,
+      0
+    ],
+    [
+      "car",
+      "بوق سيارة",
+      "Car horn",
+      "car",
+      "Car Horn.wav",
+      "15HPanska_Ruttner_Jan",
+      "CC0-1.0",
+      0,
+      0
+    ],
+    [
+      "train",
+      "بوق قطار",
+      "Train horn",
+      "train",
+      "4000 class train horn.ogg",
+      "Cityedit14",
+      "CC-BY-SA-4.0",
+      0,
+      0
+    ],
+    [
+      "door",
+      "طرق الباب",
+      "Door knock",
+      "door",
+      "Door knocker audio.ogg",
+      "Mx. Granger",
+      "CC0-1.0",
+      0,
+      0
+    ],
+    [
+      "bell",
+      "جرس",
+      "Bell",
+      "bell",
+      "St. Paul’s bell-ringing practice.oga",
+      "Tom Ackroyd",
+      "CC0-1.0",
+      1,
+      6
+    ],
+    [
+      "clock",
+      "ساعة",
+      "Clock",
+      "clock",
+      "Clock ticking.ogg",
+      "natalie",
+      "PD",
+      1,
+      6
+    ]
+  ],
+  "levels": [
+    [
+      "أصدقاء المزرعة",
+      "Farm friends",
+      [
+        "sheep",
+        "cow",
+        "cat",
+        "dog"
+      ],
+      3
+    ],
+    [
+      "أصوات الحيوانات",
+      "Animal voices",
+      [
+        "horse",
+        "rooster",
+        "sheep-field",
+        "dog-alt"
+      ],
+      3
+    ],
+    [
+      "أصوات الحديقة",
+      "Garden sounds",
+      [
+        "bird",
+        "frog",
+        "cat",
+        "rooster"
+      ],
+      3
+    ],
+    [
+      "أصوات الطبيعة",
+      "Nature sounds",
+      [
+        "rain",
+        "water",
+        "waves",
+        "storm"
+      ],
+      3
+    ],
+    [
+      "في الطريق",
+      "On the road",
+      [
+        "car",
+        "train",
+        "bell",
+        "door"
+      ],
+      4
+    ],
+    [
+      "أصوات البيت",
+      "At home",
+      [
+        "clock",
+        "water",
+        "door",
+        "cat"
+      ],
+      4
+    ],
+    [
+      "مغامرة الاستماع",
+      "Listening adventure",
+      [
+        "dog-alt",
+        "frog",
+        "train",
+        "rain",
+        "bell"
+      ],
+      4
+    ],
+    [
+      "تحدي الحيوانات",
+      "Animal challenge",
+      [
+        "sheep-field",
+        "horse",
+        "cow",
+        "bird"
+      ],
+      4
+    ],
+    [
+      "تحدي البيئة",
+      "Environment challenge",
+      [
+        "waves",
+        "storm",
+        "clock",
+        "water"
+      ],
+      4
+    ],
+    [
+      "المحقق الصوتي",
+      "Sound detective",
+      [
+        "rooster",
+        "car",
+        "frog",
+        "sheep"
+      ],
+      4
+    ]
+  ]
+}
