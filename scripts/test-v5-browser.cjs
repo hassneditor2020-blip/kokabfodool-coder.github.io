@@ -15,7 +15,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    const page=await browser.newPage({viewport:{width,height:844}});
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto(origin+(lang==='ar'?'/play-app/':'/en/play-app/'),{waitUntil:'networkidle'});
-   const visible=async v=>assert(await page.locator('[data-v5-view="'+v+'"]').isVisible(),lang+' '+width+' '+v);
+   const visible=async v=>{await page.locator('[data-v5-view="'+v+'"]').waitFor({state:'visible',timeout:8000});};
    const fit=async()=>assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'horizontal overflow '+lang+' '+width);
    await visible('home');await fit();
    await page.screenshot({path:'build/v5-screenshots/'+lang+'-'+width+'-home.png',fullPage:true});
