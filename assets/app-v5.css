@@ -53,3 +53,6 @@
 
 /* The dashboard owns its navigation; suppress the older PWA navigation only here. */
 .v5-body .pwa-bottom-nav{display:none!important}.v5-body .v5-nav{z-index:100}
+
+/* Local parent keypad: usable even if Android's IME is unavailable. */
+#v5-gate{box-sizing:border-box;width:min(92vw,420px);max-height:calc(100dvh - 24px);overflow-y:auto}#v5-gate h2{margin:0 0 8px}#v5-gate p{margin:8px 0;line-height:1.55}#v5-gate input{box-sizing:border-box;text-align:center;font-weight:800;letter-spacing:2px}#v5-gate .v5-keypad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0 10px}#v5-gate .v5-key{min-height:39px;padding:5px;background:#eee8f8;color:#48366d;border:1px solid #d8cbee;border-radius:12px;font-size:1.05rem}#v5-gate [data-v5-status]:empty{display:none}#v5-gate .v5-key:focus-visible{outline:2px solid #6544ad;outline-offset:2px}

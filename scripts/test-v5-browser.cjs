@@ -27,7 +27,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    assert.equal(await page.locator('#v5-series-detail .v5-detail-grid .v5-episode').count(),19);
    await page.locator('#v5-series-detail .v5-detail-grid .v5-episode').first().click();
    assert(await page.locator('#v5-gate').isVisible());
-   await page.locator('#v5-gate [data-v5-answer]').fill('0');
+   await page.locator('#v5-gate [data-v5-key="0"]').click();
    await page.locator('#v5-gate [data-v5-confirm]').click();
    assert(await page.locator('#v5-gate [data-v5-status]').innerText());
    await page.locator('#v5-gate button[value=cancel]').click();
@@ -42,6 +42,32 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    assert.deepEqual(errors,[],lang+' '+width+' JS errors');
    await page.close();
    console.log('PASS',lang,width,'five views / 20 games / catalogue / parent gate / no overflow');
+  }
+  for(const lang of ['ar','en']) {
+   const page=await browser.newPage({viewport:{width:390,height:844},userAgent:'Mozilla/5.0 FudoolAndroidOffline'});
+   let opened=null;
+   await page.route('**/play-app/external/?url=*',async route=>{opened=new URL(route.request().url()).searchParams.get('url');await route.fulfill({status:200,body:'native interception simulated'})});
+   await page.goto(origin+(lang==='ar'?'/play-app/':'/en/play-app/'),{waitUntil:'networkidle'});
+   await page.locator('.v5-nav a[href="#v5-watch"]').click();
+   await page.locator('a[href="#v5-series-arabic-letters"]').last().click();
+   await page.waitForSelector('#v5-series-detail .v5-detail-grid .v5-episode');
+   const yt=page.locator('#v5-series-detail .v5-yt-button').first();
+   await yt.click();
+   const gate=page.locator('#v5-gate');
+   assert(await gate.locator('[data-v5-answer]').isEnabled());
+   assert(await gate.locator('[data-v5-confirm]').isEnabled());
+   await gate.locator('[data-v5-key="0"]').click();
+   await gate.locator('[data-v5-confirm]').click();
+   assert(await gate.locator('[data-v5-status]').innerText());assert.equal(opened,null);
+   await gate.locator('[data-v5-key="clear"]').click();
+   const question=await gate.locator('label span').innerText();
+   const nums=question.match(/\d+/g).map(Number);
+   for(const digit of String(nums[0]+nums[1]))await gate.locator('[data-v5-key="'+digit+'"]').click();
+   await gate.locator('[data-v5-confirm]').click();
+   await page.waitForURL('**/play-app/external/?url=*');
+   assert(opened&&new URL(opened).origin==='https://www.youtube.com');
+   await page.close();
+   console.log('PASS offline parent keypad and external navigation (simulated)',lang);
   }
  }finally{if(browser)await browser.close();server.kill()}
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -1,7 +1,7 @@
 (()=>{"use strict";
 const ar=document.documentElement.lang==='ar',tr=(a,e)=>ar?a:e,pre=ar?'':'/en';
 const views=[...document.querySelectorAll('[data-v5-view]')],nav=[...document.querySelectorAll('.v5-nav a')],detail=document.querySelector('#v5-series-detail'),series=document.querySelector('#v5-series'),latest=document.querySelector('#v5-latest');
-const offline=location.hostname==='appassets.androidplatform.net'||navigator.userAgent.includes('FudoolAndroidOffline'),nativeOnline=navigator.userAgent.includes('FudoolAndroidOnline');
+const offline=location.hostname==='appassets.androidplatform.net'||navigator.userAgent.includes('FudoolAndroidOffline'),nativeApp=/FudoolAndroidOffline|FudoolAndroidOnline/.test(navigator.userAgent);
 const config={'arabic-letters':['الحروف العربية','Arabic letters','letters.webp','letter-match',true],'arabic-numbers':['الأرقام العربية','Arabic numbers','numbers.webp','counting',true],'english-fun':['الإنجليزية مع لُمعة','English with Lumaa','english-round.webp','english-abc',true],mishal:['مغامرات مشعال','Mishaal adventures','mishal.webp','world-mishaal',false],robo:['واو! مع روبّو','Wow with Robo','robo.webp','robo-lab',false],guess:['خمّن مع فضول','Guess with Fudool','guess.webp','sound-quiz',false],'what-if':['ماذا لو؟','What if?','what-if-cover.webp','space-journey',false],'short-stories':['القصص التعليمية','Learning stories','stories-round.webp','memory',false]};
 const node=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el};
 function button(text,cls,fn){const b=node('button',cls,text);b.type='button';b.addEventListener('click',fn);return b}
@@ -28,9 +28,37 @@ document.querySelectorAll('[data-v5-episode]').forEach(b=>b.addEventListener('cl
 document.querySelectorAll('[data-v5-open-library]').forEach(b=>b.addEventListener('click',()=>series.scrollIntoView({block:'start'})));
 const gate=document.querySelector('#v5-gate'),answer=gate.querySelector('[data-v5-answer]'),status=gate.querySelector('[data-v5-status]'),message=gate.querySelector('[data-v5-message]');let target='',expected=0;
 const question=node('span');answer.closest('label').firstChild.replaceWith(question);
-function openGate(value){target=value;answer.value='';status.textContent='';let x=12+Math.floor(Math.random()*8),y=6+Math.floor(Math.random()*7);expected=x+y;question.textContent=tr('للأهل: كم حاصل ','Parents: what is ')+x+' + '+y+'?';const noNet=offline||!navigator.onLine;message.textContent=noNet?tr('المشاهدة تحتاج إلى الإنترنت. يمكنك تصفح مكتبة الحلقات ومتابعة الألعاب دون اتصال.','Watching needs internet. You can browse the library and play offline.'):tr('هذه الصفحة ستفتح خارج التطبيق بموافقة أحد الوالدين.','This page opens outside the app with a parent’s permission.');answer.disabled=noNet;gate.querySelector('[data-v5-confirm]').disabled=noNet;if(typeof gate.showModal==='function')gate.showModal();else gate.setAttribute('open','');if(!noNet)answer.focus()}
+// The parent gate is local; only the destination needs a network.
+const confirm=gate.querySelector('[data-v5-confirm]');
+const keypad=node('div','v5-keypad');keypad.setAttribute('role','group');keypad.setAttribute('aria-label',tr('لوحة الأرقام','Number keypad'));keypad.dir='ltr';
+answer.maxLength=2;answer.setAttribute('inputmode','numeric');answer.dir='ltr';
+for(const key of ['1','2','3','4','5','6','7','8','9','clear','0','back']){
+ const b=button(key==='clear'?tr('مسح','Clear'):key==='back'?'⌫':key,'v5-key',()=>{
+  answer.value=key==='clear'?'':key==='back'?answer.value.slice(0,-1):((answer.value+key).slice(0,2));
+  status.textContent='';
+ });
+ b.dataset.v5Key=key;if(key==='back')b.setAttribute('aria-label',tr('حذف رقم','Delete digit'));keypad.append(b);
+}
+answer.closest('label').after(keypad);
+answer.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();confirm.click()}});
+function openGate(value){
+ target=value;answer.value='';status.textContent='';let x=12+Math.floor(Math.random()*8),y=6+Math.floor(Math.random()*7);expected=x+y;
+ question.textContent=tr('للأهل: كم حاصل ','Parents: what is ')+x+' + '+y+'?';
+ question.dir='auto';
+ message.textContent=offline||!navigator.onLine?tr('يمكن فتح الرابط خارج التطبيق بإذن الأهل. المشاهدة والتصفح يحتاجان إلى الإنترنت؛ الألعاب تعمل دون اتصال.','A parent can open the link outside the app. Watching and browsing need internet; games work offline.'):tr('هذه الصفحة ستفتح خارج التطبيق بموافقة أحد الوالدين.','This page opens outside the app with a parent’s permission.');
+ answer.disabled=false;confirm.disabled=false;
+ if(typeof gate.showModal==='function')gate.showModal();else gate.setAttribute('open','');
+ if(nativeApp)keypad.querySelector('button').focus();else answer.focus();
+}
 document.querySelectorAll('[data-v5-external]').forEach(b=>b.addEventListener('click',()=>openGate(b.dataset.v5External)));
-gate.querySelector('[data-v5-confirm]').addEventListener('click',()=>{if(offline||!navigator.onLine)return;const normalized=answer.value.trim().replace(/[٠-٩]/g,c=>String(c.charCodeAt(0)-1632));if(normalized!==String(expected)){status.textContent=tr('حاول مرة أخرى.','Try again.');return}let u;try{u=new URL(target,'https://kokabfodool.com')}catch{return}if(!['https://kokabfodool.com','https://www.youtube.com','https://www.instagram.com'].includes(u.origin))return;if(typeof gate.close==='function')gate.close();else gate.removeAttribute('open');if(nativeOnline)location.assign('/play-app/external/?url='+encodeURIComponent(u.href));else location.assign(u.href)});
+confirm.addEventListener('click',()=>{
+ const normalized=answer.value.trim().replace(/[٠-٩۰-۹]/g,c=>String(c.charCodeAt(0)-(c.charCodeAt(0)>=1776?1776:1632)));
+ if(normalized!==String(expected)){status.textContent=tr('حاول مرة أخرى.','Try again.');return}
+ let u;try{u=new URL(target,'https://kokabfodool.com')}catch{return}
+ if(!['https://kokabfodool.com','https://www.youtube.com','https://www.instagram.com'].includes(u.origin)||u.username||u.password)return;
+ if(typeof gate.close==='function')gate.close();else gate.removeAttribute('open');
+ if(nativeApp)location.assign('/play-app/external/?url='+encodeURIComponent(u.href));else location.assign(u.href);
+});
 gate.querySelector('button[value=cancel]').addEventListener('click',()=>{if(typeof gate.close!=='function')gate.removeAttribute('open')});
 const badges=document.querySelector('[data-v5-badges]');if(badges){const stats=document.querySelector('[data-app-stats]');function renderBadges(){const nums=[...stats.querySelectorAll('strong')].map(e=>Number(e.textContent)||0);if(nums.length<3)return;badges.replaceChildren();[['star',nums[0]>=1,tr('أول نجمة','First star')],['medal',nums[0]>=10,tr('مستكشف النجوم','Star explorer')],['crown',nums[1]>=10,tr('بطل التعلّم','Learning hero')],['globe',nums[2]>=5,tr('مغامر فضول','Fudool adventurer')]].forEach(([id,won,title])=>{const card=node('article','v5-badge'+(won?'':' locked'));const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),use=document.createElementNS(ns,'use');svg.setAttribute('viewBox','0 0 120 120');use.setAttribute('href','/assets/learning-art.svg#'+id);svg.append(use);card.append(svg,node('strong','',title),node('small','',won?tr('تم الإنجاز','Earned'):tr('واصل اللعب','Keep playing')));badges.append(card)})}new MutationObserver(renderBadges).observe(stats,{childList:true,subtree:true});renderBadges()}
 })();
