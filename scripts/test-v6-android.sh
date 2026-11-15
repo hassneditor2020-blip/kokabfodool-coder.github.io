@@ -79,10 +79,10 @@ find_label 'الجولة 1' no
 find_label 'انطلق' no
 adb exec-out screencap -p > build/v6-screenshots/android-offline-drive.png
 
-adb shell am force-stop "$package"
-adb shell am start -W -n "$activity"
-find_label 'الألعاب' yes
-find_label 'عالم الألعاب' no
+adb shell input keyevent KEYCODE_BACK
+sleep 1
+adb shell input swipe 193 225 193 720 300
+adb shell input swipe 193 225 193 720 300
 find_label 'التحديات' yes
 find_label 'مختبر روبو' yes
 find_label 'تجارب روبو' yes
