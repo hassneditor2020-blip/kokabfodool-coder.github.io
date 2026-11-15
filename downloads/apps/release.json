@@ -1,10 +1,10 @@
 {
   "unified": {
-    "file": "Kokab-Fodool-V6.0.apk",
-    "version": "6.0.0",
-    "versionCode": 60,
-    "bytes": 14776698,
-    "sha256": "10840b09b65fbc8042115617619cc7eb428ebede17f08cdd33711c62efa53c83",
+    "file": "Kokab-Fodool-V6.1.apk",
+    "version": "6.1.0",
+    "versionCode": 61,
+    "bytes": 14785059,
+    "sha256": "e0fbee0178787da7d750c0010d348b0dde286ff913421a7000eb152a27084cc1",
     "certificate_sha256": "ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729"
   }
 }
