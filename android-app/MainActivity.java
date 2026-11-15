@@ -15,13 +15,12 @@ import java.io.*;
 import java.util.*;
 public class MainActivity extends Activity {
     private WebView web;
-    private boolean offline;
     private String host;
     private String home;
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
-        offline=getPackageName().endsWith(".offline");
-        host=offline?"appassets.androidplatform.net":"kokabfodool.com";
+        // Preserve the old offline package and origin so saved progress is retained on update.
+        host="appassets.androidplatform.net";
         home="https://"+host+"/play-app/";
         getWindow().setStatusBarColor(Color.rgb(73,48,143));
         getWindow().setNavigationBarColor(Color.WHITE);
@@ -35,46 +34,39 @@ public class MainActivity extends Activity {
         s.setAllowFileAccessFromFileURLs(false);s.setAllowUniversalAccessFromFileURLs(false);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         s.setJavaScriptCanOpenWindowsAutomatically(false);s.setSupportMultipleWindows(false);
-        s.setMediaPlaybackRequiresUserGesture(true);s.setUserAgentString(s.getUserAgentString()+(offline?" FudoolAndroidOffline":" FudoolAndroidOnline"));
-        if(offline)s.setBlockNetworkLoads(true);
+        s.setMediaPlaybackRequiresUserGesture(true);s.setUserAgentString(s.getUserAgentString()+" FudoolAndroidUnified");
+        s.setBlockNetworkLoads(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(web,false);
         web.setWebChromeClient(new WebChromeClient());
         web.setWebViewClient(new WebViewClient(){
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest req){
                 Uri u=req.getUrl();String p=u.getPath();
-                if(req.isForMainFrame() && "https".equals(u.getScheme()) && host.equals(u.getHost()) && "/play-app/external/".equals(p)){openParentLink(u.getQueryParameter("url"));return true;}
+                if(req.isForMainFrame() && "https".equals(u.getScheme()) && host.equals(u.getHost()) && "/play-app/external/".equals(p)){openExternalLink(u.getQueryParameter("url"));return true;}
                 if("https".equals(u.getScheme())&&host.equals(u.getHost())&&allowedPage(p))return false;
-                if(req.isForMainFrame())Toast.makeText(MainActivity.this,"هذه النسخة مخصصة للألعاب | Games edition",Toast.LENGTH_SHORT).show();
+                if(req.isForMainFrame())Toast.makeText(MainActivity.this,"هذا الرابط غير متاح | Link unavailable",Toast.LENGTH_SHORT).show();
                 return true;
             }
             @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest req){
                 Uri u=req.getUrl();
                 if(!"https".equals(u.getScheme())||!host.equals(u.getHost()))return error(403,"Blocked");
-                if(!offline)return null;
                 return local(u,req.getRequestHeaders());
             }
             @Override public void onReceivedError(WebView view,WebResourceRequest req,WebResourceError e){
-                if(req.isForMainFrame()&&!offline)runOnUiThread(()->showRetry());
+                if(req.isForMainFrame())runOnUiThread(()->Toast.makeText(MainActivity.this,"تعذر فتح الصفحة | Unable to open page",Toast.LENGTH_SHORT).show());
             }
         });
         setContentView(web);
         if(state==null)web.loadUrl(home);else if(web.restoreState(state)==null)web.loadUrl(home);
     }
-    private void openParentLink(String value){
+    private void openExternalLink(String value){
         if(value==null)return;
         Uri u=Uri.parse(value);String h=u.getHost();
         if(!"https".equals(u.getScheme())||u.getUserInfo()!=null||(u.getPort()!=-1&&u.getPort()!=443)||!("kokabfodool.com".equals(h)||"www.youtube.com".equals(h)||"www.instagram.com".equals(h)))return;
-        new AlertDialog.Builder(this).setTitle("للأهل فقط").setMessage("فتح هذا الرابط خارج التطبيق؟ تحتاج المشاهدة والتصفح إلى الإنترنت.\nOpen outside the app? Internet is required.").setNegativeButton("إلغاء",null).setPositiveButton("فتح",(d,w)->{try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception e){Toast.makeText(this,"لا يمكن فتح الرابط",Toast.LENGTH_SHORT).show();}}).show();
+        try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception e){Toast.makeText(this,"لا يمكن فتح الرابط | Unable to open link",Toast.LENGTH_SHORT).show();}
     }
     private boolean allowedPage(String p){
         if(p==null)return false;
         return p.equals("/")||p.equals("/en/")||p.matches("^/(en/)?(play-app|games|app|privacy)(/.*)?$");
-    }
-    private void showRetry(){
-        LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setPadding(32,64,32,32);
-        TextView text=new TextView(this);text.setText("تحتاج نسخة أونلاين إلى الإنترنت.\nThe online edition needs an internet connection.");text.setTextSize(20);
-        Button b=new Button(this);b.setText("إعادة المحاولة | Retry");b.setOnClickListener(v->{setContentView(web);web.loadUrl(home);});
-        box.addView(text);box.addView(b);setContentView(box);
     }
     private static WebResourceResponse error(int code,String message){
         return new WebResourceResponse("text/plain","UTF-8",code,message,Collections.emptyMap(),new ByteArrayInputStream(message.getBytes(java.nio.charset.StandardCharsets.UTF_8)));

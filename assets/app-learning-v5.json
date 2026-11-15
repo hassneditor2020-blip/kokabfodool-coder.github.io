@@ -7,97 +7,116 @@
           {
             "route": "/series/arabic-letters/alif-lion/",
             "image": "/assets/cover-alif-lion.webp",
-            "title": "حرف الألف أَ مع أَسَد"
+            "title": "حرف الألف أَ مع أَسَد",
+            "video": "https://www.youtube.com/shorts/jWGpJk12uvY"
           },
           {
             "route": "/series/arabic-letters/baa-duck/",
             "image": "/assets/cover-baa-duck.webp",
-            "title": "حرف الباء بَ مع بَطَّة"
+            "title": "حرف الباء بَ مع بَطَّة",
+            "video": "https://www.youtube.com/shorts/eD2G0v9IdJc"
           },
           {
             "route": "/series/arabic-letters/taa-crown/",
             "image": "/assets/cover-taa-crown.webp",
-            "title": "حرف التاء تَ مع تَاج"
+            "title": "حرف التاء تَ مع تَاج",
+            "video": "https://www.youtube.com/shorts/vI5cfUL1qQ8"
           },
           {
             "route": "/series/arabic-letters/thaa-fox/",
             "image": "/assets/cover-thaa-fox.webp",
-            "title": "حرف الثاء ثَ مع ثَعْلَب"
+            "title": "حرف الثاء ثَ مع ثَعْلَب",
+            "video": "https://www.youtube.com/shorts/TPHwUroHbRc"
           },
           {
             "route": "/series/arabic-letters/jeem-camel/",
             "image": "/assets/cover-jeem-camel.webp",
-            "title": "حرف الجيم جَ مع جَمَل"
+            "title": "حرف الجيم جَ مع جَمَل",
+            "video": "https://www.youtube.com/shorts/fAjnYuQbdVs"
           },
           {
             "route": "/series/arabic-letters/haa-dove/",
             "image": "/assets/cover-haa-dove.webp",
-            "title": "حرف الحاء حَ مع حَمَامَة"
+            "title": "حرف الحاء حَ مع حَمَامَة",
+            "video": "https://www.youtube.com/shorts/P3HzQxIt6JU"
           },
           {
             "route": "/series/arabic-letters/khaa-sheep/",
             "image": "/assets/cover-khaa-sheep.webp",
-            "title": "حرف الخاء خَ مع خَرُوف"
+            "title": "حرف الخاء خَ مع خَرُوف",
+            "video": "https://www.youtube.com/shorts/JrDgzbz01rw"
           },
           {
             "route": "/series/arabic-letters/daal-chicken/",
             "image": "/assets/cover-daal-chicken.webp",
-            "title": "حرف الدال دَ مع دَجَاجَة"
+            "title": "حرف الدال دَ مع دَجَاجَة",
+            "video": "https://www.youtube.com/shorts/8OW3aSgZ1qQ"
           },
           {
             "route": "/series/arabic-letters/dhaal-gold/",
             "image": "/assets/episode-dhaal-gold.webp",
-            "title": "حرف الذال ذَ مع ذَهَب"
+            "title": "حرف الذال ذَ مع ذَهَب",
+            "video": "https://www.youtube.com/shorts/0wKH7MYeqVM"
           },
           {
             "route": "/series/arabic-letters/raa-bread/",
             "image": "/assets/cover-raa-bread.webp",
-            "title": "حرف الراء رَ مع رَغِيف"
+            "title": "حرف الراء رَ مع رَغِيف",
+            "video": "https://www.youtube.com/shorts/NgMmrN91IWw"
           },
           {
             "route": "/series/arabic-letters/zay-giraffe/",
             "image": "/assets/cover-zay-giraffe.webp",
-            "title": "حرف الزاي زَ مع زَرَافَة"
+            "title": "حرف الزاي زَ مع زَرَافَة",
+            "video": "https://www.youtube.com/shorts/XlUZS3X_Q-s"
           },
           {
             "route": "/series/arabic-letters/seen-fish/",
             "image": "/assets/cover-seen-fish.webp",
-            "title": "حرف السين سَ مع سَمَكَة"
+            "title": "حرف السين سَ مع سَمَكَة",
+            "video": "https://www.youtube.com/shorts/jOKUX4vNNT8"
           },
           {
             "route": "/series/arabic-letters/sheen-sun/",
             "image": "/assets/cover-sheen-sun.webp",
-            "title": "حرف الشين شَ مع شَمْس"
+            "title": "حرف الشين شَ مع شَمْس",
+            "video": "https://www.youtube.com/shorts/9pIfFxMI9xQ"
           },
           {
             "route": "/series/arabic-letters/saad-rocket/",
             "image": "/assets/cover-saad-rocket.webp",
-            "title": "حرف الصاد صَ مع صَارُوخ"
+            "title": "حرف الصاد صَ مع صَارُوخ",
+            "video": "https://www.youtube.com/shorts/n0XOVc6Crmo"
           },
           {
             "route": "/series/arabic-letters/dad-light/",
             "image": "/assets/cover-dad-light.webp",
-            "title": "حرف الضاد ضَ مع ضَوْء"
+            "title": "حرف الضاد ضَ مع ضَوْء",
+            "video": "https://www.youtube.com/shorts/H_FyyESCYQk"
           },
           {
             "route": "/series/arabic-letters/taa-peacock/",
             "image": "/assets/cover-taa-peacock.webp",
-            "title": "حرف الطاء طَ مع طَاوُوس"
+            "title": "حرف الطاء طَ مع طَاوُوس",
+            "video": "https://www.youtube.com/shorts/zeZBg1S93_E"
           },
           {
             "route": "/series/arabic-letters/dhaa-gazelle/",
             "image": "/assets/cover-dhaa-gazelle.webp",
-            "title": "حرف الظاء ظَ مع ظَبْي"
+            "title": "حرف الظاء ظَ مع ظَبْي",
+            "video": "https://www.youtube.com/shorts/TnQ10RWGRsI"
           },
           {
             "route": "/series/arabic-letters/ayn-honey/",
             "image": "/assets/cover-ayn-honey.webp",
-            "title": "حرف العين عَ مع عَسَل"
+            "title": "حرف العين عَ مع عَسَل",
+            "video": "https://www.youtube.com/shorts/qnEde0jGrnU"
           },
           {
             "route": "/series/arabic-letters/ghayn-cloud/",
             "image": "/assets/episode-ghayn-cloud.webp",
-            "title": "حرف الغين غَ مع غَيْمَة"
+            "title": "حرف الغين غَ مع غَيْمَة",
+            "video": "https://www.youtube.com/shorts/4-3Upr5HF60"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLCpjZ-qYSMDw"
@@ -107,97 +126,116 @@
           {
             "route": "/en/series/arabic-letters/alif-lion/",
             "image": "/assets/cover-alif-lion.webp",
-            "title": "Arabic letter Alif with a lion"
+            "title": "Arabic letter Alif with a lion",
+            "video": "https://www.youtube.com/shorts/jWGpJk12uvY"
           },
           {
             "route": "/en/series/arabic-letters/baa-duck/",
             "image": "/assets/cover-baa-duck.webp",
-            "title": "Arabic letter Baa with a duck"
+            "title": "Arabic letter Baa with a duck",
+            "video": "https://www.youtube.com/shorts/eD2G0v9IdJc"
           },
           {
             "route": "/en/series/arabic-letters/taa-crown/",
             "image": "/assets/cover-taa-crown.webp",
-            "title": "Arabic letter Taa with a crown"
+            "title": "Arabic letter Taa with a crown",
+            "video": "https://www.youtube.com/shorts/vI5cfUL1qQ8"
           },
           {
             "route": "/en/series/arabic-letters/thaa-fox/",
             "image": "/assets/cover-thaa-fox.webp",
-            "title": "Arabic letter Thaa with a fox"
+            "title": "Arabic letter Thaa with a fox",
+            "video": "https://www.youtube.com/shorts/TPHwUroHbRc"
           },
           {
             "route": "/en/series/arabic-letters/jeem-camel/",
             "image": "/assets/cover-jeem-camel.webp",
-            "title": "Arabic letter Jeem with a camel"
+            "title": "Arabic letter Jeem with a camel",
+            "video": "https://www.youtube.com/shorts/fAjnYuQbdVs"
           },
           {
             "route": "/en/series/arabic-letters/haa-dove/",
             "image": "/assets/cover-haa-dove.webp",
-            "title": "Arabic letter Ḥaa with a dove"
+            "title": "Arabic letter Ḥaa with a dove",
+            "video": "https://www.youtube.com/shorts/P3HzQxIt6JU"
           },
           {
             "route": "/en/series/arabic-letters/khaa-sheep/",
             "image": "/assets/cover-khaa-sheep.webp",
-            "title": "Arabic letter Khaa with a sheep"
+            "title": "Arabic letter Khaa with a sheep",
+            "video": "https://www.youtube.com/shorts/JrDgzbz01rw"
           },
           {
             "route": "/en/series/arabic-letters/daal-chicken/",
             "image": "/assets/cover-daal-chicken.webp",
-            "title": "Arabic letter Daal with a hen"
+            "title": "Arabic letter Daal with a hen",
+            "video": "https://www.youtube.com/shorts/8OW3aSgZ1qQ"
           },
           {
             "route": "/en/series/arabic-letters/dhaal-gold/",
             "image": "/assets/episode-dhaal-gold.webp",
-            "title": "Arabic letter Dhaal with gold"
+            "title": "Arabic letter Dhaal with gold",
+            "video": "https://www.youtube.com/shorts/0wKH7MYeqVM"
           },
           {
             "route": "/en/series/arabic-letters/raa-bread/",
             "image": "/assets/cover-raa-bread.webp",
-            "title": "Arabic letter Raa with a loaf of bread"
+            "title": "Arabic letter Raa with a loaf of bread",
+            "video": "https://www.youtube.com/shorts/NgMmrN91IWw"
           },
           {
             "route": "/en/series/arabic-letters/zay-giraffe/",
             "image": "/assets/cover-zay-giraffe.webp",
-            "title": "Arabic letter Zay with a giraffe"
+            "title": "Arabic letter Zay with a giraffe",
+            "video": "https://www.youtube.com/shorts/XlUZS3X_Q-s"
           },
           {
             "route": "/en/series/arabic-letters/seen-fish/",
             "image": "/assets/cover-seen-fish.webp",
-            "title": "Arabic letter Seen with a fish"
+            "title": "Arabic letter Seen with a fish",
+            "video": "https://www.youtube.com/shorts/jOKUX4vNNT8"
           },
           {
             "route": "/en/series/arabic-letters/sheen-sun/",
             "image": "/assets/cover-sheen-sun.webp",
-            "title": "Arabic letter Sheen with the sun"
+            "title": "Arabic letter Sheen with the sun",
+            "video": "https://www.youtube.com/shorts/9pIfFxMI9xQ"
           },
           {
             "route": "/en/series/arabic-letters/saad-rocket/",
             "image": "/assets/cover-saad-rocket.webp",
-            "title": "Arabic letter Saad with a rocket"
+            "title": "Arabic letter Saad with a rocket",
+            "video": "https://www.youtube.com/shorts/n0XOVc6Crmo"
           },
           {
             "route": "/en/series/arabic-letters/dad-light/",
             "image": "/assets/cover-dad-light.webp",
-            "title": "Arabic letter Daad and light"
+            "title": "Arabic letter Daad and light",
+            "video": "https://www.youtube.com/shorts/H_FyyESCYQk"
           },
           {
             "route": "/en/series/arabic-letters/taa-peacock/",
             "image": "/assets/cover-taa-peacock.webp",
-            "title": "Arabic letter Ṭaa with a peacock"
+            "title": "Arabic letter Ṭaa with a peacock",
+            "video": "https://www.youtube.com/shorts/zeZBg1S93_E"
           },
           {
             "route": "/en/series/arabic-letters/dhaa-gazelle/",
             "image": "/assets/cover-dhaa-gazelle.webp",
-            "title": "Arabic letter Ẓaa with a gazelle"
+            "title": "Arabic letter Ẓaa with a gazelle",
+            "video": "https://www.youtube.com/shorts/TnQ10RWGRsI"
           },
           {
             "route": "/en/series/arabic-letters/ayn-honey/",
             "image": "/assets/cover-ayn-honey.webp",
-            "title": "Arabic letter Ayn with honey"
+            "title": "Arabic letter Ayn with honey",
+            "video": "https://www.youtube.com/shorts/qnEde0jGrnU"
           },
           {
             "route": "/en/series/arabic-letters/ghayn-cloud/",
             "image": "/assets/episode-ghayn-cloud.webp",
-            "title": "Arabic letter Ghayn with a cloud"
+            "title": "Arabic letter Ghayn with a cloud",
+            "video": "https://www.youtube.com/shorts/4-3Upr5HF60"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLCpjZ-qYSMDw"
@@ -210,32 +248,38 @@
           {
             "route": "/series/arabic-numbers/one/",
             "image": "/assets/episode-one.webp",
-            "title": "الرقم ١ | واحد"
+            "title": "الرقم ١ | واحد",
+            "video": "https://www.youtube.com/shorts/t9MWgW_m31I"
           },
           {
             "route": "/series/arabic-numbers/two-pencils/",
             "image": "/assets/cover-two-pencils.webp",
-            "title": "الرقم ٢ مع قلمين"
+            "title": "الرقم ٢ مع قلمين",
+            "video": "https://www.youtube.com/shorts/2cfTL5FAKvg"
           },
           {
             "route": "/series/arabic-numbers/three-pencils/",
             "image": "/assets/cover-three-pencils.webp",
-            "title": "الرقم ٣ مع ثلاثة أقلام"
+            "title": "الرقم ٣ مع ثلاثة أقلام",
+            "video": "https://www.youtube.com/shorts/9_ZCbb6oBhU"
           },
           {
             "route": "/series/arabic-numbers/four-balloons/",
             "image": "/assets/episode-four-balloons.webp",
-            "title": "الرقم ٤ مع أربعة بالونات"
+            "title": "الرقم ٤ مع أربعة بالونات",
+            "video": "https://www.youtube.com/shorts/_Mz15VJsvOM"
           },
           {
             "route": "/series/arabic-numbers/five-stars/",
             "image": "/assets/cover-five-stars.webp",
-            "title": "الرقم ٥ مع خمس نجوم"
+            "title": "الرقم ٥ مع خمس نجوم",
+            "video": "https://www.youtube.com/shorts/F1sTTH8vteM"
           },
           {
             "route": "/series/arabic-numbers/six-cubes/",
             "image": "/assets/cover-six-cubes.webp",
-            "title": "الرقم ٦ مع ستة مكعبات"
+            "title": "الرقم ٦ مع ستة مكعبات",
+            "video": "https://www.youtube.com/shorts/yXmpA69rxEc"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLCpjZ-qYSMDw"
@@ -245,32 +289,38 @@
           {
             "route": "/en/series/arabic-numbers/one/",
             "image": "/assets/episode-one.webp",
-            "title": "Arabic number 1 | One"
+            "title": "Arabic number 1 | One",
+            "video": "https://www.youtube.com/shorts/t9MWgW_m31I"
           },
           {
             "route": "/en/series/arabic-numbers/two-pencils/",
             "image": "/assets/cover-two-pencils.webp",
-            "title": "Arabic number 2 with two pencils"
+            "title": "Arabic number 2 with two pencils",
+            "video": "https://www.youtube.com/shorts/2cfTL5FAKvg"
           },
           {
             "route": "/en/series/arabic-numbers/three-pencils/",
             "image": "/assets/cover-three-pencils.webp",
-            "title": "Arabic number 3 with three pencils"
+            "title": "Arabic number 3 with three pencils",
+            "video": "https://www.youtube.com/shorts/9_ZCbb6oBhU"
           },
           {
             "route": "/en/series/arabic-numbers/four-balloons/",
             "image": "/assets/episode-four-balloons.webp",
-            "title": "Arabic number 4 with four balloons"
+            "title": "Arabic number 4 with four balloons",
+            "video": "https://www.youtube.com/shorts/_Mz15VJsvOM"
           },
           {
             "route": "/en/series/arabic-numbers/five-stars/",
             "image": "/assets/cover-five-stars.webp",
-            "title": "Arabic number 5 with five stars"
+            "title": "Arabic number 5 with five stars",
+            "video": "https://www.youtube.com/shorts/F1sTTH8vteM"
           },
           {
             "route": "/en/series/arabic-numbers/six-cubes/",
             "image": "/assets/cover-six-cubes.webp",
-            "title": "Arabic number 6 with six cubes"
+            "title": "Arabic number 6 with six cubes",
+            "video": "https://www.youtube.com/shorts/yXmpA69rxEc"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLCpjZ-qYSMDw"
@@ -283,7 +333,9 @@
           {
             "route": "/series/english-fun/one-apple/",
             "image": "/assets/cover-one-apple.webp",
-            "title": "الرقم 1 بالإنجليزية مع لُمعة"
+            "title": "الرقم 1 بالإنجليزية مع لُمعة",
+            "category": "numbers",
+            "video": "https://www.youtube.com/shorts/e5KbHoivCWk"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLU6piO0KbPBw"
@@ -293,7 +345,9 @@
           {
             "route": "/en/series/english-fun/one-apple/",
             "image": "/assets/cover-one-apple.webp",
-            "title": "Number 1 in English with Lumaa"
+            "title": "Number 1 in English with Lumaa",
+            "category": "numbers",
+            "video": "https://www.youtube.com/shorts/e5KbHoivCWk"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLU6piO0KbPBw"
@@ -306,27 +360,32 @@
           {
             "route": "/series/mishal/protect-our-environment/",
             "image": "/assets/episode-protect-our-environment.webp",
-            "title": "كيف نحافظ على بيئتنا؟"
+            "title": "كيف نحافظ على بيئتنا؟",
+            "video": "https://www.youtube.com/watch?v=0Zw-tt_f4sA"
           },
           {
             "route": "/series/mishal/sheikh-zayed/",
             "image": "/assets/episode-sheikh-zayed.webp",
-            "title": "لغز الصندوق والشيخ زايد"
+            "title": "لغز الصندوق والشيخ زايد",
+            "video": "https://www.youtube.com/watch?v=s46SrK0PZbE"
           },
           {
             "route": "/series/mishal/road-to-union/",
             "image": "/assets/episode-road-to-union.webp",
-            "title": "التعاون والطريق إلى اتحاد الإمارات"
+            "title": "التعاون والطريق إلى اتحاد الإمارات",
+            "video": "https://www.youtube.com/watch?v=eZFBARKbowA"
           },
           {
             "route": "/series/mishal/uae-constitution/",
             "image": "/assets/episode-uae-constitution.webp",
-            "title": "ما الدستور الإماراتي؟"
+            "title": "ما الدستور الإماراتي؟",
+            "video": "https://www.youtube.com/watch?v=IevhGFPhpns"
           },
           {
             "route": "/series/mishal/longitude/",
             "image": "/assets/episode-longitude.webp",
-            "title": "ما خطوط الطول؟"
+            "title": "ما خطوط الطول؟",
+            "video": "https://www.youtube.com/watch?v=rBCZ2sTVLyg"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLP9OXkUK0ZbI"
@@ -336,27 +395,32 @@
           {
             "route": "/en/series/mishal/protect-our-environment/",
             "image": "/assets/episode-protect-our-environment.webp",
-            "title": "How can we protect our environment?"
+            "title": "How can we protect our environment?",
+            "video": "https://www.youtube.com/watch?v=0Zw-tt_f4sA"
           },
           {
             "route": "/en/series/mishal/sheikh-zayed/",
             "image": "/assets/episode-sheikh-zayed.webp",
-            "title": "The mystery box and Sheikh Zayed"
+            "title": "The mystery box and Sheikh Zayed",
+            "video": "https://www.youtube.com/watch?v=s46SrK0PZbE"
           },
           {
             "route": "/en/series/mishal/road-to-union/",
             "image": "/assets/episode-road-to-union.webp",
-            "title": "Working together on the road to UAE union"
+            "title": "Working together on the road to UAE union",
+            "video": "https://www.youtube.com/watch?v=eZFBARKbowA"
           },
           {
             "route": "/en/series/mishal/uae-constitution/",
             "image": "/assets/episode-uae-constitution.webp",
-            "title": "What is the UAE Constitution?"
+            "title": "What is the UAE Constitution?",
+            "video": "https://www.youtube.com/watch?v=IevhGFPhpns"
           },
           {
             "route": "/en/series/mishal/longitude/",
             "image": "/assets/episode-longitude.webp",
-            "title": "What are lines of longitude?"
+            "title": "What are lines of longitude?",
+            "video": "https://www.youtube.com/watch?v=rBCZ2sTVLyg"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLP9OXkUK0ZbI"
@@ -369,32 +433,38 @@
           {
             "route": "/series/robo/mixing-green/",
             "image": "/assets/cover-mixing-green.webp",
-            "title": "كيف نصنع اللون الأخضر؟"
+            "title": "كيف نصنع اللون الأخضر؟",
+            "video": "https://www.youtube.com/shorts/4kr7v9vzri4"
           },
           {
             "route": "/series/robo/melting-ice/",
             "image": "/assets/cover-melting-ice.webp",
-            "title": "لماذا يذوب الثلج؟"
+            "title": "لماذا يذوب الثلج؟",
+            "video": "https://www.youtube.com/shorts/KH2yEk3uOXI"
           },
           {
             "route": "/series/robo/magnets/",
             "image": "/assets/cover-magnets.webp",
-            "title": "كيف يعمل المغناطيس؟"
+            "title": "كيف يعمل المغناطيس؟",
+            "video": "https://www.youtube.com/shorts/5K5A40JKRKo"
           },
           {
             "route": "/series/robo/static-balloon/",
             "image": "/assets/episode-static-balloon.webp",
-            "title": "لماذا ينجذب الورق إلى البالون؟"
+            "title": "لماذا ينجذب الورق إلى البالون؟",
+            "video": "https://www.youtube.com/shorts/4nWr0CiuEGE"
           },
           {
             "route": "/series/robo/pepper-and-soap/",
             "image": "/assets/cover-pepper-and-soap.webp",
-            "title": "لماذا يتحرّك الفلفل مع الصابون؟"
+            "title": "لماذا يتحرّك الفلفل مع الصابون؟",
+            "video": "https://www.youtube.com/shorts/VfjJiqpRp-U"
           },
           {
             "route": "/series/robo/ball-and-feather/",
             "image": "/assets/episode-ball-and-feather.webp",
-            "title": "أيهما يسقط أولًا، الكرة أم الريشة؟"
+            "title": "أيهما يسقط أولًا، الكرة أم الريشة؟",
+            "video": "https://www.youtube.com/shorts/Aiz60B01vcI"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLQd2O1Icr8f8"
@@ -404,32 +474,38 @@
           {
             "route": "/en/series/robo/mixing-green/",
             "image": "/assets/cover-mixing-green.webp",
-            "title": "How do we make green?"
+            "title": "How do we make green?",
+            "video": "https://www.youtube.com/shorts/4kr7v9vzri4"
           },
           {
             "route": "/en/series/robo/melting-ice/",
             "image": "/assets/cover-melting-ice.webp",
-            "title": "Why does ice melt?"
+            "title": "Why does ice melt?",
+            "video": "https://www.youtube.com/shorts/KH2yEk3uOXI"
           },
           {
             "route": "/en/series/robo/magnets/",
             "image": "/assets/cover-magnets.webp",
-            "title": "How does a magnet work?"
+            "title": "How does a magnet work?",
+            "video": "https://www.youtube.com/shorts/5K5A40JKRKo"
           },
           {
             "route": "/en/series/robo/static-balloon/",
             "image": "/assets/episode-static-balloon.webp",
-            "title": "Why does paper stick to a balloon?"
+            "title": "Why does paper stick to a balloon?",
+            "video": "https://www.youtube.com/shorts/4nWr0CiuEGE"
           },
           {
             "route": "/en/series/robo/pepper-and-soap/",
             "image": "/assets/cover-pepper-and-soap.webp",
-            "title": "Why does pepper move when soap touches water?"
+            "title": "Why does pepper move when soap touches water?",
+            "video": "https://www.youtube.com/shorts/VfjJiqpRp-U"
           },
           {
             "route": "/en/series/robo/ball-and-feather/",
             "image": "/assets/episode-ball-and-feather.webp",
-            "title": "Which falls first, the ball or the feather?"
+            "title": "Which falls first, the ball or the feather?",
+            "video": "https://www.youtube.com/shorts/Aiz60B01vcI"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLQd2O1Icr8f8"
@@ -442,57 +518,68 @@
           {
             "route": "/series/guess/mystery-tail/",
             "image": "/assets/cover-mystery-tail.webp",
-            "title": "من صاحب هذا الذيل؟"
+            "title": "من صاحب هذا الذيل؟",
+            "video": "https://www.youtube.com/shorts/IDY0GPsF7ak"
           },
           {
             "route": "/series/guess/missing-star/",
             "image": "/assets/episode-missing-star.webp",
-            "title": "أين اختفت النجمة؟"
+            "title": "أين اختفت النجمة؟",
+            "video": "https://www.youtube.com/shorts/LcOD71xUF5U"
           },
           {
             "route": "/series/guess/mystery-sound/",
             "image": "/assets/cover-mystery-sound.webp",
-            "title": "من صاحب هذا الصوت؟"
+            "title": "من صاحب هذا الصوت؟",
+            "video": "https://www.youtube.com/shorts/il4DPdmCBw4"
           },
           {
             "route": "/series/guess/missing-car-part/",
             "image": "/assets/episode-missing-car-part.webp",
-            "title": "ما القطعة الناقصة في السيارة؟"
+            "title": "ما القطعة الناقصة في السيارة؟",
+            "video": "https://www.youtube.com/shorts/7qWu7UPMd_c"
           },
           {
             "route": "/series/guess/treasure-door/",
             "image": "/assets/cover-treasure-door.webp",
-            "title": "أي باب يخفي الكنز؟"
+            "title": "أي باب يخفي الكنز؟",
+            "video": "https://www.youtube.com/shorts/q9LaDeYqlPU"
           },
           {
             "route": "/series/guess/mystery-footprints/",
             "image": "/assets/episode-mystery-footprints.webp",
-            "title": "من ترك هذه الآثار؟"
+            "title": "من ترك هذه الآثار؟",
+            "video": "https://www.youtube.com/shorts/Jkgz1wLJ_Wk"
           },
           {
             "route": "/series/guess/behind-the-curtain/",
             "image": "/assets/episode-behind-the-curtain.webp",
-            "title": "من يختبئ خلف الستار؟"
+            "title": "من يختبئ خلف الستار؟",
+            "video": "https://www.youtube.com/shorts/Vb0x2xeR3R0"
           },
           {
             "route": "/series/guess/white-light/",
             "image": "/assets/episode-white-light.webp",
-            "title": "ماذا يخفي الضوء الأبيض؟"
+            "title": "ماذا يخفي الضوء الأبيض؟",
+            "video": "https://www.youtube.com/shorts/rOGZlgkZ-1s"
           },
           {
             "route": "/series/guess/glow-in-the-dark/",
             "image": "/assets/episode-glow-in-the-dark.webp",
-            "title": "من يضيء في الظلام؟"
+            "title": "من يضيء في الظلام؟",
+            "video": "https://www.youtube.com/shorts/rCzEahTDMzM"
           },
           {
             "route": "/series/guess/three-hearts/",
             "image": "/assets/cover-three-hearts.webp",
-            "title": "أي حيوان لديه ثلاثة قلوب؟"
+            "title": "أي حيوان لديه ثلاثة قلوب؟",
+            "video": "https://www.youtube.com/shorts/VPa1LDB_J4c"
           },
           {
             "route": "/series/guess/upside-down-bat/",
             "image": "/assets/cover-upside-down-bat.webp",
-            "title": "أي حيوان يستريح بالمقلوب؟"
+            "title": "أي حيوان يستريح بالمقلوب؟",
+            "video": "https://www.youtube.com/shorts/Nm9QX3-qxKw"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLLROQvcofPTI"
@@ -502,57 +589,68 @@
           {
             "route": "/en/series/guess/mystery-tail/",
             "image": "/assets/cover-mystery-tail.webp",
-            "title": "Whose tail is this?"
+            "title": "Whose tail is this?",
+            "video": "https://www.youtube.com/shorts/IDY0GPsF7ak"
           },
           {
             "route": "/en/series/guess/missing-star/",
             "image": "/assets/episode-missing-star.webp",
-            "title": "Where did the star go?"
+            "title": "Where did the star go?",
+            "video": "https://www.youtube.com/shorts/LcOD71xUF5U"
           },
           {
             "route": "/en/series/guess/mystery-sound/",
             "image": "/assets/cover-mystery-sound.webp",
-            "title": "Which animal made that sound?"
+            "title": "Which animal made that sound?",
+            "video": "https://www.youtube.com/shorts/il4DPdmCBw4"
           },
           {
             "route": "/en/series/guess/missing-car-part/",
             "image": "/assets/episode-missing-car-part.webp",
-            "title": "What part is missing from the car?"
+            "title": "What part is missing from the car?",
+            "video": "https://www.youtube.com/shorts/7qWu7UPMd_c"
           },
           {
             "route": "/en/series/guess/treasure-door/",
             "image": "/assets/cover-treasure-door.webp",
-            "title": "Which door hides the treasure?"
+            "title": "Which door hides the treasure?",
+            "video": "https://www.youtube.com/shorts/q9LaDeYqlPU"
           },
           {
             "route": "/en/series/guess/mystery-footprints/",
             "image": "/assets/episode-mystery-footprints.webp",
-            "title": "Who left these footprints?"
+            "title": "Who left these footprints?",
+            "video": "https://www.youtube.com/shorts/Jkgz1wLJ_Wk"
           },
           {
             "route": "/en/series/guess/behind-the-curtain/",
             "image": "/assets/episode-behind-the-curtain.webp",
-            "title": "Who is hiding behind the curtain?"
+            "title": "Who is hiding behind the curtain?",
+            "video": "https://www.youtube.com/shorts/Vb0x2xeR3R0"
           },
           {
             "route": "/en/series/guess/white-light/",
             "image": "/assets/episode-white-light.webp",
-            "title": "What is hidden in white light?"
+            "title": "What is hidden in white light?",
+            "video": "https://www.youtube.com/shorts/rOGZlgkZ-1s"
           },
           {
             "route": "/en/series/guess/glow-in-the-dark/",
             "image": "/assets/episode-glow-in-the-dark.webp",
-            "title": "What glows in the dark?"
+            "title": "What glows in the dark?",
+            "video": "https://www.youtube.com/shorts/rCzEahTDMzM"
           },
           {
             "route": "/en/series/guess/three-hearts/",
             "image": "/assets/cover-three-hearts.webp",
-            "title": "Which animal has three hearts?"
+            "title": "Which animal has three hearts?",
+            "video": "https://www.youtube.com/shorts/VPa1LDB_J4c"
           },
           {
             "route": "/en/series/guess/upside-down-bat/",
             "image": "/assets/cover-upside-down-bat.webp",
-            "title": "Which animal rests upside down?"
+            "title": "Which animal rests upside down?",
+            "video": "https://www.youtube.com/shorts/Nm9QX3-qxKw"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLLROQvcofPTI"
@@ -565,27 +663,32 @@
           {
             "route": "/series/what-if/no-gravity/",
             "image": "/assets/cover-no-gravity.webp",
-            "title": "ماذا لو اختفت الجاذبية؟"
+            "title": "ماذا لو اختفت الجاذبية؟",
+            "video": "https://www.youtube.com/shorts/MsXzLeIvUf8"
           },
           {
             "route": "/series/what-if/ant-size/",
             "image": "/assets/cover-ant-size.webp",
-            "title": "ماذا لو أصبحت بحجم نملة؟"
+            "title": "ماذا لو أصبحت بحجم نملة؟",
+            "video": "https://www.youtube.com/shorts/TirQBo94kK8"
           },
           {
             "route": "/series/what-if/walking-on-clouds/",
             "image": "/assets/episode-walking-on-clouds.webp",
-            "title": "ماذا لو مشيت فوق الغيوم؟"
+            "title": "ماذا لو مشيت فوق الغيوم؟",
+            "video": "https://www.youtube.com/shorts/Kp1oqqkNBws"
           },
           {
             "route": "/series/what-if/no-friction/",
             "image": "/assets/cover-no-friction.webp",
-            "title": "ماذا لو اختفى الاحتكاك؟"
+            "title": "ماذا لو اختفى الاحتكاك؟",
+            "video": "https://www.youtube.com/shorts/BnabqGFZzCs"
           },
           {
             "route": "/series/what-if/no-colors/",
             "image": "/assets/episode-no-colors.webp",
-            "title": "ماذا لو اختفت الألوان؟"
+            "title": "ماذا لو اختفت الألوان؟",
+            "video": "https://www.youtube.com/shorts/H0AL7Pdhr3o"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLUj7wVfSWIE8"
@@ -595,27 +698,32 @@
           {
             "route": "/en/series/what-if/no-gravity/",
             "image": "/assets/cover-no-gravity.webp",
-            "title": "What if gravity disappeared?"
+            "title": "What if gravity disappeared?",
+            "video": "https://www.youtube.com/shorts/MsXzLeIvUf8"
           },
           {
             "route": "/en/series/what-if/ant-size/",
             "image": "/assets/cover-ant-size.webp",
-            "title": "What if you were the size of an ant?"
+            "title": "What if you were the size of an ant?",
+            "video": "https://www.youtube.com/shorts/TirQBo94kK8"
           },
           {
             "route": "/en/series/what-if/walking-on-clouds/",
             "image": "/assets/episode-walking-on-clouds.webp",
-            "title": "What if you could walk on clouds?"
+            "title": "What if you could walk on clouds?",
+            "video": "https://www.youtube.com/shorts/Kp1oqqkNBws"
           },
           {
             "route": "/en/series/what-if/no-friction/",
             "image": "/assets/cover-no-friction.webp",
-            "title": "What if friction disappeared?"
+            "title": "What if friction disappeared?",
+            "video": "https://www.youtube.com/shorts/BnabqGFZzCs"
           },
           {
             "route": "/en/series/what-if/no-colors/",
             "image": "/assets/episode-no-colors.webp",
-            "title": "What if colors disappeared?"
+            "title": "What if colors disappeared?",
+            "video": "https://www.youtube.com/shorts/H0AL7Pdhr3o"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLUj7wVfSWIE8"
@@ -628,7 +736,8 @@
           {
             "route": "/series/short-stories/little-umbrella/",
             "image": "/assets/episode-little-umbrella.webp",
-            "title": "المظلّة الصغيرة"
+            "title": "المظلّة الصغيرة",
+            "video": "https://www.youtube.com/shorts/vVaVshhfnq0"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLMGFo8Uo4eIw"
@@ -638,7 +747,8 @@
           {
             "route": "/en/series/short-stories/little-umbrella/",
             "image": "/assets/episode-little-umbrella.webp",
-            "title": "The Little Umbrella"
+            "title": "The Little Umbrella",
+            "video": "https://www.youtube.com/shorts/vVaVshhfnq0"
           }
         ],
         "playlist": "https://www.youtube.com/playlist?list=PLMGFo8Uo4eIw"
