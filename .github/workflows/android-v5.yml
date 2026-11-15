@@ -7,6 +7,11 @@ on:
       - 'android-app/**'
       - 'scripts/build-android.sh'
       - 'scripts/verify-v5.py'
+      - 'scripts/stage-v5-release.py'
+      - 'scripts/test-v5-browser.cjs'
+      - 'app/index.html'
+      - 'en/app/index.html'
+      - 'assets/app-release-info.js'
       - 'assets/app-v5.*'
       - 'assets/app-learning-v5.json'
       - 'play-app/**'
@@ -19,6 +24,8 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    outputs:
+      kind: ${{ steps.signing.outputs.kind }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -89,3 +96,41 @@ jobs:
       - name: Remove signing key
         if: always()
         run: rm -f "$RUNNER_TEMP/fudool-signing.jks"
+
+  stage:
+    if: needs.build.outputs.kind == 'release' && github.ref_name == 'v5-education-platform'
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --no-package-lock playwright
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/test-v5-browser.cjs
+      - uses: actions/download-artifact@v4
+        with:
+          name: Kokab-Fodool-V5.0-release
+          path: build/android-v5/
+      - name: Stage verified APKs for the release PR
+        run: |
+          python3 scripts/stage-v5-release.py
+          python3 scripts/verify-v5.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads/apps/
+          git diff --cached --quiet && exit 0
+          git commit -m "Stage signed Kokab Fodool V5.0 Android release"
+          git push origin HEAD:refs/heads/v5-education-platform
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V5-release-visual-screenshots
+          path: build/v5-screenshots/
+          if-no-files-found: ignore
+          retention-days: 14
