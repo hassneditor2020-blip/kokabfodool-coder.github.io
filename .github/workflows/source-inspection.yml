@@ -45,8 +45,11 @@ jobs:
           for f in assets/vowel-audio-routing.js assets/vowel-drive.js assets/game-extra.js assets/games.js assets/letter-match.js assets/audio-retest-page.js; do node --input-type=module --check < "$f"; done
       - name: Verify audio routing
         run: |
-          node --experimental-default-type=module --input-type=module <<'JS'
-          import {driveAudioSource,sharedAudioSource,repairedFullClips} from './assets/vowel-audio-routing.js';
+          mkdir -p /tmp/fudool-audio-module
+          cp assets/vowel-audio-routing.js assets/vowel-audio-review.js /tmp/fudool-audio-module/
+          printf '%s' '{"type":"module"}' > /tmp/fudool-audio-module/package.json
+          node --input-type=module <<'JS'
+          import {driveAudioSource,sharedAudioSource,repairedFullClips} from 'file:///tmp/fudool-audio-module/vowel-audio-routing.js';
           import fs from 'node:fs';
           if(repairedFullClips.size!==18)throw Error('wrong repaired count');
           for(let id=1;id<=84;id++){const src=driveAudioSource(id),expect='/assets/vowel-drive-audio-v'+(repairedFullClips.has(id)?4:3)+'/'+id+'.mp3';if(src!==expect||!fs.existsSync('.'+src)||sharedAudioSource('/assets/vowel-drive-audio-v3/'+id+'.mp3')!==expect)throw Error('routing '+id)}
