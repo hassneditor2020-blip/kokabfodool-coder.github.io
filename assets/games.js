@@ -22,7 +22,7 @@ function element(tag, text, className) {
   return node;
 }
 
-function makeOption(choice, correct) {
+function makeOption(choice, correct, explanation) {
   const button = element('button', '', 'game-option');
   button.type = 'button';
   if (Array.isArray(choice)) {
@@ -53,6 +53,7 @@ function makeOption(choice, correct) {
     button.setAttribute('aria-disabled', 'true');
     feedback.dataset.state = state;
     feedback.textContent = correct ? messages.correct : messages.retry;
+    if (correct && explanation) feedback.append(' ', explanation);
     if (!correct) {
       journey.mistake();
       return;

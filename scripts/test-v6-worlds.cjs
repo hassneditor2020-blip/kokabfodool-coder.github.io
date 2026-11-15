@@ -260,6 +260,17 @@ async function validateAgePaths(browser, language) {
     await expectPlay(4);
     await page.goto(lab);
     await expectPlay(7);
+    await page.evaluate(() => {
+      const levels = JSON.parse(document.querySelector('#game-data').textContent).levels;
+      const round = levels[6].rounds.findIndex(question => question.explanation);
+      localStorage.setItem('fudool-profile-v1:p-older:game:robo-lab',
+        JSON.stringify({checkpoints: {6: {round, mistakes: 0}}}));
+    });
+    await play.click();
+    assert.match(await page.locator('[data-prompt]').textContent(), arabic ? /تتوقّع/ : /predict/i);
+    await page.locator('[data-options] button[aria-label="👃"]').click();
+    assert.match(await page.locator('[data-feedback]').textContent(),
+      arabic ? /يساعدك الأنف/ : /Your nose helps/i);
     await page.goto(drive);
     await expectPlay(4);
     await choice.locator('[data-path-action="age"]').click();
