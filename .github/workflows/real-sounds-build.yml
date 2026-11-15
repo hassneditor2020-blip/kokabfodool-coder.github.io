@@ -1,0 +1,48 @@
+name: Build authentic sound game
+on:
+  push:
+    branches: [development/real-sounds-v39]
+    paths: ['.github/workflows/real-sounds-build.yml']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: development/real-sounds-v39
+      - name: Download real recordings and build levels
+        run: |
+          python3 -m pip install -q requests imageio-ffmpeg
+          python3 -u scripts/build-real-sound-world.py
+      - name: Validate files and syntax
+        run: |
+          node --input-type=module --check < assets/sound-world.js
+          python3 - <<'PY'
+          import pathlib,xml.etree.ElementTree as ET,json,re
+          p=pathlib.Path
+          symbols={e.attrib['id'] for path in ['assets/learning-art.svg','assets/sound-world-art.svg'] for e in ET.parse(path).getroot().iter() if e.tag.endswith('symbol')}
+          credits=json.loads(p('assets/real-sounds/credits.json').read_text())
+          assert len(credits)==19
+          for prefix in ['','en/']:
+              s=p(prefix+'games/sound-quiz/index.html').read_text()
+              d=json.loads(re.search(r'<script id="game-data"[^>]*>([\s\S]*?)</script>',s)[1])
+              assert len(d['levels'])==10
+              rounds=[q for l in d['levels'] for q in l['rounds']]
+              assert len(rounds)==41 and len({q['soundId'] for q in rounds})==19
+              for q in rounds:
+                  assert q['kind']=='recorded-sound' and 'speech' not in q and 'tones' not in q
+                  assert p(q['audio'].lstrip('/')).stat().st_size>2000
+                  assert q['answer'] in [c['id'] for c in q['choices']]
+                  assert all(c['art'] in symbols for c in q['choices'])
+              assert 'sound-world.js?v=1' in s and 'noindex' not in s
+          print('All 82 rounds, 19 audio sources and matching art verified')
+          PY
+      - name: Commit the game and local audio assets
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/real-sounds games/sound-quiz en/games/sound-quiz index.html en/index.html games/index.html en/games/index.html
+          git commit -m "Replace word and tone quiz with authentic sound recordings"
+          git push origin HEAD:development/real-sounds-v39
