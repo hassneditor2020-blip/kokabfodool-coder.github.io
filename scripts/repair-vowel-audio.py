@@ -1,5 +1,5 @@
 """Repair the 18 isolated CV syllables using labelled, licensed human speech."""
-import csv,io,json,re,hashlib,subprocess,pathlib,math
+import csv,io,json,re,hashlib,subprocess,pathlib,math,wave,zlib
 import requests
 from remotezip import RemoteZip
 import imageio_ffmpeg
@@ -46,11 +46,18 @@ with RemoteZip(base+'bc20baae-7152-439a-a56a-73699fa23381/file_downloaded') as z
             filename=f'{n}-{v}-{rep}.wav';source=f'benar/1/{filename}';row=metadata[source]
             assert row['category']=='benar' and int(row['huruf_no'])==n and int(row['sub'])==v and row['flag_error']=='False',row
             entry=f'Data Benar/1/{filename}';raw=z.read(entry)
-            assert hashlib.md5(raw).hexdigest()==row['md5'],entry
+            assert zlib.crc32(raw)&0xffffffff==z.getinfo(entry).CRC,entry
+            with wave.open(io.BytesIO(raw),'rb') as w:
+                assert w.getnchannels()==1 and w.getframerate()==int(row['sr']),entry
+                actual_duration=w.getnframes()/w.getframerate()
+                pcm=w.readframes(w.getnframes())
+            assert abs(actual_duration-float(row['duration']))<.04,(entry,actual_duration,row['duration'])
+            digest=hashlib.md5(raw).hexdigest();pcm_digest=hashlib.md5(pcm).hexdigest()
+            print('Source',entry,'duration',round(actual_duration,3),'hash match',row['md5'] in (digest,pcm_digest))
             audio=trim(decode(raw));d=len(audio)/sr
-            if .17<=d<=1.15:candidates.append((abs(d-.48),rep,audio,entry,row['md5']))
+            if .17<=d<=1.15:candidates.append((abs(d-.48),rep,audio,entry,digest,row['md5']))
         assert candidates,(i,n,v)
-        _,rep,mid,entry,digest=min(candidates,key=lambda x:x[0])
+        _,rep,mid,entry,digest,declared=min(candidates,key=lambda x:x[0])
         original=decode((root/f'assets/vowel-drive-audio-v3/{i}.mp3').read_bytes())
         end_header,start_example=bounds[i]
         head=trim(original[:int((end_header+.055)*sr)])
@@ -61,12 +68,12 @@ with RemoteZip(base+'bc20baae-7152-439a-a56a-73699fa23381/file_downloaded') as z
         full=np.concatenate([np.zeros(int(sr*.08),dtype=np.float32),*segments,np.zeros(int(sr*.1),dtype=np.float32)])
         length=encode(full,out/f'{i}.mp3')
         middle_length=encode(norm(mid),out/f'{i}-syllable.mp3')
-        item={'id':i,'letter':letter,'vowel':c['vowel'],'syllable':c['syllable'],'example':c['example'],'mode':'full' if start_example is not None else 'letter-vowel-only','dataset_file':entry,'source_md5':digest,'middle_seconds':round(middle_length,3),'recording_seconds':round(length,3),'source_class':'correct/benar','human_listening_review':False}
+        item={'id':i,'letter':letter,'vowel':c['vowel'],'syllable':c['syllable'],'example':c['example'],'mode':'full' if start_example is not None else 'letter-vowel-only','dataset_file':entry,'source_md5':digest,'metadata_md5':declared,'middle_seconds':round(middle_length,3),'recording_seconds':round(length,3),'source_class':'correct/benar','human_listening_review':False}
         items.append(item);print(json.dumps(item,ensure_ascii=False))
 assert len(items)==18 and sum(x['mode']=='full' for x in items)==15
 (out/'credits.json').write_text(json.dumps({'source':'Azis, Aaz M Hafidz (2026), Hijaiyah Letter Pronunciation Audio Dataset for Articulation Characteristic Classification, Mendeley Data, V1','doi':'https://doi.org/10.17632/r5fy2dd98g.1','license':'https://creativecommons.org/licenses/by/4.0/','modifications':'Selected the labelled correct recordings, trimmed leading/trailing silence, resampled, normalized and spliced with the original game intro/example. No endorsement is implied. Not independently listening-reviewed.','records':items},ensure_ascii=False,indent=2)+'\n')
 (out/'README.md').write_text('''# Human-recorded vowel repairs
-Middle syllables selected from the dataset labelled correct (Data Benar), using the exact letter and vowel metadata and original file MD5. No synthetic isolated syllables. Fifteen recordings retain the original intro and example; three retain only the intro and syllable because the original example was wrong or missing. The corrected examples are shown in writing in the game.
+Middle syllables selected from the dataset labelled correct (Data Benar), using the exact letter/vowel metadata, ZIP CRC, sample rate and duration. The supplied metadata MD5 did not consistently match the WAV bytes; actual file and metadata hashes are recorded separately. No synthetic isolated syllables. Fifteen recordings retain the original intro and example; three retain only the intro and syllable because the original example was wrong or missing. The corrected examples are shown in writing in the game.
 
 Source: Azis, Aaz M Hafidz (2026), *Hijaiyah Letter Pronunciation Audio Dataset for Articulation Characteristic Classification*, Mendeley Data, V1, https://doi.org/10.17632/r5fy2dd98g.1. License: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Selected, trimmed, normalized, resampled and combined with game speech. No endorsement implied. See credits.json for source paths and checksums. Not independently reviewed by a listener.
 ''')
