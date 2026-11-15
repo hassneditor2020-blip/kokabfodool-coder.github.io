@@ -1,0 +1,56 @@
+{
+  "id": "/",
+  "name": "كوكب فضول | Kawkab Fudool",
+  "short_name": "كوكب فضول",
+  "description": "20 educational games for ages 3–10, in Arabic and English.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8f6ff",
+  "theme_color": "#49308f",
+  "icons": [
+    {
+      "src": "/assets/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/app-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "الألعاب التعليمية",
+      "short_name": "الألعاب",
+      "url": "/games/",
+      "icons": [
+        {
+          "src": "/assets/app-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "English games",
+      "url": "/en/games/",
+      "icons": [
+        {
+          "src": "/assets/app-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
