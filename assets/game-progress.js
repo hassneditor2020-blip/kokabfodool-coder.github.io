@@ -1,9 +1,13 @@
+import {activeProfile,prefix} from './profile-state.js?v=1';
 import {setupWorld,updateMap,decorateLevel,celebrate,enhanceRewards} from './reward-worlds.js?v=1';
 import { bindGameAudio } from './game-audio.js?v=5';
 
 const language = document.documentElement.lang;
 const tr = (ar, en) => language === 'ar' ? ar : en;
-const storageKey = 'fudool-games-v1:';
+const profile=activeProfile();
+const storageKey = prefix(profile.id);
+function profileChanged(){if(activeProfile().id!==profile.id)location.reload()}
+window.addEventListener('storage',profileChanged);window.addEventListener('pageshow',profileChanged);
 const memory = new Map();
 const starBadges = [
   [5, '🌱', tr('بداية مشرقة', 'Bright start')],
@@ -29,7 +33,7 @@ function read(key) {
   }
 }
 
-const legacy = read('kokab-games-v2');
+const legacy = profile.id==='default'?read('kokab-games-v2'):null;
 
 function progress(id, levelCount) {
   const saved = memory.get(id) ?? read(storageKey + id);

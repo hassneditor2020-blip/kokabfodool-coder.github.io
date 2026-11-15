@@ -21,8 +21,22 @@ for p in root.rglob('index.html'):
     # Safe areas for installed mobile devices.
     s=s.replace('width=device-width,initial-scale=1"','width=device-width,initial-scale=1,viewport-fit=cover"')
     p.write_text(s)
+# Refresh dependencies for every game engine and public page, including existing offline clients.
+for p in assets.glob('*.js'):
+    s=p.read_text()
+    s=re.sub(r'(game-progress\.js\?v=)\d+',lambda m:m[1]+'9',s)
+    p.write_text(s)
+for p in root.rglob('index.html'):
+    if '.git' in p.parts:continue
+    s=p.read_text()
+    s=re.sub(r'(/assets/pwa\.(?:js|css))(?:\?v=\d+)?(?=["\'])',lambda m:m[1]+'?v=2',s)
+    s=re.sub(r'(/assets/age-journey\.js\?v=)\d+',lambda m:m[1]+'5',s)
+    # Bump entry points whose imports were changed.
+    for name,ver in [('games',15),('letter-match',12),('vowel-drive',14),('interactive-games',8),('planet-adventures',7),('sound-world',2),('game-progress',9)]:
+        s=re.sub(r'(/assets/'+name+r'\.js\?v=)\d+',lambda m:m[1]+str(ver),s)
+    p.write_text(s)
 # Pack includes the current canonical app/game pages, all local media and code required by the games.
-pages=['/','/en/','/games/','/en/games/','/app/','/en/app/','/offline/','/en/offline/','/grown-ups/','/en/grown-ups/','/episodes/','/en/episodes/','/privacy/','/en/privacy/']
+pages=['/','/en/','/games/','/en/games/','/app/','/en/app/','/play-app/','/en/play-app/','/app/family/','/en/app/family/','/offline/','/en/offline/','/grown-ups/','/en/grown-ups/','/episodes/','/en/episodes/','/privacy/','/en/privacy/']
 for prefix in ['', 'en/']:
     pages += ['/'+p.parent.as_posix()+'/' for p in (root/(prefix+'games')).glob('*/index.html')]
 assert len([x for x in pages if re.match(r'^/(?:en/)?games/[^/]+/$',x)])==40

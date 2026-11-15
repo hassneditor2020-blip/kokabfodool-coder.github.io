@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:?Android SDK missing}}"
+BT="$(find "$SDK/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+PLATFORM="$(find "$SDK/platforms" -name android.jar | sort -V | tail -1)"
+test -x "$BT/aapt2" && test -f "$PLATFORM"
+echo "SDK $BT $PLATFORM"
+mkdir -p /tmp/fudool-apk downloads/apps
+# Initial test release uses a temporary signing key. Never commit the private key.
+keytool -genkeypair -keystore /tmp/fudool-apk/signing.jks -storepass android -keypass android -alias fudool-preview -keyalg RSA -keysize 2048 -validity 3650 -dname "CN=Kawkab Fudool Preview" >/dev/null 2>&1
+for mode in online offline; do
+  W="/tmp/fudool-apk/$mode";mkdir -p "$W/res/drawable" "$W/classes" "$W/dex" "$W/assets"
+  cp assets/app-icon-512.png "$W/res/drawable/app_icon.png"
+  permission="";label="كوكب فضول أونلاين"
+  if [ "$mode" = online ]; then permission='<uses-permission android:name="android.permission.INTERNET"/>'; else label="كوكب فضول بدون نت"; fi
+  cat > "$W/AndroidManifest.xml" <<EOF
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.$mode" android:versionCode="41" android:versionName="4.1">
+<uses-sdk android:minSdkVersion="23" android:targetSdkVersion="32"/>
+$permission
+<application android:label="$label" android:icon="@drawable/app_icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:usesCleartextTraffic="false">
+<activity android:name="com.kokabfodool.shell.MainActivity" android:exported="true" android:configChanges="orientation|screenSize|keyboardHidden">
+<intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+</activity>
+</application></manifest>
+EOF
+  if [ "$mode" = offline ]; then
+    python3 - "$W/assets/site" <<'PY'
+import pathlib,shutil,json,urllib.parse,sys
+dest=pathlib.Path(sys.argv[1]);dest.mkdir(parents=True)
+pack=json.loads(pathlib.Path('offline-pack.json').read_text())
+for url in pack['files']:
+    p=urllib.parse.unquote(url.lstrip('/'))
+    if url.endswith('/'):p+='index.html'
+    target=dest/p;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,target)
+print('Bundled',len(pack['files']),'files')
+PY
+  fi
+  "$BT/aapt2" compile --dir "$W/res" -o "$W/res.zip"
+  "$BT/aapt2" link -o "$W/base.apk" -I "$PLATFORM" --manifest "$W/AndroidManifest.xml" -A "$W/assets" "$W/res.zip"
+  javac -source 8 -target 8 -classpath "$PLATFORM" -d "$W/classes" android-app/MainActivity.java
+  "$BT/d8" --lib "$PLATFORM" --min-api 23 --output "$W/dex" $(find "$W/classes" -name '*.class')
+  (cd "$W/dex"; zip -q "$W/base.apk" classes.dex)
+  "$BT/zipalign" -f 4 "$W/base.apk" "$W/aligned.apk"
+  "$BT/apksigner" sign --ks /tmp/fudool-apk/signing.jks --ks-key-alias fudool-preview --ks-pass pass:android --key-pass pass:android --out "downloads/apps/kawkab-fudool-$mode.apk" "$W/aligned.apk"
+  "$BT/apksigner" verify --verbose --print-certs "downloads/apps/kawkab-fudool-$mode.apk"
+  "$BT/aapt" dump badging "downloads/apps/kawkab-fudool-$mode.apk" | head -8 || true
+done
+python3 - <<'PY'
+import zipfile,pathlib,json,hashlib
+p=pathlib.Path('downloads/apps')
+out={}
+for mode in ['online','offline']:
+ f=p/f'kawkab-fudool-{mode}.apk'
+ with zipfile.ZipFile(f) as z:
+  names=z.namelist()
+  assert 'classes.dex' in names and 'AndroidManifest.xml' in names
+  assert ('assets/site/play-app/index.html' in names)==(mode=='offline')
+  if mode=='offline':
+   assert 'assets/site/assets/real-sounds/sheep.mp3' in names
+   assert len([n for n in names if n.startswith('assets/site/')])>=780
+ out[mode]={'file':f.name,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()}
+(p/'release.json').write_text(json.dumps(out,indent=2)+'\n')
+print(out)
+PY

@@ -2,7 +2,7 @@ import {vowelClipId} from './vowel-audio-review.js?v=2';
 import {sharedAudioSource} from './vowel-audio-routing.js?v=2';
 import {drawGuide,evaluateTrace} from './trace-assessment.js?v=1';
 import {illustrate} from './learning-art.js?v=1';
-import {shuffle} from './game-progress.js?v=8';
+import {shuffle} from './game-progress.js?v=9';
 const ar=document.documentElement.lang==='ar';
 const tr=(a,b)=>ar?a:b;
 const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};
