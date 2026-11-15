@@ -1,12 +1,18 @@
 {
   "online": {
-    "file": "kawkab-fudool-online.apk",
-    "bytes": 262642,
-    "sha256": "4876203faeb90086cd44c36bf5fbf298be9a2cc3130bc892bb454e02d2cab448"
+    "file": "Kokab-Fodool-V5.0-Online.apk",
+    "version": "5.0",
+    "versionCode": 50,
+    "bytes": 266738,
+    "sha256": "1f85d9161aee3ec6c06c3128f1ca3481a6fca7e76b05a95ddb9220f0013500bb",
+    "certificate_sha256": "ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729"
   },
   "offline": {
-    "file": "kawkab-fudool-offline.apk",
-    "bytes": 12364864,
-    "sha256": "6b46b504c47e5864d148f090f8ff58b0ece2e4067a27de324ea33ec9aaf5c90c"
+    "file": "Kokab-Fodool-V5.0-Offline.apk",
+    "version": "5.0",
+    "versionCode": 50,
+    "bytes": 12385662,
+    "sha256": "7cb780c953b6e5d0c00fba2f4a1952a1ca01376245ff80119e721f8e92933840",
+    "certificate_sha256": "ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729"
   }
 }

@@ -1,0 +1,33 @@
+name: V5 browser and visual validation
+on:
+  push:
+    branches: [v5-education-platform]
+    paths:
+      - '.github/workflows/browser-v5.yml'
+      - 'scripts/test-v5-browser.cjs'
+      - 'assets/app-v5.*'
+      - 'assets/app-learning-v5.json'
+      - 'play-app/**'
+      - 'en/play-app/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --no-package-lock playwright
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/test-v5-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: V5-visual-screenshots
+          path: build/v5-screenshots/
+          if-no-files-found: ignore
+          retention-days: 14
