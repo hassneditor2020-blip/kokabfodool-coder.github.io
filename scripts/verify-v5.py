@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static preflight for V5. Never modifies site files."""
+"""Static preflight for the unified website and Android app. Never modifies site files."""
 from pathlib import Path
 import json,re,urllib.parse,hashlib
 from html.parser import HTMLParser
@@ -12,6 +12,9 @@ def file_for(url):
 for url in paths:
     assert file_for(url).is_file(),f"Missing offline file: {url}"
 assert len(paths)==len(pack['files'])
+world_files={p.name for p in (root/'assets/worlds').glob('*.webp')}
+assert len(world_files)==32
+assert all('/assets/worlds/'+p in paths for p in world_files)
 catalog=json.loads((root/'assets/app-learning-v5.json').read_text())
 assert len(catalog['series'])==8
 assert '/assets/english-numbers-badge.webp' in paths
@@ -22,6 +25,15 @@ assert all(any(e.get('category')=='numbers' for e in next(g for g in catalog['se
 for lang,prefix in [('ar',''),('en','en/')]:
     pages=list((root/(prefix+'games')).glob('*/index.html'))
     assert len(pages)==20,(lang,len(pages))
+    level_count=0
+    for page in pages:
+        assert page.parent.name+'.webp' in world_files
+        data=re.search(r'<script id="(?:game|drive|match)-data" type="application/json">(.*?)</script>',page.read_text(),re.S)
+        assert data,page
+        levels=json.loads(data.group(1))['levels']
+        assert all(level['rounds'] for level in levels),page
+        level_count+=len(levels)
+    assert level_count==275,(lang,level_count)
     assert all('/'+p.parent.as_posix()+'/' in paths for p in pages)
     download=(root/(prefix+'app/index.html')).read_text()
     assert download.count('data-release-mode="unified"')==1

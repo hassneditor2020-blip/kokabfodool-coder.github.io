@@ -1,5 +1,6 @@
 import {activeProfile,prefix} from './profile-state.js?v=1';
-import {setupWorld,updateMap,decorateLevel,celebrate,enhanceRewards} from './reward-worlds.js?v=1';
+import {setupWorld,updateMap,decorateLevel,renderTrailStage,celebrate,enhanceRewards} from './reward-worlds.js?v=2';
+import {createIllustration} from './learning-art.js?v=2';
 import { bindGameAudio } from './game-audio.js?v=5';
 
 const language = document.documentElement.lang;
@@ -10,19 +11,19 @@ function profileChanged(){if(activeProfile().id!==profile.id)location.reload()}
 window.addEventListener('storage',profileChanged);window.addEventListener('pageshow',profileChanged);
 const memory = new Map();
 const starBadges = [
-  [5, '🌱', tr('بداية مشرقة', 'Bright start')],
-  [20, '🚀', tr('مستكشف الكوكب', 'Planet explorer')],
-  [40, '🏅', tr('صديق لُمعة', 'Lumaa’s friend')],
-  [60, '🏆', tr('بطل كوكب فضول', 'Kawkab Fudool champion')],
-  [78, '👑', tr('وسام التحدّي الكبير', 'Grand challenge badge')],
-  [150,'🛸',tr('رائد الكوكب','Planet pioneer')],
-  [225,'🌟',tr('نجم الكوكب','Planet star')],
-  [300,'🏅',tr('مستكشف العوالم','World explorer')],
-  [375,'👑',tr('ملك الكوكب','Planet champion')],
-  [450,'🚀',tr('رائد النجوم','Star voyager')],
-  [555,'🏆',tr('بطل جميع العوالم','All-world champion')],
-  [675,'🌠',tr('نجم المجرة','Galaxy star')],
-  [825,'👑',tr('أسطورة كوكب فضول','Fudool legend')],
+  [5, 'seedling', tr('بداية مشرقة', 'Bright start')],
+  [20, 'rocket', tr('مستكشف الكوكب', 'Planet explorer')],
+  [40, 'award', tr('صديق لُمعة', 'Lumaa’s friend')],
+  [60, 'trophy', tr('بطل كوكب فضول', 'Kawkab Fudool champion')],
+  [78, 'crown', tr('وسام التحدّي الكبير', 'Grand challenge badge')],
+  [150,'rocket',tr('رائد الكوكب','Planet pioneer')],
+  [225,'star',tr('نجم الكوكب','Planet star')],
+  [300,'award',tr('مستكشف العوالم','World explorer')],
+  [375,'crown',tr('ملك الكوكب','Planet champion')],
+  [450,'rocket',tr('رائد النجوم','Star voyager')],
+  [555,'trophy',tr('بطل جميع العوالم','All-world champion')],
+  [675,'galaxy',tr('نجم المجرة','Galaxy star')],
+  [825,'crown',tr('أسطورة كوكب فضول','Fudool legend')],
 ];
 
 function read(key) {
@@ -61,16 +62,20 @@ function save(id, levelCount, update) {
 const gameCounts = new Map(Object.entries({"vowel-drive":15,"letter-match":12,"letter-hunt":15,"counting":18,"english-abc":15,"memory":10,"trace":10,"robo-lab":10,"puzzle":10,"sound-quiz":10,"fudool-shop":15,"word-factory":15,"lumaa-clock":10,"code-robo":20,"world-mishaal":15,"planet-engineer":15,"healthy-hero":10,"space-journey":15,"spot-differences":15,"grand-challenge":20}));
 const starCount = (scores) => scores.reduce((total, score) => total + score, 0);
 export const totalStars = () => [...gameCounts].reduce((total, [id, count]) => total + starCount(progress(id, count).scores), 0);
-const starText = (score) => tr(`⭐ ${score} من 3`, `⭐ ${score} of 3`);
+const starText = (score) => tr(`${score} من 3 نجوم`, `${score} of 3 stars`);
 
 function renderRewards(rewards) {
   const total = totalStars();
   const max = [...gameCounts.values()].reduce((sum, count) => sum + count, 0) * 3;
-  rewards.querySelector('[data-total-stars]').textContent = tr(`⭐ ${total} من ${max} نجمة`, `⭐ ${total} of ${max} stars`);
+  rewards.querySelector('[data-total-stars]').textContent = tr(`${total} من ${max} نجمة`, `${total} of ${max} stars`);
   const badges = starBadges.map(([threshold, icon, title]) => {
     const item = document.createElement('li');
     item.dataset.earned = String(total >= threshold);
-    item.textContent = total >= threshold ? `${icon} ${title} ✓` : `🔒 ${title} · ${threshold} ⭐`;
+    const earned = total >= threshold;
+    const badgeArt = createIllustration(earned ? icon : 'lock');
+    badgeArt.classList.add('world-icon');
+    const label = earned ? title + ' ✓' : title + ' · ' + tr(threshold + ' نجمة', threshold + ' stars');
+    item.append(badgeArt, document.createTextNode(label));
     return item;
   });
   rewards.querySelector('[data-game-badges]').replaceChildren(...badges);
@@ -80,7 +85,7 @@ function renderRewards(rewards) {
     summary.textContent = tr(`${completed} من ${count} مستويات مكتملة`, `${completed} of ${count} levels complete`);
   });
   const album=rewards.querySelector('[data-character-album]');
-  if(album){const heading=document.createElement('h3');heading.textContent=tr('ألبوم الشخصيات','Character album');const grid=document.createElement('div');grid.className='fudool-album-grid';for(const [threshold,image,a,e] of [[0,'brand.webp','كوكب فضول','Kawkab Fudool'],[20,'lumaa.webp','لُمعة','Lumaa'],[40,'robo.webp','روبو','Robo'],[75,'mishal.webp','مشعال','Mishal']]){const item=document.createElement('div');const img=document.createElement('img');img.src='/assets/'+image;img.alt='';img.className=total>=threshold?'':'album-locked';const label=document.createElement('span');label.textContent=total>=threshold?tr(a,e):'🔒 '+threshold+' ⭐';item.append(img,label);grid.append(item);}album.replaceChildren(heading,grid);}
+  if(album){const heading=document.createElement('h3');heading.textContent=tr('ألبوم الشخصيات','Character album');const grid=document.createElement('div');grid.className='fudool-album-grid';for(const [threshold,image,a,e] of [[0,'brand.webp','كوكب فضول','Kawkab Fudool'],[20,'lumaa.webp','لُمعة','Lumaa'],[40,'robo.webp','روبو','Robo'],[75,'mishal.webp','مشعال','Mishal']]){const item=document.createElement('div');const img=document.createElement('img');img.src='/assets/'+image;img.alt='';img.className=total>=threshold?'':'album-locked';const label=document.createElement('span');label.textContent=total>=threshold?tr(a,e):tr(threshold+' نجمة',threshold+' stars');item.append(img,label);grid.append(item);}album.replaceChildren(heading,grid);}
   enhanceRewards(rewards,total,starBadges,max);
   rewards.hidden = false;
 }
@@ -160,19 +165,25 @@ export function bindJourney({id, levels}, board, renderRound) {
       button.className = 'game-level';
       button.disabled = locked;
       const number = document.createElement('strong');
+      number.className = 'sr-only';
       number.textContent = tr(`المستوى ${index + 1}`, `Level ${index + 1}`);
       const label = document.createElement('span');
+      label.className = 'reward-level-title';
       label.textContent = title;
       const status = document.createElement('small');
-      status.textContent = locked ? tr('🔒 مغلق', '🔒 Locked') :
+      status.textContent = locked ? tr('مغلق', 'Locked') :
         Number.isInteger(checkpoints[index]?.round) ? tr('تابع اللعب', 'Continue playing') :
-        scores[index] ? starText(scores[index]) : tr('ابدأ اللعب', 'Start playing');
+        scores[index] ? tr('مكتمل', 'Completed') : tr('ابدأ اللعب', 'Start playing');
       button.append(number, label, status);
       decorateLevel(button,index,scores[index],locked);
       button.addEventListener('click', () => start(index));
       return button;
     });
-    const groups=[];for(let i=0;i<buttons.length;i+=5){const group=document.createElement("section");group.className="fudool-level-world";const heading=document.createElement("h3");heading.textContent=tr(`🚀 رحلة ${Math.floor(i/5)+1} · ${i+1}–${Math.min(i+5,buttons.length)}`,`🚀 Journey ${Math.floor(i/5)+1} · ${i+1}–${Math.min(i+5,buttons.length)}`);group.append(heading,...buttons.slice(i,i+5));groups.push(group);}list.replaceChildren(...groups);
+    const stages = [];
+    for (let i = 0; i < buttons.length; i += 5) {
+      stages.push(renderTrailStage(id, Math.floor(i / 5) + 1, buttons.slice(i, i + 5)));
+    }
+    list.replaceChildren(...stages);
     show(map, focus);
   }
 
@@ -224,7 +235,12 @@ export function bindJourney({id, levels}, board, renderRound) {
     const badges = result.querySelector('[data-result-badges]');
     const unlocked = starBadges.filter(([threshold]) => total >= threshold).at(-1);
     badges.hidden = !unlocked;
-    badges.textContent = unlocked ? `${unlocked[1]} ${unlocked[2]}` : '';
+    badges.replaceChildren();
+    if (unlocked) {
+      const badgeArt = createIllustration(unlocked[1]);
+      badgeArt.classList.add('world-icon');
+      badges.append(badgeArt, document.createTextNode(unlocked[2]));
+    }
     nextLevel.hidden = last;
     show(result);
     celebrate(result,{score:score(),best,total,scores:progress(id,levels.length).scores,badges:starBadges,level,rounds:levels[level].rounds.length,last,previousTotal});

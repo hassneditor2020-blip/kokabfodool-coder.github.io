@@ -7,7 +7,7 @@ test -x "$BT/aapt2" && test -f "$PLATFORM"
 echo "SDK $BT $PLATFORM"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
-OUT="${FUDOOL_OUTPUT_DIR:-build/android-v5}"
+OUT="${FUDOOL_OUTPUT_DIR:-build/android-v6}"
 mkdir -p "$OUT"
 # Use a stable private signing key. A new key requires explicit opt-in; outputs are staged, not published.
 : "${FUDOOL_KEYSTORE:?Original signing keystore required}"
@@ -31,7 +31,7 @@ for mode in unified; do
   # All assets are bundled; external HTTPS links use Android ACTION_VIEW, not the app network.
   permission="";label="كوكب فضول"
   cat > "$W/AndroidManifest.xml" <<EOF
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="55" android:versionName="5.0.5">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="60" android:versionName="6.0.0">
 <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="32"/>
 $permission
 <application android:label="$label" android:icon="@drawable/app_icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:usesCleartextTraffic="false">
@@ -65,7 +65,7 @@ PY
   "$BT/aapt" dump badging "$OUT/kawkab-fudool-$mode.apk" | head -8 || true
 done
 python3 - "$OUT" <<'PY'
-import zipfile,pathlib,json,hashlib,sys
+import zipfile,pathlib,json,hashlib,sys,urllib.parse
 p=pathlib.Path(sys.argv[1])
 out={}
 for mode in ['unified']:
@@ -76,8 +76,14 @@ for mode in ['unified']:
   assert 'assets/site/play-app/index.html' in names
   assert 'assets/site/assets/real-sounds/sheep.mp3' in names
   assert 'assets/site/assets/app-learning-v5.json' in names
-  assert len([n for n in names if n.startswith('assets/site/')])>=780
- out[mode]={'file':f.name,'version':'5.0.5','versionCode':55,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'certificate_sha256':(p/f'{mode}-certificate.txt').read_text().strip()}
+  expected = json.loads(pathlib.Path('offline-pack.json').read_text())['files']
+ expected = {'assets/site/' + urllib.parse.unquote(url[1:]) + ('index.html' if url.endswith('/') else '') for url in expected}
+ assert expected <= set(names), sorted(expected - set(names))
+ assert sum(n.startswith('assets/site/assets/worlds/') for n in names)==32
+ for name in expected:
+  data = pathlib.Path(name.removeprefix('assets/site/')).read_bytes()
+  assert hashlib.sha256(z.read(name)).digest() == hashlib.sha256(data).digest(), name
+ out[mode]={'file':f.name,'version':'6.0.0','versionCode':60,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'certificate_sha256':(p/f'{mode}-certificate.txt').read_text().strip()}
 assert list(out)==['unified']
 (p/'release.json').write_text(json.dumps(out,indent=2)+'\n')
 print(out)
