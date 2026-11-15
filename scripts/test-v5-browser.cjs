@@ -32,6 +32,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    assert.equal(await page.locator('#v5-series-detail .v5-detail-grid .v5-episode').count(),19);
    await page.locator('.v5-nav a[href="#v5-games"]').click();await visible('games');await fit();
    assert.equal(await page.locator('[data-app-games] .app-game-card').count(),20);
+   assert.equal(await page.locator('[data-app-games] .premium-game-scene use').count(),20);
    await page.screenshot({path:'build/v5-screenshots/'+lang+'-'+width+'-games.png',fullPage:true});
    await page.locator('.v5-nav a[href="#v5-achievements"]').click();await visible('achievements');await fit();
    await page.waitForSelector('.v5-badge');assert.equal(await page.locator('.v5-badge').count(),4);
@@ -41,6 +42,26 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    assert.deepEqual(errors,[],lang+' '+width+' JS errors');
    await page.close();
    console.log('PASS',lang,width,'five views / 20 games / catalogue / direct links / no overflow');
+  }
+  // Check shared art and actual level entry for all twenty games in both languages.
+  const ids=["vowel-drive","letter-match","letter-hunt","counting","english-abc","memory","trace","robo-lab","puzzle","sound-quiz","fudool-shop","word-factory","lumaa-clock","code-robo","world-mishaal","planet-engineer","healthy-hero","space-journey","spot-differences","grand-challenge"];
+  for(const lang of ['ar','en']){
+   const page=await browser.newPage({viewport:{width:390,height:844}});
+   const prefix=lang==='ar'?'':'/en';
+   await page.goto(origin+prefix+'/games/',{waitUntil:'networkidle'});
+   assert.equal(await page.locator('.premium-library-card .premium-game-cover').count(),20);
+   for(const id of ids){
+    await page.goto(origin+prefix+'/games/'+id+'/',{waitUntil:'domcontentloaded'});
+    const map=page.locator('[data-level-map]');
+    await map.waitFor({state:'visible',timeout:10000});
+    assert.equal(await page.locator('.premium-game-heading .premium-game-cover svg use').count(),1);
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'game map overflow '+lang+' '+id);
+    await map.locator('button.game-level:not(:disabled)').first().click();
+    await page.waitForFunction(()=>[...document.querySelectorAll('.game-board')].some(b=>!b.hidden&&!b.matches('.game-levels,.game-result')));
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'game play overflow '+lang+' '+id);
+    if(['vowel-drive','counting','robo-lab','space-journey','grand-challenge'].includes(id))await page.screenshot({path:'build/v5-screenshots/'+lang+'-game-'+id+'.png',fullPage:true});
+   }
+   await page.close();console.log('PASS website/game artwork and levels',lang,ids.length);
   }
   // Verify all catalog covers load on the website and in the actual application grids.
   const catalog=JSON.parse(fs.readFileSync('assets/app-learning-v5.json','utf8'));

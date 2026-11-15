@@ -16,6 +16,7 @@ catalog=json.loads((root/'assets/app-learning-v5.json').read_text())
 assert len(catalog['series'])==8
 assert '/assets/english-numbers-badge.webp' in paths
 assert '/assets/fudool-premium-art.svg' in paths
+assert (root/'assets/fudool-premium-art.svg').read_text().count('<symbol id=')>=40
 assert file_for('/assets/fudool-premium-art.svg').is_file()
 assert all(any(e.get('category')=='numbers' for e in next(g for g in catalog['series'] if g['id']=='english-fun')[lang]['episodes']) for lang in ('ar','en'))
 for lang,prefix in [('ar',''),('en','en/')]:
