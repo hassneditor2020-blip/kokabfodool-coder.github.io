@@ -1,3 +1,6 @@
+.pwa-native, .pwa-standalone {
+  scroll-padding-block-end: calc(92px + env(safe-area-inset-bottom, 0px));
+}
 .robo-experiments {
   width: min(100%, 680px);
   overflow: hidden;

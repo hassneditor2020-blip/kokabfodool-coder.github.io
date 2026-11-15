@@ -176,6 +176,11 @@ async function validateRobo(page, language) {
   assert(await mix.isDisabled());
   await page.locator('[data-robo-add="blue"]').click();
   await page.locator('.robo-beaker[data-fill="both"]').waitFor();
+  const nav = page.locator('.pwa-bottom-nav');
+  if (await nav.isVisible()) {
+    const [control, footer] = await Promise.all([mix.boundingBox(), nav.boundingBox()]);
+    assert(control.y + control.height <= footer.y, 'The Android navigation must not cover Mix');
+  }
   await mix.click();
   await page.locator('.robo-beaker[data-fill="green"]').waitFor();
   assert.match(await page.locator('.robo-observation').textContent(), language === 'ar' ? /الأخضر/ : /green/);
@@ -250,7 +255,10 @@ async function validateOffline(browser) {
     browser = await chromium.launch({headless: true, executablePath: process.env.FUDOOL_CHROMIUM});
     for (const language of ['ar', 'en']) {
       await validateDriving(browser, language);
-      const labPage = await browser.newPage({viewport: {width: language === 'ar' ? 390 : 1280, height: 844}});
+      const labPage = await browser.newPage({
+        viewport: {width: language === 'ar' ? 390 : 1280, height: 844},
+        userAgent: language === 'ar' ? 'Mozilla/5.0 Mobile FudoolAndroidUnified' : undefined,
+      });
       try {
         await validateRobo(labPage, language);
         console.log('PASS V6.1 Robo experiments', language);

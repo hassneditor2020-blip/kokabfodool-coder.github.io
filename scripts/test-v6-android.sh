@@ -43,6 +43,7 @@ for attempt in range(15):
             root = ET.fromstring(xml)
             candidates = []
             visible = []
+            behind_navigation = False
             for node in root.iter('node'):
                 x1,y1,x2,y2 = map(int,re.findall(r'\d+',node.get('bounds','')))
                 if x2 <= x1 or y2 <= y1:
@@ -55,8 +56,12 @@ for attempt in range(15):
                 clickable = node.get('clickable') == 'true'
                 if tap == 'yes' and not (exact or clickable):
                     continue
+                center_y = (y1+y2)//2
+                if tap == 'yes' and label != 'الألعاب' and center_y >= 740:
+                    behind_navigation = True
+                    continue
                 priority = (not exact, not clickable)
-                point = (str((x1+x2)//2),str((y1+y2)//2))
+                point = (str((x1+x2)//2),str(center_y))
                 candidates.append((priority,point))
             if candidates:
                 _, point = min(candidates)
@@ -64,6 +69,10 @@ for attempt in range(15):
                     subprocess.run(['adb','shell','input','tap',*point],check=True)
                 print('Android UI:', label, 'tapped' if tap == 'yes' else 'visible', flush=True)
                 sys.exit(0)
+            if behind_navigation:
+                subprocess.run(['adb','shell','input','swipe','193','690','193','490','280'],check=True)
+                time.sleep(.5)
+                continue
     if attempt in (3,6,9,12):
         subprocess.run(['adb','shell','input','swipe','193','725','193','370','350'],check=True)
     time.sleep(1)

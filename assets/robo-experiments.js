@@ -46,6 +46,16 @@ function show(title, message, content, focus) {
   if (focus) heading.focus();
 }
 
+function focusControl(control) {
+  control.focus({preventScroll: true});
+  const navigation = document.querySelector('.pwa-bottom-nav')?.getBoundingClientRect();
+  const bottom = navigation?.height ? navigation.top : innerHeight;
+  const bounds = control.getBoundingClientRect();
+  if (bounds.top < 12 || bounds.bottom > bottom - 12) {
+    control.scrollIntoView({block: 'center', behavior: 'instant'});
+  }
+}
+
 function predict(kind, focus = true) {
   for (const choice of choices) {
     choice.setAttribute('aria-pressed', String(choice.dataset.roboExperiment === kind));
@@ -97,7 +107,7 @@ function mixPaint(prediction) {
     );
     blend.disabled = true;
     retry.hidden = false;
-    retry.focus({preventScroll: true});
+    focusControl(retry);
   });
   blend.dataset.roboMix = '';
   blend.disabled = true;
@@ -111,7 +121,7 @@ function mixPaint(prediction) {
         ? tr('أضفت اللونين. اضغط اخلط لتعرف النتيجة.', 'Both colors are in. Press Mix to see the result.')
         : tr('أضفت ' + colors[color] + '. جرّب إضافة اللون الآخر.', 'You added ' + colors[color] + '. Add the other color.');
       const next = added.size === 2 ? blend : supplies.querySelector('button:not(:disabled)');
-      next.focus({preventScroll: true});
+      focusControl(next);
     });
     add.dataset.roboAdd = color;
     add.append(specimen(color), element('span', '', tr('أضف ' + colors[color], 'Add ' + colors[color])));
@@ -120,7 +130,7 @@ function mixPaint(prediction) {
   const actions = element('div', 'robo-actions');
   actions.append(blend, retry);
   station.append(cup, supplies);
-  show(tr('جرّب خلط الطلاء', 'Mix the paint'), tr('أضف اللونين إلى الكأس ثم اخلطهما.', 'Add both colors to the beaker, then mix them.'), [station, actions, status], true);
+  show(tr('جرّب خلط الطلاء', 'Mix the paint'), tr('أضف اللونين إلى الكأس ثم اخلطهما.', 'Add both colors to the beaker, then mix them.'), [station, status, actions], true);
 }
 
 function testMagnet(prediction) {
