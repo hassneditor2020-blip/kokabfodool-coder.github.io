@@ -38,10 +38,12 @@ async function validateHomeCovers(browser, language, width) {
           badge.left >= bounds.left && badge.right <= bounds.right &&
           badge.top >= bounds.top && badge.bottom <= bounds.bottom &&
           badge.width <= bounds.width * .25;
-        return {id: card.dataset.gameId, fitted, placed};
+        const ordered = ['h3', '.round-arrow'].every(selector =>
+          card.querySelector(selector).getBoundingClientRect().top >= bounds.bottom - 1);
+        return {id: card.dataset.gameId, fitted, placed, ordered};
       }));
     });
-    assert.deepEqual(cards.filter(card => !card.fitted || !card.placed), [], 'Home covers ' + language + ' ' + width);
+    assert.deepEqual(cards.filter(card => !card.fitted || !card.placed || !card.ordered), [], 'Home covers ' + language + ' ' + width);
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2));
     console.log('PASS home thumbnails', language, width, '20 full-width covers with inset character badges');
   } finally {
