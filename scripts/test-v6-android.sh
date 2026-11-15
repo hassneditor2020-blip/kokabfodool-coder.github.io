@@ -26,28 +26,48 @@ import re
 import subprocess
 import sys
 import time
+import unicodedata
 import xml.etree.ElementTree as ET
 
 label, tap = sys.argv[1:]
-for attempt in range(12):
+def normalize(text):
+    return ''.join(c for c in unicodedata.normalize('NFKD', text) if not unicodedata.combining(c)).strip()
+
+needle = normalize(label)
+visible = []
+for attempt in range(15):
     dump = subprocess.run(['adb','shell','uiautomator','dump','/sdcard/fudool-ui.xml'], capture_output=True)
     if dump.returncode == 0:
         xml = subprocess.check_output(['adb','exec-out','cat','/sdcard/fudool-ui.xml'])
         if xml.startswith(b'<?xml'):
             root = ET.fromstring(xml)
+            candidates = []
+            visible = []
             for node in root.iter('node'):
-                caption = node.get('text', '') + ' ' + node.get('content-desc', '')
-                if label not in caption:
-                    continue
                 x1,y1,x2,y2 = map(int,re.findall(r'\d+',node.get('bounds','')))
                 if x2 <= x1 or y2 <= y1:
                     continue
+                captions = [normalize(node.get(key, '')) for key in ('text', 'content-desc')]
+                visible.extend(text for text in captions if text)
+                exact = needle in captions
+                if not any(needle in text for text in captions):
+                    continue
+                clickable = node.get('clickable') == 'true'
+                if tap == 'yes' and not (exact or clickable):
+                    continue
+                priority = (not exact, not clickable)
+                point = (str((x1+x2)//2),str((y1+y2)//2))
+                candidates.append((priority,point))
+            if candidates:
+                _, point = min(candidates)
                 if tap == 'yes':
-                    subprocess.run(['adb','shell','input','tap',str((x1+x2)//2),str((y1+y2)//2)],check=True)
+                    subprocess.run(['adb','shell','input','tap',*point],check=True)
+                print('Android UI:', label, 'tapped' if tap == 'yes' else 'visible', flush=True)
                 sys.exit(0)
-    if attempt in (4,8):
+    if attempt in (3,6,9,12):
         subprocess.run(['adb','shell','input','swipe','193','725','193','370','350'],check=True)
     time.sleep(1)
+print('Visible controls:', visible, flush=True)
 raise SystemExit('Offline Android view did not display: ' + label)
 PY
 }
@@ -62,6 +82,8 @@ adb exec-out screencap -p > build/v6-screenshots/android-offline-drive.png
 adb shell am force-stop "$package"
 adb shell am start -W -n "$activity"
 find_label 'الألعاب' yes
+find_label 'عالم الألعاب' no
+find_label 'التحديات' yes
 find_label 'مختبر روبو' yes
 find_label 'تجارب روبو' yes
 find_label 'البنفسجي' yes
