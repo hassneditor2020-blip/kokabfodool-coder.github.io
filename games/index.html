@@ -3,7 +3,7 @@
 <html dir="rtl" lang="ar">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#f8f6ff" name="theme-color"/>
 <meta content="strict-origin-when-cross-origin" name="referrer"/>
 <meta content="default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; img-src 'self' data:; frame-src 'none'" http-equiv="Content-Security-Policy"/>
@@ -31,6 +31,10 @@
 <script defer src="/assets/age-journey.js?v=4"></script>
 <link rel="stylesheet" href="/assets/game-visuals.css?v=1"/>
 <link rel="stylesheet" href="/assets/reward-worlds.css?v=1"/>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="/assets/app-icon-192.png"/>
+<link rel="stylesheet" href="/assets/pwa.css"/>
+<script defer src="/assets/pwa.js"></script>
 </head>
 <body><a class="skip" href="#main">تخطَّ إلى المحتوى</a>
 <header class="site-head site-head-inner-page"><div class="wrap head-inner">
@@ -43,7 +47,8 @@
 </details>
 </div>
 </div></header>
-<main id="main" tabindex="-1"><div class="wrap simple-page"><nav aria-label="مسار الصفحة" class="crumbs"><ol><li><a href="/">الرئيسية</a></li><li><span aria-current="page">ألعاب تعليمية للأطفال</span></li></ol></nav><div class="simple-intro"><h1>20 لعبة تعليمية للأطفال</h1><p>صِل الحروف بالصور، والعب بالحروف العربية والإنجليزية، وتدرّب على العدّ.</p></div><section class="age-journey" id="age-journey" data-age-journey><h2>رحلتي التعليمية</h2><p>اختر عمرك أو استكشف جميع الألعاب.</p><div class="age-tabs" role="group" aria-label="الفئة العمرية" data-age-tabs></div><div data-age-panel hidden></div></section><section aria-labelledby="rewards-title" class="game-rewards" data-game-rewards="" hidden="">
+<main id="main" tabindex="-1"><div class="wrap simple-page"><nav aria-label="مسار الصفحة" class="crumbs"><ol><li><a href="/">الرئيسية</a></li><li><span aria-current="page">ألعاب تعليمية للأطفال</span></li></ol></nav><div class="simple-intro"><h1>20 لعبة تعليمية للأطفال</h1><p>صِل الحروف بالصور، والعب بالحروف العربية والإنجليزية، وتدرّب على العدّ.</p></div><div data-pwa-slot></div>
+<section class="age-journey" id="age-journey" data-age-journey><h2>رحلتي التعليمية</h2><p>اختر عمرك أو استكشف جميع الألعاب.</p><div class="age-tabs" role="group" aria-label="الفئة العمرية" data-age-tabs></div><div data-age-panel hidden></div></section><section aria-labelledby="rewards-title" class="game-rewards" data-game-rewards="" hidden="">
 <img alt="" decoding="async" height="220" loading="lazy" src="/assets/lumaa.webp" width="220"/>
 <div><h2 id="rewards-title">نجومي ومكافآتي</h2>
 <p data-total-stars=""></p><ul class="game-badges" data-game-badges=""></ul>
