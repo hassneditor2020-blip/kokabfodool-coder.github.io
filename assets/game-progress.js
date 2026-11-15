@@ -6,6 +6,8 @@ const language = document.documentElement.lang;
 const tr = (ar, en) => language === 'ar' ? ar : en;
 const profile=activeProfile();
 const storageKey = prefix(profile.id);
+function profileChanged(){if(activeProfile().id!==profile.id)location.reload()}
+window.addEventListener('storage',profileChanged);window.addEventListener('pageshow',profileChanged);
 const memory = new Map();
 const starBadges = [
   [5, '🌱', tr('بداية مشرقة', 'Bright start')],
