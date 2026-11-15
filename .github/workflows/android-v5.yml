@@ -56,7 +56,7 @@ jobs:
           if [ -n "$RELEASE_BUNDLE" ]; then
             python3 - "$KEY" <<'PY'
           import os,sys,json,base64,pathlib
-          b=json.loads(base64.b64decode(os.environ['RELEASE_BUNDLE'],validate=True))
+          b=json.loads(base64.b64decode(os.environ['RELEASE_BUNDLE'].strip(),validate=True))
           assert b['certificate_sha256']=='ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729'
           pathlib.Path(sys.argv[1]).write_bytes(base64.b64decode(b['keystore_base64'],validate=True))
           for k,v in [('FUDOOL_KEY_ALIAS',b['alias']),('FUDOOL_STORE_PASSWORD',b['store_password']),('FUDOOL_KEY_PASSWORD',b['key_password']),('FUDOOL_CERT_SHA256',b['certificate_sha256'])]:
