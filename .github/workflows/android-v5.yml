@@ -38,6 +38,7 @@ jobs:
       - name: Prepare signing key
         id: signing
         env:
+          RELEASE_BUNDLE: ${{ secrets.FUDOOL_RELEASE_BUNDLE }}
           RELEASE_KEY_B64: ${{ secrets.FUDOOL_KEYSTORE_BASE64 }}
           RELEASE_ALIAS: ${{ secrets.FUDOOL_KEY_ALIAS }}
           RELEASE_STORE: ${{ secrets.FUDOOL_STORE_PASSWORD }}
@@ -45,7 +46,19 @@ jobs:
         run: |
           set -euo pipefail
           KEY="$RUNNER_TEMP/fudool-signing.jks"
-          if [ -n "$RELEASE_KEY_B64" ]; then
+          if [ -n "$RELEASE_BUNDLE" ]; then
+            python3 - "$KEY" <<'PY'
+          import os,sys,json,base64,pathlib
+          b=json.loads(base64.b64decode(os.environ['RELEASE_BUNDLE'],validate=True))
+          assert b['certificate_sha256']=='ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729'
+          pathlib.Path(sys.argv[1]).write_bytes(base64.b64decode(b['keystore_base64'],validate=True))
+          for k,v in [('FUDOOL_KEY_ALIAS',b['alias']),('FUDOOL_STORE_PASSWORD',b['store_password']),('FUDOOL_KEY_PASSWORD',b['key_password']),('FUDOOL_CERT_SHA256',b['certificate_sha256'])]:
+              assert '\n' not in v and '\r' not in v
+              if 'PASSWORD' in k: print('::add-mask::'+v)
+              with open(os.environ['GITHUB_ENV'],'a') as f: f.write(k+'='+v+'\n')
+          PY
+            echo "kind=release" >> "$GITHUB_OUTPUT"
+          elif [ -n "$RELEASE_KEY_B64" ]; then
             test -n "$RELEASE_ALIAS" && test -n "$RELEASE_STORE" && test -n "$RELEASE_PASS"
             printf '%s' "$RELEASE_KEY_B64" | base64 -d > "$KEY"
             echo "FUDOOL_KEY_ALIAS=$RELEASE_ALIAS" >> "$GITHUB_ENV"
