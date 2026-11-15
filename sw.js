@@ -1,6 +1,6 @@
 /* Kawkab Fudool PWA. Offline packs are opt-in, complete and kept separate from the live site. */
 const SHELL='fudool-shell-v1',PACK='fudool-offline-',META='fudool-offline-meta-v1',MARK='/__fudool_pack__';
-const CORE=['/offline/','/en/offline/','/assets/pwa.css','/assets/pwa.js','/assets/app-icon-192.png','/assets/app-icon-512.png','/manifest.webmanifest'];
+const CORE=['/offline/','/en/offline/','/app/','/en/app/','/assets/site.css','/assets/pwa.css','/assets/pwa.js','/assets/app-icon-192.png','/assets/app-icon-512.png','/manifest.webmanifest'];
 let job=null;
 self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('fudool-shell-')&&k!==SHELL)await caches.delete(k);await self.clients.claim()})()));
