@@ -1,6 +1,6 @@
 {
-  "version": "v5-platform-55d9caf938c3",
-  "bytes": 13097125,
+  "version": "v5-platform-6468a1b06dc5",
+  "bytes": 13098624,
   "files": [
     "/",
     "/app/",
@@ -14,6 +14,7 @@
     "/assets/app-icon-512.png",
     "/assets/app-learning-v5.json",
     "/assets/app-maskable-512.png",
+    "/assets/app-release-info.js",
     "/assets/app-v5.css",
     "/assets/app-v5.js",
     "/assets/arabic-letters-kit-cover.webp",
