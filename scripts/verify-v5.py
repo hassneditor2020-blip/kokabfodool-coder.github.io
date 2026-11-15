@@ -20,6 +20,9 @@ for lang,prefix in [('ar',''),('en','en/')]:
     pages=list((root/(prefix+'games')).glob('*/index.html'))
     assert len(pages)==20,(lang,len(pages))
     assert all('/'+p.parent.as_posix()+'/' in paths for p in pages)
+    download=(root/(prefix+'app/index.html')).read_text()
+    assert download.count('data-release-mode="unified"')==1
+    assert 'data-release-mode="offline"' not in download and 'data-release-mode="online"' not in download
     html=(root/(prefix+'play-app/index.html')).read_text()
     for view in ['home','learn','games','achievements','more']:
         assert html.count('data-v5-view="'+view+'"')==1,(lang,view)

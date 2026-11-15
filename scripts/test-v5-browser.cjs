@@ -42,6 +42,10 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   for(const lang of ['ar','en']){
    const page=await browser.newPage({viewport:{width:390,height:844}});
    const prefix=lang==='ar'?'':'/en';
+   await page.goto(origin+prefix+'/app/',{waitUntil:'networkidle'});
+   assert.equal(await page.locator('.apk-card').count(),1);
+   assert.equal(await page.locator('[data-release-mode="unified"]').count(),1);
+   assert.equal(await page.locator('[data-release-mode="offline"], [data-release-mode="online"]').count(),0);
    await page.goto(origin+prefix+'/episodes/',{waitUntil:'networkidle'});
    const coverCheck=async selector=>await page.locator(selector).evaluateAll(async imgs=>Promise.all(imgs.map(async im=>{im.loading='eager';try{await im.decode()}catch{}return {src:im.getAttribute('src'),ok:im.naturalWidth>0&&im.naturalHeight>0,fit:getComputedStyle(im).objectFit}})));
    const webCovers=await coverCheck('.episode-card .episode-art img');
@@ -65,7 +69,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    await page.close();
    console.log('PASS website and app catalogue covers, English numbers',lang);
   }
-  for(const lang of ['ar','en']) for(const mode of ['Offline','Online']){
+  for(const lang of ['ar','en']) for(const mode of ['Unified']){
    const page=await browser.newPage({viewport:{width:390,height:844},userAgent:'Mozilla/5.0 FudoolAndroid'+mode});
    let opened=null;
    await page.route('**/play-app/external/?url=*',async route=>{opened=new URL(route.request().url()).searchParams.get('url');await route.fulfill({status:200,body:'native interception simulated'})});
