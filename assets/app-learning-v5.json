@@ -54,7 +54,7 @@
           },
           {
             "route": "/series/arabic-letters/dhaal-gold/",
-            "image": "/assets/episode-dhaal-gold.webp",
+            "image": "/assets/cover-dhaal-gold.webp",
             "title": "حرف الذال ذَ مع ذَهَب",
             "video": "https://www.youtube.com/shorts/0wKH7MYeqVM"
           },
@@ -173,7 +173,7 @@
           },
           {
             "route": "/en/series/arabic-letters/dhaal-gold/",
-            "image": "/assets/episode-dhaal-gold.webp",
+            "image": "/assets/cover-dhaal-gold.webp",
             "title": "Arabic letter Dhaal with gold",
             "video": "https://www.youtube.com/shorts/0wKH7MYeqVM"
           },
@@ -247,7 +247,7 @@
         "episodes": [
           {
             "route": "/series/arabic-numbers/one/",
-            "image": "/assets/episode-one.webp",
+            "image": "/assets/cover-one.webp",
             "title": "الرقم ١ | واحد",
             "video": "https://www.youtube.com/shorts/t9MWgW_m31I"
           },
@@ -265,7 +265,7 @@
           },
           {
             "route": "/series/arabic-numbers/four-balloons/",
-            "image": "/assets/episode-four-balloons.webp",
+            "image": "/assets/cover-four-balloons.webp",
             "title": "الرقم ٤ مع أربعة بالونات",
             "video": "https://www.youtube.com/shorts/_Mz15VJsvOM"
           },
@@ -288,7 +288,7 @@
         "episodes": [
           {
             "route": "/en/series/arabic-numbers/one/",
-            "image": "/assets/episode-one.webp",
+            "image": "/assets/cover-one.webp",
             "title": "Arabic number 1 | One",
             "video": "https://www.youtube.com/shorts/t9MWgW_m31I"
           },
@@ -306,7 +306,7 @@
           },
           {
             "route": "/en/series/arabic-numbers/four-balloons/",
-            "image": "/assets/episode-four-balloons.webp",
+            "image": "/assets/cover-four-balloons.webp",
             "title": "Arabic number 4 with four balloons",
             "video": "https://www.youtube.com/shorts/_Mz15VJsvOM"
           },
@@ -450,7 +450,7 @@
           },
           {
             "route": "/series/robo/static-balloon/",
-            "image": "/assets/episode-static-balloon.webp",
+            "image": "/assets/cover-static-balloon.webp",
             "title": "لماذا ينجذب الورق إلى البالون؟",
             "video": "https://www.youtube.com/shorts/4nWr0CiuEGE"
           },
@@ -462,7 +462,7 @@
           },
           {
             "route": "/series/robo/ball-and-feather/",
-            "image": "/assets/episode-ball-and-feather.webp",
+            "image": "/assets/cover-ball-and-feather.webp",
             "title": "أيهما يسقط أولًا، الكرة أم الريشة؟",
             "video": "https://www.youtube.com/shorts/Aiz60B01vcI"
           }
@@ -491,7 +491,7 @@
           },
           {
             "route": "/en/series/robo/static-balloon/",
-            "image": "/assets/episode-static-balloon.webp",
+            "image": "/assets/cover-static-balloon.webp",
             "title": "Why does paper stick to a balloon?",
             "video": "https://www.youtube.com/shorts/4nWr0CiuEGE"
           },
@@ -503,7 +503,7 @@
           },
           {
             "route": "/en/series/robo/ball-and-feather/",
-            "image": "/assets/episode-ball-and-feather.webp",
+            "image": "/assets/cover-ball-and-feather.webp",
             "title": "Which falls first, the ball or the feather?",
             "video": "https://www.youtube.com/shorts/Aiz60B01vcI"
           }
@@ -523,7 +523,7 @@
           },
           {
             "route": "/series/guess/missing-star/",
-            "image": "/assets/episode-missing-star.webp",
+            "image": "/assets/cover-missing-star.webp",
             "title": "أين اختفت النجمة؟",
             "video": "https://www.youtube.com/shorts/LcOD71xUF5U"
           },
@@ -535,7 +535,7 @@
           },
           {
             "route": "/series/guess/missing-car-part/",
-            "image": "/assets/episode-missing-car-part.webp",
+            "image": "/assets/cover-missing-car-part.webp",
             "title": "ما القطعة الناقصة في السيارة؟",
             "video": "https://www.youtube.com/shorts/7qWu7UPMd_c"
           },
@@ -547,25 +547,25 @@
           },
           {
             "route": "/series/guess/mystery-footprints/",
-            "image": "/assets/episode-mystery-footprints.webp",
+            "image": "/assets/cover-mystery-footprints.webp",
             "title": "من ترك هذه الآثار؟",
             "video": "https://www.youtube.com/shorts/Jkgz1wLJ_Wk"
           },
           {
             "route": "/series/guess/behind-the-curtain/",
-            "image": "/assets/episode-behind-the-curtain.webp",
+            "image": "/assets/cover-behind-the-curtain.webp",
             "title": "من يختبئ خلف الستار؟",
             "video": "https://www.youtube.com/shorts/Vb0x2xeR3R0"
           },
           {
             "route": "/series/guess/white-light/",
-            "image": "/assets/episode-white-light.webp",
+            "image": "/assets/cover-white-light.webp",
             "title": "ماذا يخفي الضوء الأبيض؟",
             "video": "https://www.youtube.com/shorts/rOGZlgkZ-1s"
           },
           {
             "route": "/series/guess/glow-in-the-dark/",
-            "image": "/assets/episode-glow-in-the-dark.webp",
+            "image": "/assets/cover-glow-in-the-dark.webp",
             "title": "من يضيء في الظلام؟",
             "video": "https://www.youtube.com/shorts/rCzEahTDMzM"
           },
@@ -594,7 +594,7 @@
           },
           {
             "route": "/en/series/guess/missing-star/",
-            "image": "/assets/episode-missing-star.webp",
+            "image": "/assets/cover-missing-star.webp",
             "title": "Where did the star go?",
             "video": "https://www.youtube.com/shorts/LcOD71xUF5U"
           },
@@ -606,7 +606,7 @@
           },
           {
             "route": "/en/series/guess/missing-car-part/",
-            "image": "/assets/episode-missing-car-part.webp",
+            "image": "/assets/cover-missing-car-part.webp",
             "title": "What part is missing from the car?",
             "video": "https://www.youtube.com/shorts/7qWu7UPMd_c"
           },
@@ -618,25 +618,25 @@
           },
           {
             "route": "/en/series/guess/mystery-footprints/",
-            "image": "/assets/episode-mystery-footprints.webp",
+            "image": "/assets/cover-mystery-footprints.webp",
             "title": "Who left these footprints?",
             "video": "https://www.youtube.com/shorts/Jkgz1wLJ_Wk"
           },
           {
             "route": "/en/series/guess/behind-the-curtain/",
-            "image": "/assets/episode-behind-the-curtain.webp",
+            "image": "/assets/cover-behind-the-curtain.webp",
             "title": "Who is hiding behind the curtain?",
             "video": "https://www.youtube.com/shorts/Vb0x2xeR3R0"
           },
           {
             "route": "/en/series/guess/white-light/",
-            "image": "/assets/episode-white-light.webp",
+            "image": "/assets/cover-white-light.webp",
             "title": "What is hidden in white light?",
             "video": "https://www.youtube.com/shorts/rOGZlgkZ-1s"
           },
           {
             "route": "/en/series/guess/glow-in-the-dark/",
-            "image": "/assets/episode-glow-in-the-dark.webp",
+            "image": "/assets/cover-glow-in-the-dark.webp",
             "title": "What glows in the dark?",
             "video": "https://www.youtube.com/shorts/rCzEahTDMzM"
           },
@@ -674,7 +674,7 @@
           },
           {
             "route": "/series/what-if/walking-on-clouds/",
-            "image": "/assets/episode-walking-on-clouds.webp",
+            "image": "/assets/cover-walking-on-clouds.webp",
             "title": "ماذا لو مشيت فوق الغيوم؟",
             "video": "https://www.youtube.com/shorts/Kp1oqqkNBws"
           },
@@ -686,7 +686,7 @@
           },
           {
             "route": "/series/what-if/no-colors/",
-            "image": "/assets/episode-no-colors.webp",
+            "image": "/assets/cover-no-colors.webp",
             "title": "ماذا لو اختفت الألوان؟",
             "video": "https://www.youtube.com/shorts/H0AL7Pdhr3o"
           }
@@ -709,7 +709,7 @@
           },
           {
             "route": "/en/series/what-if/walking-on-clouds/",
-            "image": "/assets/episode-walking-on-clouds.webp",
+            "image": "/assets/cover-walking-on-clouds.webp",
             "title": "What if you could walk on clouds?",
             "video": "https://www.youtube.com/shorts/Kp1oqqkNBws"
           },
@@ -721,7 +721,7 @@
           },
           {
             "route": "/en/series/what-if/no-colors/",
-            "image": "/assets/episode-no-colors.webp",
+            "image": "/assets/cover-no-colors.webp",
             "title": "What if colors disappeared?",
             "video": "https://www.youtube.com/shorts/H0AL7Pdhr3o"
           }
