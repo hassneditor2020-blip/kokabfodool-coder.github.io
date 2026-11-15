@@ -73,13 +73,8 @@ jobs:
             echo "FUDOOL_KEY_PASSWORD=$RELEASE_PASS" >> "$GITHUB_ENV"
             echo "kind=release" >> "$GITHUB_OUTPUT"
           else
-            PASS="$(openssl rand -hex 24)"
-            echo "::add-mask::$PASS"
-            keytool -genkeypair -keystore "$KEY" -storepass "$PASS" -keypass "$PASS" -alias fudool-preview -keyalg RSA -keysize 2048 -validity 3650 -dname "CN=Fudool CI Preview" -storetype JKS
-            echo "FUDOOL_KEY_ALIAS=fudool-preview" >> "$GITHUB_ENV"
-            echo "FUDOOL_STORE_PASSWORD=$PASS" >> "$GITHUB_ENV"
-            echo "FUDOOL_KEY_PASSWORD=$PASS" >> "$GITHUB_ENV"
-            echo "kind=preview" >> "$GITHUB_OUTPUT"
+            echo 'Release signing secret is required for official V5.0 publication.' >&2
+            exit 1
           fi
           chmod 600 "$KEY"
           echo "FUDOOL_KEYSTORE=$KEY" >> "$GITHUB_ENV"
