@@ -65,26 +65,36 @@ PY
   "$BT/aapt" dump badging "$OUT/kawkab-fudool-$mode.apk" | head -8 || true
 done
 python3 - "$OUT" <<'PY'
-import zipfile,pathlib,json,hashlib,sys,urllib.parse
-p=pathlib.Path(sys.argv[1])
-out={}
-for mode in ['unified']:
- f=p/f'kawkab-fudool-{mode}.apk'
- with zipfile.ZipFile(f) as z:
-  names=z.namelist()
-  assert 'classes.dex' in names and 'AndroidManifest.xml' in names
-  assert 'assets/site/play-app/index.html' in names
-  assert 'assets/site/assets/real-sounds/sheep.mp3' in names
-  assert 'assets/site/assets/app-learning-v5.json' in names
-  expected = json.loads(pathlib.Path('offline-pack.json').read_text())['files']
- expected = {'assets/site/' + urllib.parse.unquote(url[1:]) + ('index.html' if url.endswith('/') else '') for url in expected}
- assert expected <= set(names), sorted(expected - set(names))
- assert sum(n.startswith('assets/site/assets/worlds/') for n in names)==32
- for name in expected:
-  data = pathlib.Path(name.removeprefix('assets/site/')).read_bytes()
-  assert hashlib.sha256(z.read(name)).digest() == hashlib.sha256(data).digest(), name
- out[mode]={'file':f.name,'version':'6.0.0','versionCode':60,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'certificate_sha256':(p/f'{mode}-certificate.txt').read_text().strip()}
-assert list(out)==['unified']
-(p/'release.json').write_text(json.dumps(out,indent=2)+'\n')
-print(out)
+import hashlib
+import json
+import pathlib
+import sys
+import urllib.parse
+import zipfile
+
+output = pathlib.Path(sys.argv[1])
+apk = output / 'kawkab-fudool-unified.apk'
+pack = json.loads(pathlib.Path('offline-pack.json').read_text())
+expected = {
+    'assets/site/' + urllib.parse.unquote(url[1:]) + ('index.html' if url.endswith('/') else '')
+    for url in pack['files']
+}
+with zipfile.ZipFile(apk) as archive:
+    names = set(archive.namelist())
+    assert {'AndroidManifest.xml', 'classes.dex'} <= names
+    assert expected <= names, sorted(expected - names)
+    assert sum(name.startswith('assets/site/assets/worlds/') for name in names) == 32
+    for name in expected:
+        source = pathlib.Path(name.removeprefix('assets/site/')).read_bytes()
+        assert archive.read(name) == source, name
+release = {'unified': {
+    'file': apk.name,
+    'version': '6.0.0',
+    'versionCode': 60,
+    'bytes': apk.stat().st_size,
+    'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
+    'certificate_sha256': (output / 'unified-certificate.txt').read_text().strip(),
+}}
+(output / 'release.json').write_text(json.dumps(release, indent=2) + '\n')
+print(release)
 PY
