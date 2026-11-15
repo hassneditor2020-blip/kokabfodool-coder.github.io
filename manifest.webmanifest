@@ -5,7 +5,7 @@
   "description": "20 educational games for ages 3–10, in Arabic and English.",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "/",
+  "start_url": "/play-app/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f8f6ff",
