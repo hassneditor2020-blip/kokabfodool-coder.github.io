@@ -31,7 +31,7 @@ for mode in unified; do
   # All assets are bundled; external HTTPS links use Android ACTION_VIEW, not the app network.
   permission="";label="كوكب فضول"
   cat > "$W/AndroidManifest.xml" <<EOF
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="53" android:versionName="5.0.3">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="54" android:versionName="5.0.4">
 <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="32"/>
 $permission
 <application android:label="$label" android:icon="@drawable/app_icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:usesCleartextTraffic="false">
@@ -77,7 +77,7 @@ for mode in ['unified']:
   assert 'assets/site/assets/real-sounds/sheep.mp3' in names
   assert 'assets/site/assets/app-learning-v5.json' in names
   assert len([n for n in names if n.startswith('assets/site/')])>=780
- out[mode]={'file':f.name,'version':'5.0.3','versionCode':53,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'certificate_sha256':(p/f'{mode}-certificate.txt').read_text().strip()}
+ out[mode]={'file':f.name,'version':'5.0.4','versionCode':54,'bytes':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'certificate_sha256':(p/f'{mode}-certificate.txt').read_text().strip()}
 assert list(out)==['unified']
 (p/'release.json').write_text(json.dumps(out,indent=2)+'\n')
 print(out)
