@@ -1,0 +1,12 @@
+{
+  "online": {
+    "file": "kawkab-fudool-online.apk",
+    "bytes": 262642,
+    "sha256": "4876203faeb90086cd44c36bf5fbf298be9a2cc3130bc892bb454e02d2cab448"
+  },
+  "offline": {
+    "file": "kawkab-fudool-offline.apk",
+    "bytes": 12364864,
+    "sha256": "6b46b504c47e5864d148f090f8ff58b0ece2e4067a27de324ea33ec9aaf5c90c"
+  }
+}
