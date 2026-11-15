@@ -1,0 +1,47 @@
+.game-path-choice {
+  display: grid;
+  gap: 12px;
+  margin-block: 16px;
+  padding: clamp(12px, 3vw, 20px);
+  border: 1px solid #ded3ee;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f2e9ff, #fff);
+  text-align: start;
+}
+
+.game-path-choice h3,
+.game-path-choice p {
+  margin: 0;
+}
+
+.game-path-choice p {
+  color: #514662;
+}
+
+.game-path-choice [data-path-play] {
+  justify-self: start;
+}
+
+.game-path-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.game-path-controls .button {
+  min-height: 44px;
+}
+
+.game-path-controls .button:disabled {
+  opacity: .58;
+  cursor: default;
+  box-shadow: none;
+}
+
+.game-path-controls .button[hidden] {
+  display: none;
+}
+
+.fudool-level-world[data-current-path] {
+  border-color: var(--rw);
+}

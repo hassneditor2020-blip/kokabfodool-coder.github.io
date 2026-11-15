@@ -1,7 +1,8 @@
 import {activeProfile,prefix} from './profile-state.js?v=1';
-import {setupWorld,updateMap,decorateLevel,renderTrailStage,celebrate,enhanceRewards} from './reward-worlds.js?v=2';
+import {setupWorld,updateMap,decorateLevel,renderTrailStage,celebrate,enhanceRewards} from './reward-worlds.js?v=3';
 import {createIllustration} from './learning-art.js?v=2';
 import { bindGameAudio } from './game-audio.js?v=5';
+import {pathsForGame,recommendedAge,includesLevel,nextPathLevel} from './game-age-paths.js?v=1';
 
 const language = document.documentElement.lang;
 const tr = (ar, en) => language === 'ar' ? ar : en;
@@ -43,7 +44,11 @@ function progress(id, levelCount) {
       .filter((score) => Number.isInteger(score) && score >= 1 && score <= 3);
     return Math.max(0, ...valid);
   });
-  return {scores, checkpoints: {...saved?.checkpoints}, lastPlayed: saved?.lastPlayed, lastLevel: saved?.lastLevel, orders: {...saved?.orders}};
+  return {
+    scores, checkpoints: {...saved?.checkpoints},
+    lastPlayed: saved?.lastPlayed, lastLevel: saved?.lastLevel,
+    orders: {...saved?.orders}, agePath: saved?.agePath,
+  };
 }
 
 function save(id, levelCount, update) {
@@ -142,6 +147,15 @@ export function bindJourney({id, levels}, board, renderRound) {
   const list = map.querySelector('[data-level-list]');
   const result = document.querySelector('[data-level-result]');
   const nextLevel = result.querySelector('[data-level-next]');
+  const paths = pathsForGame(id);
+  const pathForAge = age => paths.find(path => path.age === age);
+  const pathForLevel = index => paths.find(path => includesLevel(path, index));
+  const query = new URLSearchParams(location.search);
+  const continuing = query.get('continue') === '1';
+  const initial = progress(id, levels.length);
+  let linkedPath = pathForAge(query.get('path')) ??
+    (continuing ? pathForLevel(initial.lastLevel) : undefined);
+  const pathChoice = paths.length ? createPathChoice() : null;
   let level = 0;
   let round = 0;
   let mistakes = 0;
@@ -150,19 +164,104 @@ export function bindJourney({id, levels}, board, renderRound) {
   let previousTotal = totalStars();
   setupWorld(id,board,map,result);
 
+  function currentPath(state) {
+    return linkedPath ?? pathForAge(state.agePath) ??
+      pathForAge(recommendedAge(activeProfile())) ?? paths[0];
+  }
+
+  function isOpen(index, state, path) {
+    return index === 0 || Boolean(state.scores[index - 1] || state.scores[index]) ||
+      Boolean(path && (index === path.first - 1 || Number.isInteger(state.checkpoints[index]?.round)));
+  }
+
+  function createPathChoice() {
+    const root = document.createElement('section');
+    root.className = 'game-path-choice';
+    root.dataset.gamePaths = '';
+    const summary = document.createElement('div');
+    summary.setAttribute('aria-live', 'polite');
+    const title = document.createElement('h3');
+    title.id = 'game-path-title';
+    root.setAttribute('aria-labelledby', title.id);
+    const range = document.createElement('p');
+    summary.append(title, range);
+    const controls = document.createElement('div');
+    controls.className = 'game-path-controls';
+    controls.setAttribute('role', 'group');
+    controls.setAttribute('aria-label', tr('صعوبة اللعبة', 'Game difficulty'));
+    const control = (label, action, click) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'button button-white';
+      button.dataset.pathAction = action;
+      button.textContent = label;
+      button.addEventListener('click', () => click(button));
+      return button;
+    };
+    const easier = control(tr('أسهل', 'Easier'), 'easier', button => changeDifficulty(-1, button));
+    const harder = control(tr('أصعب', 'Harder'), 'harder', button => changeDifficulty(1, button));
+    const reset = control(tr('حسب العمر', 'By age'), 'age', button => changeDifficulty(0, button));
+    const play = document.createElement('button');
+    play.type = 'button';
+    play.className = 'button button-primary';
+    play.dataset.pathPlay = '';
+    play.addEventListener('click', () => {
+      const state = progress(id, levels.length);
+      start(nextPathLevel(currentPath(state), state.scores));
+    });
+    controls.append(easier, harder, reset);
+    root.append(summary, play, controls);
+    map.querySelector('h2').nextElementSibling.after(root);
+    return {root, title, range, play, easier, harder, reset};
+  }
+
+  function changeDifficulty(step, button) {
+    const path = currentPath(progress(id, levels.length));
+    const selected = step ? paths[paths.indexOf(path) + step] : undefined;
+    if (step && !selected) return;
+    linkedPath = undefined;
+    save(id, levels.length, state => { state.agePath = selected?.age; });
+    const url = new URL(location.href);
+    for (const key of ['path', 'level', 'continue']) url.searchParams.delete(key);
+    if (url.href !== location.href) history.replaceState(history.state, '', url);
+    showMap(false);
+    if (button.disabled || button.hidden) pathChoice.play.focus();
+  }
+
+  function updatePathChoice(path, state) {
+    const {root, title, range, play, easier, harder, reset} = pathChoice;
+    const next = nextPathLevel(path, state.scores);
+    const number = next + 1;
+    root.dataset.gamePaths = path.age;
+    title.textContent = tr(path.title.ar, path.title.en);
+    range.textContent = tr(`المستويات ${path.first}–${path.last}`, `Levels ${path.first}–${path.last}`);
+    play.textContent = state.scores[next]
+      ? tr(`راجع المستوى ${number}`, `Review level ${number}`)
+      : Number.isInteger(state.checkpoints[next]?.round)
+        ? tr(`تابع المستوى ${number}`, `Continue level ${number}`)
+        : tr(`ابدأ المستوى ${number}`, `Start level ${number}`);
+    easier.disabled = path === paths[0];
+    harder.disabled = path === paths.at(-1);
+    reset.hidden = !state.agePath && !linkedPath;
+  }
+
   function show(panel, focus = true) {
     for (const section of [map, board, result]) section.hidden = section !== panel;
     if (focus) panel.querySelector('h2').focus();
   }
 
   function showMap(focus = true) {
-    const {scores, checkpoints} = progress(id, levels.length);
+    const state = progress(id, levels.length);
+    const {scores, checkpoints} = state;
+    const activePath = paths.length ? currentPath(state) : undefined;
+    if (activePath) updatePathChoice(activePath, state);
     updateMap(map,scores);
     const buttons=levels.map(({title}, index) => {
-      const locked = index > 0 && !scores[index - 1] && !scores[index];
+      const locked = !isOpen(index, state, activePath);
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'game-level';
+      button.dataset.levelNumber = String(index + 1);
       button.disabled = locked;
       const number = document.createElement('strong');
       number.className = 'sr-only';
@@ -179,9 +278,20 @@ export function bindJourney({id, levels}, board, renderRound) {
       button.addEventListener('click', () => start(index));
       return button;
     });
-    const stages = [];
-    for (let i = 0; i < buttons.length; i += 5) {
-      stages.push(renderTrailStage(id, Math.floor(i / 5) + 1, buttons.slice(i, i + 5)));
+    let stages;
+    if (activePath) {
+      stages = [activePath, ...paths.filter(path => path !== activePath)].map(path => {
+        const stage = renderTrailStage(id, paths.indexOf(path) + 1, buttons.slice(path.first - 1, path.last),
+          tr(path.title.ar, path.title.en));
+        stage.dataset.levelPath = path.age;
+        stage.toggleAttribute('data-current-path', path === activePath);
+        return stage;
+      });
+    } else {
+      stages = [];
+      for (let i = 0; i < buttons.length; i += 5) {
+        stages.push(renderTrailStage(id, Math.floor(i / 5) + 1, buttons.slice(i, i + 5)));
+      }
     }
     list.replaceChildren(...stages);
     show(map, focus);
@@ -222,13 +332,19 @@ export function bindJourney({id, levels}, board, renderRound) {
   }
 
   function showResult() {
-    const last = level === levels.length - 1;
+    const {scores} = progress(id, levels.length);
+    const path = pathForLevel(level);
+    const atEnd = level === (path?.last ?? levels.length) - 1;
+    const allComplete = atEnd && (!path || scores.every(Boolean));
+    const pathComplete = path && atEnd && scores.slice(path.first - 1, path.last).every(Boolean);
     const total = totalStars();
-    result.querySelector('h2').textContent = last
+    result.querySelector('h2').textContent = allComplete
       ? tr('أكملت مستويات اللعبة!', `You finished all ${levels.length} levels!`)
-      : tr(`أكملت المستوى ${level + 1}!`, `Level ${level + 1} complete!`);
+      : pathComplete
+        ? tr(`أكملت ${path.title.ar}!`, `${path.title.en} complete!`)
+        : tr(`أكملت المستوى ${level + 1}!`, `Level ${level + 1} complete!`);
     result.querySelector('[data-result-stars]').textContent = starText(score());
-    const best = progress(id, levels.length).scores[level];
+    const best = scores[level];
     result.querySelector('[data-result-message]').textContent = best > score()
       ? tr(`أفضل نتيجة لك: ${starText(best)}`, `Your best: ${starText(best)}`)
       : tr('أحسنت! كل جولة تجعلك أفضل.', 'Well done! Keep exploring.');
@@ -241,9 +357,15 @@ export function bindJourney({id, levels}, board, renderRound) {
       badgeArt.classList.add('world-icon');
       badges.append(badgeArt, document.createTextNode(unlocked[2]));
     }
-    nextLevel.hidden = last;
+    nextLevel.hidden = atEnd;
     show(result);
-    celebrate(result,{score:score(),best,total,scores:progress(id,levels.length).scores,badges:starBadges,level,rounds:levels[level].rounds.length,last,previousTotal});
+    const endNote = atEnd && !allComplete
+      ? tr('اختر مسارًا أو مستوى من الخريطة لتواصل اللعب.', 'Choose a path or level on the map to keep playing.')
+      : undefined;
+    celebrate(result, {
+      score: score(), best, total, badges: starBadges, rounds: levels[level].rounds.length,
+      last: allComplete && atEnd, pathComplete, endNote, previousTotal,
+    });
   }
 
   document.querySelectorAll('[data-level-menu]').forEach((button) => button.addEventListener('click', () => showMap()));
@@ -251,15 +373,16 @@ export function bindJourney({id, levels}, board, renderRound) {
   result.querySelector('[data-level-replay]').addEventListener('click', () => start(level, true));
   window.addEventListener('pageshow', (event) => { if (event.persisted && !map.hidden) showMap(false); });
   window.addEventListener('storage', () => { if (!map.hidden) showMap(false); });
-  const requested = Number(new URLSearchParams(location.search).get('level')) - 1;
-  const requestedScores = progress(id, levels.length).scores;
-  if (Number.isInteger(requested) && requested >= 0 && requested < levels.length && (requested === 0 || requestedScores[requested-1] || requestedScores[requested])) {
+  const requested = Number(query.get('level')) - 1;
+  const startingPath = paths.length ? currentPath(initial) : undefined;
+  if (Number.isInteger(requested) && requested >= 0 && requested < levels.length && isOpen(requested, initial, startingPath)) {
     queueMicrotask(() => start(requested));
-  } else if (new URLSearchParams(location.search).get('continue') === '1') {
-    const {scores, checkpoints, lastLevel} = progress(id, levels.length);
-    const unlocked = levels.map((_, index) => index).filter((index) => index === 0 || scores[index - 1] || scores[index]);
+  } else if (continuing) {
+    const {scores, checkpoints, lastLevel} = initial;
+    const unlocked = levels.map((_, index) => index).filter(index =>
+      (!startingPath || includesLevel(startingPath, index)) && isOpen(index, initial, startingPath));
     const checkpoint = unlocked.findLast((index) => Number.isInteger(checkpoints[index]?.round));
-    const next = unlocked.find((index) => !scores[index]);
+    const next = startingPath ? nextPathLevel(startingPath, scores) : unlocked.find(index => !scores[index]);
     const recent = unlocked.includes(lastLevel) && (!scores[lastLevel] || checkpoints[lastLevel]) ? lastLevel : undefined;
     queueMicrotask(() => start(recent ?? checkpoint ?? next ?? unlocked.at(-1)));
   } else {
