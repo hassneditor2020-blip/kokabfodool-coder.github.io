@@ -20,7 +20,7 @@ fi
 test -f "$FUDOOL_KEYSTORE"
 if [ "${FUDOOL_ALLOW_NEW_KEY:-0}" != 1 ]; then
 for mode in online offline; do
-  cert=$("$BT/apksigner" verify --print-certs "downloads/apps/kawkab-fudool-$mode.apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
+  cert=$("$BT/apksigner" verify --print-certs "downloads/apps/kawkab-fudool-$mode.apk" | sed -nE 's/^(Signer #[0-9]+|V[0-9.]+ Signer):? certificate SHA-256 digest: //p' | sed -n '1p')
   test -n "$cert" && test "${cert,,}" = "${FUDOOL_CERT_SHA256,,}" || { echo "Original APK certificate mismatch: $mode" >&2; exit 1; }
 done
 fi
@@ -60,7 +60,7 @@ PY
   "$BT/zipalign" -f 4 "$W/base.apk" "$W/aligned.apk"
   "$BT/apksigner" sign --ks "$FUDOOL_KEYSTORE" --ks-key-alias "$FUDOOL_KEY_ALIAS" --ks-pass env:FUDOOL_STORE_PASSWORD --key-pass env:FUDOOL_KEY_PASSWORD --out "$OUT/kawkab-fudool-$mode.apk" "$W/aligned.apk"
   "$BT/apksigner" verify --verbose --print-certs "$OUT/kawkab-fudool-$mode.apk"
-  cert=$("$BT/apksigner" verify --print-certs "$OUT/kawkab-fudool-$mode.apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | head -1)
+  cert=$("$BT/apksigner" verify --print-certs "$OUT/kawkab-fudool-$mode.apk" | sed -nE 's/^(Signer #[0-9]+|V[0-9.]+ Signer):? certificate SHA-256 digest: //p' | sed -n '1p')
   test -n "$cert"
   test -z "${FUDOOL_CERT_SHA256:-}" || test "${cert,,}" = "${FUDOOL_CERT_SHA256,,}" || { echo "New APK certificate mismatch: $mode" >&2; exit 1; }
   "$BT/aapt" dump badging "$OUT/kawkab-fudool-$mode.apk" | head -8 || true
