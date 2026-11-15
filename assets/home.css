@@ -55,6 +55,10 @@
 .home-games .activity-symbol { justify-self: start; grid-column: 1; }
 .home-games .round-arrow { grid-column: 2; grid-row: 1; align-self: center; }
 .home-games .activity-card > div { grid-column: 1 / -1; }
+.home-games .premium-library-card { padding: 8px; }
+.home-games .premium-library-card > .fudool-world-cover { grid-row: 1; }
+.home-games .premium-library-card > div { grid-column: 1; grid-row: 2; min-width: 0; }
+.home-games .premium-library-card > .round-arrow { grid-row: 2; align-self: end; }
 .home-games h3 { font-size: clamp(.95rem, 2vw, 1.24rem); }
 .home-games .activity-card p { font-size: clamp(.77rem, 1.65vw, .91rem); overflow-wrap: anywhere; }
 .home-page .section-wash { background: var(--home-lavender); }
