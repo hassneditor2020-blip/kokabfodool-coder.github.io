@@ -1,85 +1,87 @@
-// Age-based recommendations. Existing scores remain the source of truth.
 import {activeProfile,read,scoresFor} from './profile-state.js?v=1';
-import {agePreferenceKey,pathsForGame,nextPathLevel} from './game-age-paths.js?v=1';
+import {ageGroups,ageLabel,agePreferenceKey,gameCounts,pathsForGame,nextPathLevel} from './game-age-paths.js?v=2';
+import {worldCover} from './world-art.js?v=1';
 
-const root=document.querySelector('[data-age-journey]');
-if(root){
- const ar=document.documentElement.lang==='ar', tr=(a,e)=>ar?a:e;
- const ids=['letter-match','letter-hunt','vowel-drive','trace','counting','english-abc','robo-lab','memory','puzzle','sound-quiz','fudool-shop','word-factory','lumaa-clock','code-robo','world-mishaal','planet-engineer','healthy-hero','space-journey','spot-differences','grand-challenge'];
- const ranges={
- '3-5':[[1,4],[1,4],null,[1,2],[1,2],[1,4],null,[1,3],[1,4],[1,3],[1,3],[1,5],[1,2],[1,4],[1,0],[1,5],[1,4],[1,0],[1,5],[1,0]],
- '6-7':[[5,9],[5,10],null,[3,8],[3,10],[5,10],null,[4,7],[5,7],[4,6],[4,9],[6,10],[3,6],[5,12],[1,7],[6,10],[5,8],[1,7],[6,10],[1,8]],
- '8-10':[[10,12],[11,15],null,[9,10],[11,18],[11,15],null,[8,10],[8,10],[7,10],[10,15],[11,15],[7,10],[13,20],[8,15],[11,15],[9,10],[8,15],[11,15],[9,20]]
- };
- const info={
- '3-5':['🌱','المستكشف الصغير','Little explorer','الصور والحروف الأولى والعدّ والألغاز البسيطة.','Pictures, first letters, counting and simple puzzles.'],
- '6-7':['🚀','المستكشف الذكي','Smart explorer','الحركات والقراءة والكتابة والحساب التدريجي.','Vowels, reading, writing and early arithmetic.'],
- '8-10':['🏆','بطل الكوكب','Planet champion','الكلمات والحساب والعلوم والذاكرة والتحديات المتقدمة.','Words, arithmetic, science, memory and advanced challenges.']
- };
- const profile=activeProfile();
- const preference=agePreferenceKey(profile.id);
- function saveAge(v){try{localStorage.setItem(preference,JSON.stringify(v))}catch{}}
- const all=[...document.querySelectorAll('.fudool-world')], cards=new Map([...document.querySelectorAll('.fudool-world [data-game-id]')].map(c=>[c.dataset.gameId,c]));
- const tabs=root.querySelector('[data-age-tabs]'), panel=root.querySelector('[data-age-panel]');
- let selected=new URLSearchParams(location.search).get('age')||read(preference)||profile?.age||'all';
- if(selected!=='all'&&!ranges[selected])selected='all';
- function node(tag,txt,cls){const el=document.createElement(tag);if(txt)el.textContent=txt;if(cls)el.className=cls;return el}
- function link(c,level,label,path){
-  const a=node('a',label,'button age-journey-link');
-  const url=new URL(c.href);
-  url.searchParams.set('level',String(level));
-  if(path) url.searchParams.set('path',path.age);
-  a.href=url.href;
-  return a;
- }
- function draw(){
-  for(const b of tabs.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.age===selected));
-  all.forEach(s=>{s.hidden=selected!=='all'});
-  panel.replaceChildren();
-  if(selected==='all'){panel.hidden=true;return}
-  panel.hidden=false;
-  const [icon,titleAr,titleEn,descAr,descEn]=info[selected];
-  const h=node('h2',icon+' '+tr(titleAr,titleEn)+' · '+selected.replace('-','–')+' '+tr('سنوات','years'));
-  const intro=node('p',tr(descAr,descEn));
-  const rows=ids.map((id,i)=>{
-   const paths=pathsForGame(id);
-   const path=paths.find(candidate=>candidate.age===selected);
-   const [first,last]=path?[path.first,path.last]:ranges[selected][i];
-   const count=paths.at(-1)?.last??ranges['8-10'][i][1];
-   const {scores:sc}=scoresFor(id,count,profile.id);
-   const completed=sc.slice(first-1,last).filter(Boolean).length;
-   return {id,first,last,sc,completed,total:last-first+1,path};
-  }).filter(r=>r.total>0);
-  const total=rows.reduce((n,r)=>n+r.total,0), done=rows.reduce((n,r)=>n+r.completed,0);
-  const bar=node('progress');bar.max=total;bar.value=done;bar.setAttribute('aria-label',tr('إنجاز المسار','Journey progress'));
-  const stat=node('p',tr('أكملت '+done+' من '+total+' مستوى · '+Math.round(done/total*100)+'%','Completed '+done+' of '+total+' levels · '+Math.round(done/total*100)+'%'),'age-stat');
-  panel.append(h,intro,stat,bar);
-  const grid=node('div','','age-journey-grid');
-  let suggested=false;
-  for(const r of rows){
-   const c=cards.get(r.id);if(!c)continue;
-   const item=node('article','','age-journey-card'),name=c.querySelector('h3').textContent, sym=c.querySelector('.activity-symbol')?.textContent||'⭐';
-   item.dataset.gameId=r.id;
-   const cover=c.querySelector('.game-visual-cover');if(cover){item.dataset.gameTheme=r.id;item.append(cover.cloneNode(true))}else item.append(node('span',sym,'age-symbol'));item.append(node('h3',name),node('p',tr('المستويات '+r.first+'–'+r.last,'Levels '+r.first+'–'+r.last)),node('p',tr(r.completed+' من '+r.total+' مكتملة',r.completed+' of '+r.total+' complete'),'age-stat'));
-   const target=r.path?nextPathLevel(r.path,r.sc)+1:r.sc.slice(r.first-1,r.last).findIndex(v=>!v)+r.first;
-   const requested=r.completed===r.total?r.first:target;
-   let actual=requested;
-   if(!r.path&&actual>1&&!r.sc[actual-2]&&!r.sc[actual-1]){
-    actual=r.sc.findIndex((v,i)=>!v&&(i===0||r.sc[i-1]))+1;
-    if(actual<1)actual=1;
-   }
-   if(!suggested&&r.completed<r.total){item.classList.add('age-recommended');item.append(node('p',tr('مقترح لك الآن','Recommended next'),'age-next'));suggested=true}
-   const label=actual<r.first?tr('ابدأ بالمستوى '+actual+' المطلوب','Start prerequisite level '+actual):r.completed===r.total?tr('راجع المستوى '+actual,'Review level '+actual):tr('العب المستوى '+actual,'Play level '+actual);
-   item.append(link(c,actual,label,r.path));grid.append(item)
+const root = document.querySelector('[data-age-journey]');
+if (root) {
+  const ar = document.documentElement.lang === 'ar';
+  const tr = (arabic, english) => ar ? arabic : english;
+  const sections = [...document.querySelectorAll('.fudool-world')];
+  const cards = [...document.querySelectorAll('.fudool-world [data-game-id]')];
+  const tabs = root.querySelector('[data-age-tabs]');
+  const panel = root.querySelector('[data-age-panel]');
+  const groups = ['all', ...ageGroups];
+
+  function element(tag, text = '', className = '') {
+    const node = document.createElement(tag);
+    node.textContent = text;
+    node.className = className;
+    return node;
   }
-  panel.append(grid);
-  const resources=node('p','','age-resources');
-  const a=node('a',tr('أوراق العمل والمواد التعليمية','Worksheets & learning materials'),'text-link');a.href=ar?'/grown-ups/':'/en/grown-ups/';
-  const b=node('a',tr('شاهد الحلقات التعليمية','Watch learning episodes'),'text-link');b.href=ar?'/episodes/':'/en/episodes/';resources.append(a,b);panel.append(resources);
-  if(done===total)panel.append(node('p',tr('أحسنت! أكملت رحلتك التعليمية. يمكنك طباعة شهادة الإنجاز من قسم المكافآت.','Well done! You completed your journey. Print your achievement certificate in the rewards section.'),'age-stat'));
- }
- for(const [age,label] of [['all',tr('جميع الألعاب','All games')],['3-5','3–5'],['6-7','6–7'],['8-10','8–10']]){
-  const b=node('button',label,'age-tab');b.type='button';b.dataset.age=age;b.addEventListener('click',()=>{selected=age;saveAge(age);draw()});tabs.append(b)
- }
- draw();window.addEventListener('pageshow',draw);window.addEventListener('storage',draw)
+
+  function render() {
+    const profile = activeProfile();
+    const requested = new URLSearchParams(location.search).get('age') ??
+      read(agePreferenceKey(profile.id)) ?? profile.age;
+    const age = groups.includes(requested) ? requested : 'all';
+    for (const button of tabs.children) button.setAttribute('aria-pressed', String(button.dataset.age === age));
+    for (const section of sections) section.hidden = age !== 'all';
+    panel.hidden = age === 'all';
+    panel.replaceChildren();
+    if (panel.hidden) return;
+
+    const grid = element('div', '', 'age-journey-grid');
+    let total = 0;
+    let done = 0;
+    for (const card of cards) {
+      const id = card.dataset.gameId;
+      const path = pathsForGame(id).find(candidate => candidate.age === age);
+      if (!path) continue;
+      const {scores} = scoresFor(id, gameCounts.get(id), profile.id);
+      const count = path.last - path.first + 1;
+      const completed = scores.slice(path.first - 1, path.last).filter(Boolean).length;
+      total += count;
+      done += completed;
+      const item = element('article', '', 'age-journey-card');
+      item.dataset.gameId = id;
+      const level = nextPathLevel(path, scores) + 1;
+      const label = completed === count
+        ? tr('راجع المستوى ' + level, 'Review level ' + level)
+        : tr('العب المستوى ' + level, 'Play level ' + level);
+      const play = element('a', label, 'button age-journey-link');
+      const url = new URL(card.href);
+      url.searchParams.set('path', age);
+      url.searchParams.set('level', level);
+      play.href = url.href;
+      item.append(worldCover(id), element('h3', card.querySelector('h3').textContent),
+        element('p', tr(path.ar, path.en)),
+        element('p', tr(completed + ' / ' + count + ' مستويات مكتملة', completed + ' / ' + count + ' levels completed'), 'age-stat'),
+        play);
+      grid.append(item);
+    }
+    const progress = element('progress');
+    progress.max = total;
+    progress.value = done;
+    progress.setAttribute('aria-label', tr('إنجاز الفئة العمرية', 'Age group progress'));
+    panel.append(element('h2', ageLabel(age, ar)),
+      element('p', tr(done + ' من ' + total + ' مستوى مكتمل', done + ' of ' + total + ' levels complete'), 'age-stat'),
+      progress, grid);
+  }
+
+  for (const age of groups) {
+    const button = element('button', age === 'all' ? tr('جميع الألعاب', 'All games') : ageLabel(age, ar), 'age-tab');
+    button.type = 'button';
+    button.dataset.age = age;
+    button.addEventListener('click', () => {
+      try { localStorage.setItem(agePreferenceKey(activeProfile().id), JSON.stringify(age)); } catch {}
+      const url = new URL(location.href);
+      url.searchParams.set('age', age);
+      history.replaceState(history.state, '', url);
+      render();
+    });
+    tabs.append(button);
+  }
+  render();
+  window.addEventListener('pageshow', render);
+  window.addEventListener('storage', render);
 }

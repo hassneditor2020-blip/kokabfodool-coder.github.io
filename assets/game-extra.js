@@ -2,7 +2,7 @@ import {vowelClipId} from './vowel-audio-review.js?v=2';
 import {sharedAudioSource} from './vowel-audio-routing.js?v=2';
 import {drawGuide,evaluateTrace} from './trace-assessment.js?v=1';
 import {illustrate} from './learning-art.js?v=2';
-import {shuffle} from './game-progress.js?v=11';
+import {shuffle} from './game-progress.js?v=12';
 const ar=document.documentElement.lang==='ar';
 const tr=(a,b)=>ar?a:b;
 const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};
@@ -24,10 +24,29 @@ export async function tones(n){
 export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}){
   const {kind}=round;let finished=false;
   const say=(text,state='')=>{feedback.textContent=text;feedback.dataset.state=state;};
-  const done=()=>{if(finished)return;finished=true;journey.solve();say(tr('أحسنت! أكملت الجولة.','Well done! Round complete.'),'correct');next.hidden=false;};
+  const done=()=>{if(finished)return;finished=true;journey.solve();say(tr('أحسنت! أكملت الجولة.','Well done! Round complete.'),'correct');next.hidden=false;next.disabled=false;};
   const wrong=()=>{journey.mistake();say(tr('حاول مرة أخرى.','Try again.'),'wrong');};
   const button=(label,handler,cls='game-option')=>{const b=el('button',label,cls);b.type='button';b.addEventListener('click',handler);return b;};
   if(kind==='quiz'){
+    if (round.table) {
+      const table = el('table', '', 'science-observations');
+      table.createCaption().textContent = round.table.caption;
+      const header = table.createTHead().insertRow();
+      for (const column of round.table.columns) {
+        const label = el('th', column);
+        label.scope = 'col';
+        header.append(label);
+      }
+      const body = table.createTBody();
+      for (const values of round.table.rows) {
+        const row = body.insertRow();
+        const label = el('th', String(values[0]));
+        label.scope = 'row';
+        row.append(label);
+        for (const value of values.slice(1)) row.insertCell().textContent = value;
+      }
+      cue.append(table);
+    }
     if(round.cue){const content=illustrate(el('span',round.cue,'extra-cue'),round.cue);if(round.ltr)content.dir='ltr';cue.append(content);}
     if(round.speech||round.tones||round.audio){
       const fallback=()=>{if(!cue.querySelector('.audio-fallback'))cue.append(el('small',tr('الصوت غير متاح. أعد المحاولة أو اطلب مساعدة الأهل.','Audio unavailable. Try again or ask a grown-up for help.'),'audio-fallback'));};
@@ -45,16 +64,97 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
     for(const value of shuffle(target.map((v,i)=>({v,i})))){const b=button(String(value.v),()=>{if(finished)return;if(value.v!==target[pos]){wrong();return;}cells[pos++].textContent=value.v;b.disabled=true;journey.correct();if(pos===target.length)done();});group.append(b);}return;
   }
   if(kind==='memory'){
-    const deck=shuffle([...round.images,...round.images]),grid=el('div','','extra-memory discovery-memory');grid.style.setProperty('--cols',deck.length<=8?'4':'5');
-    const summary=el('div','','discovery-summary'),matchedLabel=el('strong'),meter=el('progress','');meter.max=round.images.length;meter.value=0;meter.setAttribute('aria-label',tr('الأزواج المكتملة','Matched pairs'));summary.append(matchedLabel,meter);cue.append(summary);options.append(grid);
-    let first=null,busy=false,matched=0,tries=0;
-    const update=()=>{matchedLabel.textContent=tr('الأزواج: ','Pairs: ')+matched+' / '+round.images.length+' · '+tr('المحاولات: ','Attempts: ')+tries;meter.value=matched};
-    const reveal=node=>{node.querySelector('img').hidden=false;node.querySelector('.memory-back').hidden=true;node.classList.add('revealed');node.setAttribute('aria-label',tr('بطاقة مكشوفة ','Revealed card ')+node.dataset.index)};
-    const hide=node=>{node.querySelector('img').hidden=true;node.querySelector('.memory-back').hidden=false;node.classList.remove('revealed');node.setAttribute('aria-label',tr('بطاقة ','Card ')+node.dataset.index)};
-    deck.forEach((src,i)=>{const b=button('',()=>{if(finished||busy||b.disabled||first===b)return;reveal(b);if(!first){first=b;return}const prev=first;first=null;tries++;
-      if(prev.dataset.image===src){prev.disabled=b.disabled=true;prev.dataset.matched=b.dataset.matched='true';matched++;journey.correct();update();if(matched===round.images.length)done()}
-      else{busy=true;wrong();update();setTimeout(()=>{hide(prev);hide(b);busy=false},650)}
-    },'extra-memory-card');b.dataset.image=src;b.dataset.index=String(i+1);b.setAttribute('aria-label',tr('بطاقة ','Card ')+(i+1));const back=el('span','','memory-back');back.append(el('span','✦','memory-back-star'),el('small','?'));const img=el('img');img.src=src;img.alt='';img.hidden=true;img.draggable=false;b.replaceChildren(back,img);grid.append(b)});update();return;
+    const deck = shuffle([...round.images, ...round.images]);
+    const grid = el('div', '', 'extra-memory discovery-memory');
+    grid.dataset.memoryPhase = 'preview';
+    grid.style.setProperty('--cols', deck.length === 4 ? '2' : deck.length === 6 ? '3' : deck.length <= 12 ? '4' : '5');
+    const summary = el('div', '', 'discovery-summary');
+    const matchedLabel = el('strong');
+    const meter = el('progress');
+    meter.max = round.images.length;
+    meter.setAttribute('aria-label', tr('الأزواج المكتملة', 'Matched pairs'));
+    const instructions = el('p', tr('احفظ أماكن الصور ثم ابدأ المطابقة.', 'Look at the pictures and remember their places.'), 'memory-instructions');
+    let first = null, busy = false, matched = 0, tries = 0;
+    next.hidden = false;
+    next.disabled = true;
+
+    function update() {
+      matchedLabel.textContent = tr('الأزواج: ', 'Pairs: ') + matched + ' / ' + round.images.length +
+        ' · ' + tr('المحاولات: ', 'Attempts: ') + tries;
+      meter.value = matched;
+    }
+    function showFace(card, visible) {
+      card.querySelector('img').hidden = !visible;
+      card.querySelector('.memory-back').hidden = visible;
+      card.classList.toggle('revealed', visible);
+      const position = card.dataset.index;
+      const picture = round.images.indexOf(card.dataset.image) + 1;
+      card.setAttribute('aria-label', visible
+        ? tr('البطاقة ' + position + '، الصورة ' + picture, 'Card ' + position + ', picture ' + picture)
+        : tr('بطاقة مغلقة ' + position, 'Hidden card ' + position));
+    }
+    const ready = button(tr('ابدأ المطابقة', 'Start matching'), () => {
+      grid.dataset.memoryPhase = 'match';
+      for (const card of grid.children) {
+        showFace(card, false);
+        card.disabled = false;
+      }
+      ready.hidden = true;
+      instructions.textContent = tr('اكشف بطاقتين متطابقتين.', 'Turn over two matching cards.');
+      grid.firstElementChild.focus({preventScroll: true});
+    }, 'button button-primary memory-start');
+
+    deck.forEach((src, i) => {
+      const card = button('', () => {
+        if (finished || busy || card.disabled || first === card) return;
+        showFace(card, true);
+        if (!first) { first = card; return; }
+        const previous = first;
+        first = null;
+        tries++;
+        if (previous.dataset.image === src) {
+          previous.disabled = card.disabled = true;
+          previous.dataset.matched = card.dataset.matched = 'true';
+          matched++;
+          journey.correct();
+          say(tr('وجدت زوجًا!', 'You found a pair!'), 'correct');
+          update();
+          if (matched === round.images.length) {
+            grid.dataset.memoryPhase = 'complete';
+            done();
+            next.focus({preventScroll: true});
+            next.scrollIntoView({block: 'center'});
+          }
+        } else {
+          busy = true;
+          wrong();
+          update();
+          setTimeout(() => {
+            if (!grid.isConnected) return;
+            showFace(previous, false);
+            showFace(card, false);
+            busy = false;
+          }, 750);
+        }
+      }, 'extra-memory-card');
+      card.dataset.image = src;
+      card.dataset.index = String(i + 1);
+      card.disabled = true;
+      const back = el('span', '', 'memory-back');
+      back.append(el('span', '✦', 'memory-back-star'), el('small', '?'));
+      const image = el('img');
+      image.src = src;
+      image.alt = '';
+      image.draggable = false;
+      card.append(back, image);
+      showFace(card, true);
+      grid.append(card);
+    });
+    summary.append(matchedLabel, meter);
+    cue.append(summary, instructions);
+    options.append(grid, ready);
+    update();
+    return;
   }
   if(kind==='puzzle'){
     const {cols,rows,image}=round,n=cols*rows;let arrangement=shuffle(Array.from({length:n},(_,i)=>i));if(arrangement.every((v,i)=>v===i))[arrangement[0],arrangement[1]]=[arrangement[1],arrangement[0]];let first=-1,moves=0;

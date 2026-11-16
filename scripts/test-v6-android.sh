@@ -9,10 +9,10 @@ mkdir -p build/v6-screenshots
 adb shell wm size 390x844
 adb shell wm density 160
 adb shell input keyevent 82
-adb install downloads/apps/Kokab-Fodool-V6.2.apk
+adb install downloads/apps/Kokab-Fodool-V6.2.1.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=63'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.2.1'
+adb shell dumpsys package "$package" | grep -F 'versionCode=64'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.3.0'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -31,7 +31,8 @@ import xml.etree.ElementTree as ET
 
 label, tap = sys.argv[1:]
 def normalize(text):
-    return ''.join(c for c in unicodedata.normalize('NFKD', text) if not unicodedata.combining(c)).strip()
+    return ''.join(c for c in unicodedata.normalize('NFKD', text)
+                   if not unicodedata.combining(c) and unicodedata.category(c) != 'Cf').strip()
 
 needle = normalize(label)
 visible = []
@@ -84,11 +85,9 @@ PY
 find_label 'الألعاب' yes
 find_label 'سيارة الحركات' yes
 find_label 'ابدأ المستوى 1' no
-find_label 'أصعب' yes
-find_label 'ابدأ المستوى 4' no
-find_label 'أصعب' yes
-find_label 'ابدأ المستوى 11' yes
-find_label 'المستوى 11' no
+find_label '6–7 سنوات' yes
+find_label 'ابدأ المستوى 4' yes
+find_label 'المستوى 4' no
 find_label 'الجولة 1' no
 find_label 'انطلق' no
 adb exec-out screencap -p > build/v6-screenshots/android-offline-drive.png
@@ -99,12 +98,20 @@ adb shell input swipe 193 225 193 720 300
 adb shell input swipe 193 225 193 720 300
 find_label 'التحديات' yes
 find_label 'مختبر روبو' yes
-find_label 'ابدأ المستوى 1' no
-find_label 'تجارب روبو' yes
-find_label 'البنفسجي' yes
-find_label 'أضف الأزرق' yes
-find_label 'أضف الأصفر' yes
-find_label 'اخلط' yes
-find_label 'ظهر اللون الأخضر' no
+find_label '8–10 سنوات' yes
+find_label 'ابدأ المستوى 11' yes
+find_label 'يريد روبو معرفة أثر الضوء' no
 adb exec-out screencap -p > build/v6-screenshots/android-offline-robo.png
-echo 'PASS Android 6.2.1 upgrades from 6.2.0, starts the Vowel Drive challenge at level 11 and keeps Robo Lab on its own path in airplane mode.'
+
+adb shell input keyevent KEYCODE_BACK
+sleep 1
+adb shell input swipe 193 225 193 720 300
+adb shell input swipe 193 225 193 720 300
+find_label 'التحديات' yes
+find_label 'ذاكرة فضول' yes
+find_label 'ابدأ المستوى 1' yes
+find_label 'احفظ أماكن الصور' no
+find_label 'ابدأ المطابقة' yes
+find_label 'بطاقة مغلقة' no
+adb exec-out screencap -p > build/v6-screenshots/android-offline-memory.png
+echo 'PASS Android 6.3.0 upgrades from 6.2.1 and opens age-based gameplay and memory preview in airplane mode.'

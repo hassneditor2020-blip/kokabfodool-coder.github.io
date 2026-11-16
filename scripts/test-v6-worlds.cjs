@@ -73,24 +73,35 @@ async function validateMaps(browser, language, width) {
     const cover = page.locator('.premium-game-heading .world-cover-scene');
     await cover.waitFor();
     await cover.evaluate(image => image.decode());
-    assert.equal(await page.locator('.world-trail .game-level[data-reward-state=complete]').count(), count);
     await page.evaluate(({id, count}) => {
       const map = document.querySelector('[data-level-map]');
       const game = document.querySelector('.game-board:not(.game-levels):not(.game-result)');
+      const ages = [...map.querySelectorAll('[data-age-path]')];
+      const seen = new Set();
       const fit = () => {
         if (document.documentElement.scrollWidth > window.innerWidth + 2) throw Error(id + ': overflow');
       };
-      fit();
-      for (let i = 0; i < count; i++) {
-        map.querySelectorAll('.world-trail .game-level')[i].click();
-        const label = game.querySelector('.game-progress').textContent;
-        if (game.hidden || !label.includes(String(i + 1)) || /[\u0660-\u0669\u06f0-\u06f9]/.test(label)) {
-          throw Error(id + ': level ' + (i + 1) + ' unavailable or numerals changed');
-        }
+      if (!ages.length) throw Error(id + ': no age options');
+      for (const age of ages) {
+        age.click();
         fit();
-        game.querySelector('[data-level-menu]').click();
-        if (map.hidden) throw Error(id + ': map unavailable');
+        if (age.getAttribute('aria-pressed') !== 'true') throw Error(id + ': age not selected');
+        const shown = [...map.querySelectorAll('.world-trail .game-level')].map(button => Number(button.dataset.levelNumber));
+        for (const number of shown) {
+          const button = map.querySelector('[data-level-number="' + number + '"]');
+          if (button.dataset.rewardState !== 'complete' || seen.has(number)) throw Error(id + ': wrong age partition or lost score');
+          seen.add(number);
+          button.click();
+          const label = game.querySelector('.game-progress').textContent;
+          if (game.hidden || !label.includes(' ' + number + ' ·') || /[\u0660-\u0669\u06f0-\u06f9]/.test(label)) {
+            throw Error(id + ': level ' + number + ' unavailable or numerals changed');
+          }
+          fit();
+          game.querySelector('[data-level-menu]').click();
+          if (map.hidden) throw Error(id + ': map unavailable');
+        }
       }
+      if (seen.size !== count || Math.max(...seen) !== count) throw Error(id + ': curriculum and level data differ');
     }, {id, count});
     if (language === 'ar' && width === 390 && ['vowel-drive', 'robo-lab', 'fudool-shop'].includes(id)) {
       await page.screenshot({path: 'build/v6-screenshots/' + id + '-map.png'});
@@ -100,7 +111,7 @@ async function validateMaps(browser, language, width) {
   }
   assert.deepEqual(errors, [], language + ' ' + width);
   await page.close();
-  console.log('PASS', language, width, '20 games and 275 saved levels opened');
+  console.log('PASS', language, width, '20 games and all 297 levels open under their allowed age groups');
 }
 
 async function validateDriving(browser, language) {
@@ -203,32 +214,32 @@ async function validateRobo(page, language) {
 async function validateAgePaths(browser, language) {
   const arabic = language === 'ar';
   const prefix = arabic ? '' : '/en';
+  const base = origin + prefix;
   const page = await browser.newPage({viewport: {width: arabic ? 320 : 1280, height: 844}});
-  const drive = origin + prefix + '/games/vowel-drive/';
-  const lab = origin + prefix + '/games/robo-lab/';
-  const stateKey = 'fudool-profile-v1:p-older:game:vowel-drive';
+  const lab = base + '/games/robo-lab/';
+  const drive = base + '/games/vowel-drive/';
   const map = page.locator('[data-level-map]');
   const choice = map.locator('[data-game-paths]');
   const play = choice.locator('[data-path-play]');
   const label = page.locator('.game-progress');
+  const ageButton = age => choice.locator('[data-age-path="' + age + '"]');
   const levelButton = number => map.locator('[data-level-number="' + number + '"]');
-  const gameLevel = number => arabic ? new RegExp('المستوى ' + number + ' ·') : new RegExp('Level ' + number + ' ·');
-  const state = () => page.evaluate(key => JSON.parse(localStorage.getItem(key)), stateKey);
-  async function expectPlay(number) {
+  const progressKey = 'fudool-profile-v1:p-older:game:robo-lab';
+  async function expectPlay(number, age) {
     await play.waitFor({state: 'visible'});
     assert.match(await play.textContent(), new RegExp(' ' + number + '$'));
+    assert.equal(await choice.getAttribute('data-game-paths'), age);
+    assert.equal(await ageButton(age).getAttribute('aria-pressed'), 'true');
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2));
   }
-  async function answerDrive(index) {
-    const rounds = await page.locator('#drive-data').evaluate((source, level) =>
-      JSON.parse(source.textContent).levels[level - 1].rounds, index);
-    for (const {vowel} of rounds) {
-      await page.locator('.drive-gate[data-vowel="' + vowel + '"]').click();
-      await page.locator('[data-drive-next]').click();
-    }
+  async function expectRound(number, round) {
+    await label.waitFor({state: 'visible'});
+    assert.match(await label.textContent(), new RegExp(' ' + number + ' · (?:الجولة|Round) ' + round + ' '));
   }
+  const answer = text => page.locator('[data-options] button').filter({hasText: new RegExp('^' + text + '$')});
 
   try {
-    await page.goto(origin + prefix + '/play-app/');
+    await page.goto(base + '/play-app/');
     await page.evaluate(() => {
       localStorage.setItem('fudool-profiles-v1', JSON.stringify([
         {id: 'p-older', name: 'Older', avatar: 'robot', age: '8-10'},
@@ -236,91 +247,124 @@ async function validateAgePaths(browser, language) {
       ]));
       localStorage.setItem('fudool-active-profile-v1', 'p-older');
     });
-    await page.goto(origin + prefix + '/games/?age=8-10');
-    const ageLink = page.locator('.age-journey-card[data-game-id="vowel-drive"] .age-journey-link');
+    await page.goto(base + '/games/?age=8-10');
+    const suggested = page.locator('.age-journey-card');
+    assert.equal(await suggested.count(), 12);
+    for (const id of ['vowel-drive','letter-match','letter-hunt','trace','english-abc','word-factory','sound-quiz','healthy-hero']) {
+      assert.equal(await suggested.locator('xpath=self::*[@data-game-id="' + id + '"]').count(), 0);
+    }
+    const ageLink = suggested.filter({has: page.locator('a[href*="/games/robo-lab/"]')}).locator('a');
     const target = new URL(await ageLink.getAttribute('href'));
-    assert.equal(target.searchParams.get('level'), '11');
     assert.equal(target.searchParams.get('path'), '8-10');
+    assert.equal(target.searchParams.get('level'), '11');
     await ageLink.click();
-    await label.waitFor({state: 'visible'});
-    assert.match(await label.textContent(), gameLevel(11));
-
-    await page.locator('[data-drive] [data-level-menu]').click();
-    await expectPlay(11);
-    assert(await levelButton(11).isEnabled());
+    await expectRound(11, 1);
+    await page.locator('[data-game] [data-level-menu]').click();
+    await expectPlay(11, '8-10');
+    assert.deepEqual(await map.locator('.game-level').evaluateAll(items => items.map(item => +item.dataset.levelNumber)), [11,12,13,14]);
     assert(await levelButton(12).isDisabled());
-    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2));
-    assert((await state()).scores.every(score => score === 0));
-    await page.goto(drive + '?path=8-10&level=13');
-    await expectPlay(11);
-    await choice.locator('[data-path-action="easier"]').click();
-    await expectPlay(4);
-    assert.equal(await choice.getAttribute('data-game-paths'), '6-7');
-    await page.reload();
-    await expectPlay(4);
-    await page.goto(lab);
-    await expectPlay(7);
-    await page.evaluate(() => {
-      const levels = JSON.parse(document.querySelector('#game-data').textContent).levels;
-      const round = levels[6].rounds.findIndex(question => question.explanation);
-      localStorage.setItem('fudool-profile-v1:p-older:game:robo-lab',
-        JSON.stringify({checkpoints: {6: {round, mistakes: 0}}}));
-    });
+
     await play.click();
-    assert.match(await page.locator('[data-prompt]').textContent(), arabic ? /تتوقّع/ : /predict/i);
-    await page.locator('[data-options] button[aria-label="👃"]').click();
-    assert.match(await page.locator('[data-feedback]').textContent(),
-      arabic ? /يساعدك الأنف/ : /Your nose helps/i);
-    await page.goto(drive);
-    await expectPlay(4);
-    await choice.locator('[data-path-action="age"]').click();
-    await expectPlay(11);
-    await play.click();
-    assert.match(await label.textContent(), gameLevel(11));
-    await answerDrive(11);
+    const rounds = await page.locator('#game-data').evaluate(element => JSON.parse(element.textContent).levels[10].rounds);
+    for (const question of rounds) {
+      await page.getByRole('button', {name: question.choices[question.answer], exact: true}).click();
+      await page.locator('[data-next]').click();
+    }
     assert(await page.locator('[data-level-next]').isVisible());
-    let saved = await state();
-    assert.equal(saved.scores[10], 3);
-    assert.equal(saved.scores.filter(Boolean).length, 1);
-    await map.waitFor({state: 'hidden'});
+    const saved = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), progressKey);
+    assert.deepEqual(saved.scores.slice(0, 11), [...Array(10).fill(0), 3]);
     await page.locator('[data-level-result] [data-level-menu]').click();
-    await expectPlay(12);
-    assert(await levelButton(12).isEnabled());
-    assert(await levelButton(13).isDisabled());
+    await expectPlay(12, '8-10');
+    await levelButton(12).click();
+    await expectRound(12, 1);
+    assert(await page.locator('.science-observations').isVisible());
+    await page.locator('[data-game] [data-level-menu]').click();
+
+    await ageButton('6-7').click();
+    await expectPlay(3, '6-7');
+    assert.equal(await levelButton(11).count(), 0);
+    await page.reload();
+    await expectPlay(3, '6-7');
     await play.click();
-    const vowel = await page.locator('#drive-data').evaluate(source =>
-      JSON.parse(source.textContent).levels[11].rounds[0].vowel);
-    await page.locator('.drive-gate[data-vowel="' + vowel + '"]').click();
-    await page.goto(drive + '?continue=1');
-    await label.waitFor({state: 'visible'});
-    assert.match(await label.textContent(), gameLevel(12));
-    assert.match(await label.textContent(), arabic ? /الجولة 2 من/ : /Round 2 of/);
-    await page.evaluate(key => {
-      const saved = JSON.parse(localStorage.getItem(key));
-      for (const index of [11, 12, 13]) saved.scores[index] = 3;
-      localStorage.setItem(key, JSON.stringify(saved));
-    }, stateKey);
-    await page.goto(drive + '?level=15');
-    await label.waitFor({state: 'visible'});
-    await answerDrive(15);
-    assert.match(await page.locator('[data-level-result] h2').textContent(),
-      arabic ? /أكملت مسار التحدّي/ : /Challenge path complete/);
-    assert(await page.locator('[data-level-next]').isHidden());
-    saved = await state();
-    assert(saved.scores.slice(0, 10).every(score => score === 0));
-    assert.equal(saved.scores.slice(10).filter(Boolean).length, 5);
+    await expectRound(3, 1);
+    assert.match(await page.locator('[data-prompt]').textContent(), arabic ? /فنرى/ : /lets us see/);
+    await answer(arabic ? 'حرارة' : 'Heat').click();
+    assert.equal(await page.locator('[data-feedback]').getAttribute('data-state'), 'wrong');
+    assert(await page.locator('[data-next]').isHidden());
+    await answer(arabic ? 'ضوء' : 'Light').click();
+    assert.equal(await page.locator('[data-feedback]').getAttribute('data-state'), 'correct');
+    assert(await page.locator('[data-next]').isEnabled());
+
+    await page.goto(lab + '?continue=1');
+    await expectRound(3, 2);
+    await page.goto(drive);
+    await expectPlay(4, '6-7');
+    assert.deepEqual(await choice.locator('[data-age-path]').evaluateAll(items => items.map(item => item.dataset.agePath)), ['3-5','6-7']);
+    await page.goto(base + '/play-app/#v5-games');
+    await page.locator('[data-app-age="8-10"]').click();
+    assert(await page.locator('[data-app-games] [data-game-id="vowel-drive"]').isHidden());
+    await page.locator('[data-app-games] [data-game-id="robo-lab"]').click();
+    await expectPlay(12, '8-10');
 
     await page.evaluate(() => localStorage.setItem('fudool-active-profile-v1', 'p-younger'));
-    await page.goto(drive);
-    await expectPlay(1);
-    assert(await levelButton(11).isDisabled());
-    await choice.locator('[data-path-action="harder"]').click();
-    await expectPlay(4);
     await page.goto(lab);
-    await expectPlay(1);
+    await expectPlay(1, '3-5');
     await play.click();
-    assert.match(await label.textContent(), gameLevel(1));
-    console.log('PASS V6.2 age-based entry, game/profile isolation, sequential unlocks, stars and resume', language);
+    await expectRound(1, 1);
+    console.log('PASS V6.3 age filtering, science reasoning, unambiguous sun answer, unlocks and isolated progress', language);
+  } finally {
+    await page.close();
+  }
+}
+
+async function validateMemory(browser, language) {
+  const prefix = language === 'ar' ? '' : '/en';
+  const page = await browser.newPage({viewport: {width: 390, height: 844}, hasTouch: true});
+  const game = origin + prefix + '/games/memory/';
+  const grid = page.locator('[data-memory-phase]');
+  const cards = grid.locator('.extra-memory-card');
+  const next = page.locator('[data-next]');
+  try {
+    await page.goto(game + '?path=3-5&level=1');
+    await grid.waitFor({state: 'visible'});
+    assert.equal(await grid.getAttribute('data-memory-phase'), 'preview');
+    assert.equal(await cards.count(), 4);
+    for (const picture of await cards.locator('img').all()) {
+      assert(await picture.isVisible());
+      await picture.evaluate(image => image.decode());
+    }
+    assert(await next.isVisible() && await next.isDisabled());
+    const images = await cards.evaluateAll(items => items.map(item => item.dataset.image));
+    await page.locator('.memory-start').tap();
+    assert.equal(await grid.getAttribute('data-memory-phase'), 'match');
+    assert.equal(await cards.locator('img:visible').count(), 0);
+    await cards.nth(0).tap();
+    await cards.nth(images.findIndex(source => source !== images[0])).tap();
+    await page.waitForFunction(() => !document.querySelector('.extra-memory-card.revealed'));
+    assert(await next.isDisabled());
+    for (const image of new Set(images)) {
+      await cards.nth(images.indexOf(image)).tap();
+      await cards.nth(images.lastIndexOf(image)).tap();
+    }
+    assert.equal(await grid.getAttribute('data-memory-phase'), 'complete');
+    assert(await next.isVisible() && await next.isEnabled());
+    await next.tap();
+    assert.equal(await grid.getAttribute('data-memory-phase'), 'preview');
+    assert.match(await page.locator('.game-progress').textContent(), /(?:الجولة|Round) 2 /);
+
+    await page.goto(game + '?path=8-10&level=7');
+    await grid.waitFor({state: 'visible'});
+    assert.equal(await cards.count(), 16);
+    await page.evaluate(() => {
+      const state = JSON.parse(localStorage.getItem('fudool-games-v1:memory'));
+      state.scores[10] = 3;
+      localStorage.setItem('fudool-games-v1:memory', JSON.stringify(state));
+    });
+    await page.goto(game + '?path=8-10&level=12');
+    await grid.waitFor({state: 'visible'});
+    assert.equal(await cards.count(), 24);
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2));
+    console.log('PASS V6.3 memory preview, correct and incorrect pairs, Next and older decks', language);
   } finally {
     await page.close();
   }
@@ -365,16 +409,16 @@ async function validateOffline(browser) {
   await page.evaluate(() => localStorage.setItem('fudool-age-journey-v1', '"8-10"'));
   await page.goto(origin + '/games/robo-lab/');
   await page.locator('[data-path-play]').click();
-  assert.match(await page.locator('[data-game] .game-progress').textContent(), /المستوى 7 ·/);
+  assert.match(await page.locator('[data-game] .game-progress').textContent(), /المستوى 11 ·/);
   await context.close();
-  console.log('PASS offline game, Robo experiments and V6.2 age-based entry');
+  console.log('PASS offline games, experiments and V6.3 age-based entry');
 }
 
 (async () => {
   let browser;
   try {
     assert.equal(Object.keys(games).length, 20);
-    assert.equal(Object.values(games).reduce((total, count) => total + count, 0), 275);
+    assert.equal(Object.values(games).reduce((total, count) => total + count, 0), 297);
     for (let i = 0; i < 30; i++) {
       try {
         if ((await fetch(origin)).ok) break;
@@ -385,6 +429,7 @@ async function validateOffline(browser) {
     browser = await chromium.launch({headless: true, executablePath: process.env.FUDOOL_CHROMIUM});
     for (const language of ['ar', 'en']) {
       await validateAgePaths(browser, language);
+      await validateMemory(browser, language);
       await validateDriving(browser, language);
       const labPage = await browser.newPage({
         viewport: {width: language === 'ar' ? 390 : 1280, height: 844},

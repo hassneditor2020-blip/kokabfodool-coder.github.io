@@ -1,5 +1,5 @@
 import {createIllustration, illustrate} from './learning-art.js?v=2';
-import {bindJourney,shuffle} from './game-progress.js?v=11';
+import {bindJourney,shuffle} from './game-progress.js?v=12';
 const game=JSON.parse(document.getElementById('game-data').textContent), ar=game.lang==='ar', tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'), cue=board.querySelector('[data-cue]'), options=board.querySelector('[data-options]'), feedback=board.querySelector('[data-feedback]'), next=board.querySelector('[data-next]');
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return illustrate(n,txt)};
@@ -30,7 +30,7 @@ function render(round){
  cue.replaceChildren();options.replaceChildren();options.dataset.columns='1';feedback.textContent='';delete feedback.dataset.state;next.hidden=true;next.textContent=journey.nextLabel();let solved=false;
  const say=(t,state)=>{feedback.textContent=t;feedback.dataset.state=state||''};
  const wrong=()=>{if(!solved){journey.mistake();say(tr('جرّب مرة أخرى.','Try again.'),'wrong')}};
- const done=()=>{if(solved)return;solved=true;journey.solve();const meter=board.querySelector('[data-visual-round-meter]');if(meter)meter.value=Math.min(meter.max,meter.value+1);say(tr('أحسنت! أكملت الجولة.','Well done! Round complete.'),'correct');next.hidden=false};
+ const done=()=>{if(solved)return;solved=true;journey.solve();const meter=board.querySelector('[data-visual-round-meter]');if(meter)meter.value=Math.min(meter.max,meter.value+1);say(round.explanation??tr('أحسنت! أكملت الجولة.','Well done! Round complete.'),'correct');next.hidden=false};
  const group=el('div','','new-controls');options.append(group);if(game.id==='planet-engineer'){board.dataset.discovery='engineering';}if(game.id==='space-journey'){board.dataset.discovery='space';const index=(numbers?.[0]||1)-1;cue.append(spaceScene(spaceTopics[index]||'rocket'));}
  if(round.kind==='quiz'||round.kind==='pattern'){
   if(round.kind==='pattern'){

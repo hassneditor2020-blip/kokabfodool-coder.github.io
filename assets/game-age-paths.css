@@ -18,6 +18,12 @@
   color: #514662;
 }
 
+.game-path-choice .game-path-range {
+  margin-block-start: 4px;
+  font-size: .82rem;
+  font-weight: 750;
+}
+
 .game-path-choice [data-path-play] {
   justify-self: start;
 }
@@ -30,16 +36,60 @@
 
 .game-path-controls .button {
   min-height: 44px;
+  padding-inline: 11px;
+  white-space: nowrap;
 }
 
-.game-path-controls .button:disabled {
-  opacity: .58;
-  cursor: default;
-  box-shadow: none;
+.game-path-controls [aria-pressed="true"] {
+  background: #512cc1;
+  border-color: #512cc1;
+  color: white;
+  box-shadow: 0 3px 0 #3a1e90;
 }
 
-.game-path-controls .button[hidden] {
+.extra-memory-card img[hidden],
+.extra-memory-card .memory-back[hidden],
+.memory-start[hidden] {
   display: none;
+}
+
+.discovery-memory[data-memory-phase="preview"] .extra-memory-card {
+  opacity: 1;
+}
+
+.memory-instructions {
+  margin-block: 4px;
+  font-size: .95rem;
+}
+
+.game-actions [data-next]:disabled {
+  opacity: .55;
+  box-shadow: none;
+  cursor: default;
+}
+
+.science-observations {
+  inline-size: min(100%, 480px);
+  table-layout: fixed;
+  margin-block: 8px;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: .9rem;
+}
+
+.science-observations caption {
+  padding: 5px;
+  font-weight: 800;
+}
+
+.science-observations :is(th, td) {
+  padding: 7px 4px;
+  border: 1px solid #c5e3da;
+  overflow-wrap: break-word;
+}
+
+.science-observations thead {
+  background: #e5f6ef;
 }
 
 .fudool-level-world[data-current-path] {
