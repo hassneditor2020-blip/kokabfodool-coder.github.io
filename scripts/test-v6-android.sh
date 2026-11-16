@@ -20,8 +20,8 @@ test "$(adb shell settings get global airplane_mode_on | tr -d '\r')" = 1
 adb shell am start -W -n "$activity"
 
 find_label() {
-  local label=$1 tap=$2
-  python3 - "$label" "$tap" <<'PY'
+  local label=$1 tap=$2 node_class=${3:-}
+  python3 - "$label" "$tap" "$node_class" <<'PY'
 import re
 import subprocess
 import sys
@@ -29,7 +29,7 @@ import time
 import unicodedata
 import xml.etree.ElementTree as ET
 
-label, tap = sys.argv[1:]
+label, tap, node_class = sys.argv[1:]
 def normalize(text):
     return ''.join(c for c in unicodedata.normalize('NFKD', text)
                    if not unicodedata.combining(c) and unicodedata.category(c) != 'Cf').strip()
@@ -52,7 +52,11 @@ for attempt in range(15):
                 captions = [normalize(node.get(key, '')) for key in ('text', 'content-desc')]
                 visible.extend(text for text in captions if text)
                 exact = needle in captions
-                if not any(needle in text for text in captions):
+                if node_class:
+                    if node.get('class') != node_class or node.get('enabled') != 'true':
+                        continue
+                    exact = True
+                elif not any(needle in text for text in captions):
                     continue
                 clickable = node.get('clickable') == 'true'
                 if tap == 'yes' and not (exact or clickable):
@@ -85,7 +89,7 @@ PY
 find_label 'الإعدادات' yes
 find_label 'اسم اللاعب' no
 find_label 'مستويات الصوت' no
-find_label 'مثل النجم الصغير' yes
+find_label 'حقل اسم اللاعب' yes android.widget.EditText
 adb shell input text 'Fudool'
 find_label 'حفظ الاسم' yes
 find_label 'حُفظ اسم اللاعب' no
