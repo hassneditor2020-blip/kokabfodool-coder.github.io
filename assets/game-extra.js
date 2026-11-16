@@ -1,8 +1,8 @@
 import {vowelClipId} from './vowel-audio-review.js?v=2';
 import {sharedAudioSource} from './vowel-audio-routing.js?v=2';
 import {drawGuide,evaluateTrace} from './trace-assessment.js?v=2';
-import {illustrate} from './learning-art.js?v=2';
-import {shuffle} from './game-progress.js?v=13';
+import {createIllustration,illustrate} from './learning-art.js?v=2';
+import {shuffle} from './game-progress.js?v=14';
 const ar=document.documentElement.lang==='ar';
 const tr=(a,b)=>ar?a:b;
 const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};
@@ -63,90 +63,235 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
     const cells=target.map(()=>el('span','?','extra-slot'));seq.append(...cells);
     for(const value of shuffle(target.map((v,i)=>({v,i})))){const b=button(String(value.v),()=>{if(finished)return;if(value.v!==target[pos]){wrong();return;}cells[pos++].textContent=value.v;b.disabled=true;journey.correct();if(pos===target.length)done();});group.append(b);}return;
   }
-  if(kind==='memory'){
-    const deck = shuffle([...round.images, ...round.images]);
+  if (kind === 'magnet-distance') {
+    const {distances, results, question, choices, answer, explanation, clips} = round;
+    const bench = el('section', '', 'magnet-bench');
+    bench.append(el('p', tr('محاكاة · نفس المغناطيس ونفس المشابك في كل محاولة', 'Simulation · The magnet and clips stay the same in every trial'), 'magnet-note'));
+
+    const track = el('div', '', 'magnet-distance-track');
+    track.setAttribute('aria-hidden', 'true');
+    track.append(illustrate(el('span', '🧲', 'distance-magnet'), '🧲'));
+    const paperclips = Array.from({length: clips}, (_, i) => {
+      const clip = el('span', '', 'distance-clip');
+      clip.style.setProperty('--clip-column', i % 3);
+      clip.style.setProperty('--clip-row', Math.floor(i / 3));
+      track.append(clip);
+      return clip;
+    });
+    bench.append(track);
+
+    const unit = tr(' سم', ' cm');
+    const picks = el('div', '', 'magnet-distance-choices');
+    picks.setAttribute('role', 'group');
+    picks.setAttribute('aria-label', tr('المسافة من المشابك', 'Distance from the clips'));
+    const status = el('p', '', 'magnet-observation');
+    status.setAttribute('role', 'status');
+
+    const table = el('table', '', 'science-observations');
+    table.createCaption().textContent = tr('سجل القياسات', 'Measurement log');
+    const header = table.createTHead().insertRow();
+    for (const label of [tr('المسافة', 'Distance'), tr('المشابك التي انجذبت', 'Clips pulled')]) {
+      const heading = el('th', label);
+      heading.scope = 'col';
+      header.append(heading);
+    }
+    const body = table.createTBody();
+    const cells = distances.map(distance => {
+      const row = body.insertRow();
+      const heading = el('th', distance + unit);
+      heading.scope = 'row';
+      row.append(heading);
+      const cell = row.insertCell();
+      cell.textContent = '—';
+      return cell;
+    });
+
+    let selected = 0, measured = false;
+    const recorded = new Set();
+    const conclusion = el('section', '', 'magnet-conclusion');
+    conclusion.hidden = true;
+    const heading = el('h3', question);
+    heading.tabIndex = -1;
+    const answers = choices.map((choice, index) => button(choice, () => {
+      if (finished || recorded.size < distances.length) return;
+      if (index !== answer) {
+        answers[index].disabled = true;
+        wrong();
+        return;
+      }
+      answers[index].dataset.state = 'correct';
+      for (const control of answers) control.disabled = true;
+      test.disabled = true;
+      for (const control of picks.children) control.disabled = true;
+      done();
+      say(explanation, 'correct');
+    }));
+    conclusion.append(heading, ...answers);
+
+    function place(index) {
+      selected = index;
+      measured = false;
+      track.style.setProperty('--magnet-position', (66 - 18 * index) + '%');
+      for (const clip of paperclips) delete clip.dataset.pulled;
+      [...picks.children].forEach((pick, i) => pick.setAttribute('aria-pressed', String(i === index)));
+      record.disabled = true;
+      status.textContent = tr('المسافة المختارة ', 'Selected distance ') + distances[index] + unit;
+    }
+
+    const test = button(tr('جرّب المسافة', 'Test the distance'), () => {
+      measured = true;
+      const count = results[selected];
+      paperclips.forEach((clip, i) => { clip.dataset.pulled = String(i < count); });
+      status.textContent = tr('عدد المشابك التي انجذبت ', 'Clips pulled ') + count + ' / ' + clips;
+      record.disabled = recorded.has(selected);
+    }, 'button button-primary');
+    test.dataset.testDistance = '';
+    const record = button(tr('سجّل النتيجة', 'Record the result'), () => {
+      if (!measured || recorded.has(selected)) return;
+      cells[selected].textContent = results[selected];
+      recorded.add(selected);
+      record.disabled = true;
+      status.textContent = tr('سجّلت ', 'Recorded ') + recorded.size + ' / ' + distances.length;
+      if (recorded.size === distances.length) {
+        conclusion.hidden = false;
+        heading.focus({preventScroll: true});
+      }
+    }, 'button button-white');
+    record.dataset.recordDistance = '';
+    distances.forEach((distance, index) => {
+      const control = button(distance + unit, () => place(index), 'button button-white');
+      control.dataset.distance = String(distance);
+      picks.append(control);
+    });
+
+    const actions = el('div', '', 'magnet-distance-choices');
+    actions.append(test, record);
+    bench.append(picks, actions, status, table);
+    cue.append(bench);
+    options.append(conclusion);
+    place(0);
+    return;
+  }
+  if (kind === 'memory') {
+    const pairs = round.pairs ?? round.images.map(image => ({id: image, image}));
+    const mode = round.match ?? 'picture';
+    const deck = shuffle(pairs.flatMap(pair => [{pair, type: 'picture'}, {pair, type: mode}]));
     const grid = el('div', '', 'extra-memory discovery-memory');
     grid.dataset.memoryPhase = 'preview';
     grid.style.setProperty('--cols', deck.length === 4 ? '2' : deck.length === 6 ? '3' : deck.length <= 12 ? '4' : '5');
     const summary = el('div', '', 'discovery-summary');
     const matchedLabel = el('strong');
     const meter = el('progress');
-    meter.max = round.images.length;
+    meter.max = pairs.length;
     meter.setAttribute('aria-label', tr('الأزواج المكتملة', 'Matched pairs'));
-    const instructions = el('p', tr('احفظ أماكن الصور ثم ابدأ المطابقة.', 'Look at the pictures and remember their places.'), 'memory-instructions');
+    const instructions = el('p', mode === 'sound'
+      ? tr('اضغط بطاقات السماعة لتسمع الأصوات، ثم ابدأ المطابقة.', 'Tap the speaker cards to hear the sounds, then start matching.')
+      : mode === 'word'
+        ? tr('احفظ أماكن الصور وأسمائها ثم ابدأ المطابقة.', 'Remember where the pictures and words are, then start matching.')
+        : tr('احفظ أماكن الصور ثم ابدأ المطابقة.', 'Look at the pictures and remember their places.'), 'memory-instructions');
     let first = null, busy = false, matched = 0, tries = 0;
     next.hidden = false;
     next.disabled = true;
 
     function update() {
-      matchedLabel.textContent = tr('الأزواج: ', 'Pairs: ') + matched + ' / ' + round.images.length +
+      matchedLabel.textContent = tr('الأزواج: ', 'Pairs: ') + matched + ' / ' + pairs.length +
         ' · ' + tr('المحاولات: ', 'Attempts: ') + tries;
       meter.value = matched;
     }
     function showFace(card, visible) {
-      card.querySelector('img').hidden = !visible;
+      card.querySelector('.memory-face').hidden = !visible;
       card.querySelector('.memory-back').hidden = visible;
       card.classList.toggle('revealed', visible);
       const position = card.dataset.index;
-      const picture = round.images.indexOf(card.dataset.image) + 1;
+      const item = deck[Number(position) - 1];
+      const label = item.type === 'sound' ? tr('اسمع بطاقة الصوت', 'Play sound card')
+        : item.pair.name ?? tr('الصورة ' + (pairs.indexOf(item.pair) + 1), 'picture ' + (pairs.indexOf(item.pair) + 1));
       card.setAttribute('aria-label', visible
-        ? tr('البطاقة ' + position + '، الصورة ' + picture, 'Card ' + position + ', picture ' + picture)
+        ? tr('البطاقة ' + position + '، ', 'Card ' + position + ', ') + label
         : tr('بطاقة مغلقة ' + position, 'Hidden card ' + position));
     }
+    function playSound(pair) {
+      playRecording(pair.audio, () => say(tr('تعذّر تشغيل الصوت. جرّب البطاقة مجددًا.', 'The sound could not play. Try the card again.')));
+    }
     const ready = button(tr('ابدأ المطابقة', 'Start matching'), () => {
+      if (mode === 'sound') stopSpeech();
       grid.dataset.memoryPhase = 'match';
       for (const card of grid.children) {
         showFace(card, false);
         card.disabled = false;
       }
       ready.hidden = true;
-      instructions.textContent = tr('اكشف بطاقتين متطابقتين.', 'Turn over two matching cards.');
+      say('');
+      instructions.textContent = {
+        picture: tr('اكشف بطاقتين متطابقتين.', 'Turn over two matching cards.'),
+        word: tr('طابق كل صورة مع اسمها.', 'Match each picture to its name.'),
+        sound: tr('طابق كل صورة مع صوتها.', 'Match each picture to its sound.'),
+      }[mode];
       grid.firstElementChild.focus({preventScroll: true});
     }, 'button button-primary memory-start');
 
-    deck.forEach((src, i) => {
+    deck.forEach(({pair, type}, index) => {
       const card = button('', () => {
-        if (finished || busy || card.disabled || first === card) return;
+        if (finished || busy || card.disabled) return;
+        if (grid.dataset.memoryPhase === 'preview' || first === card) {
+          if (type === 'sound') playSound(pair);
+          return;
+        }
         showFace(card, true);
+        if (type === 'sound') playSound(pair);
         if (!first) { first = card; return; }
         const previous = first;
         first = null;
         tries++;
-        if (previous.dataset.image === src) {
+        if (previous.dataset.pair === pair.id) {
           previous.disabled = card.disabled = true;
           previous.dataset.matched = card.dataset.matched = 'true';
           matched++;
           journey.correct();
           say(tr('وجدت زوجًا!', 'You found a pair!'), 'correct');
           update();
-          if (matched === round.images.length) {
+          if (matched === pairs.length) {
             grid.dataset.memoryPhase = 'complete';
             done();
             next.focus({preventScroll: true});
             next.scrollIntoView({block: 'center'});
           }
-        } else {
-          busy = true;
-          wrong();
-          update();
-          setTimeout(() => {
-            if (!grid.isConnected) return;
-            showFace(previous, false);
-            showFace(card, false);
-            busy = false;
-          }, 750);
+          return;
         }
+        busy = true;
+        wrong();
+        update();
+        setTimeout(() => {
+          if (!grid.isConnected) return;
+          if (mode === 'sound') stopSpeech();
+          showFace(previous, false);
+          showFace(card, false);
+          busy = false;
+        }, mode === 'sound' ? 1500 : 750);
       }, 'extra-memory-card');
-      card.dataset.image = src;
-      card.dataset.index = String(i + 1);
-      card.disabled = true;
+      card.dataset.pair = pair.id;
+      card.dataset.image = pair.image ?? pair.id;
+      card.dataset.face = type;
+      card.dataset.index = String(index + 1);
+      card.disabled = type !== 'sound';
       const back = el('span', '', 'memory-back');
       back.append(el('span', '✦', 'memory-back-star'), el('small', '?'));
-      const image = el('img');
-      image.src = src;
-      image.alt = '';
-      image.draggable = false;
-      card.append(back, image);
+      let face;
+      if (type === 'word') {
+        face = el('span', pair.name, 'memory-face memory-word');
+      } else if (type === 'sound') {
+        face = illustrate(el('span', '🔊', 'memory-face memory-speaker'), '🔊');
+      } else if (pair.image) {
+        face = el('img', '', 'memory-face');
+        face.src = pair.image;
+        face.alt = '';
+        face.draggable = false;
+      } else {
+        face = el('span', '', 'memory-face memory-illustration');
+        face.append(createIllustration(pair.art));
+      }
+      face.setAttribute('aria-hidden', 'true');
+      card.append(back, face);
       showFace(card, true);
       grid.append(card);
     });
@@ -156,13 +301,116 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
     update();
     return;
   }
-  if(kind==='puzzle'){
-    const {cols,rows,image}=round,n=cols*rows;let arrangement=shuffle(Array.from({length:n},(_,i)=>i));if(arrangement.every((v,i)=>v===i))[arrangement[0],arrangement[1]]=[arrangement[1],arrangement[0]];let first=-1,moves=0;
-    const preview=el('img');preview.src=image;preview.alt=tr('الصورة الأصلية','Original picture');preview.className='extra-puzzle-preview discovery-preview';
-    const panel=el('div','','puzzle-reference'),title=el('strong',tr('الصورة المرجعية','Reference picture')),toggle=button(tr('إخفاء الصورة','Hide picture'),()=>{preview.hidden=!preview.hidden;toggle.textContent=preview.hidden?tr('عرض الصورة','Show picture'):tr('إخفاء الصورة','Hide picture');toggle.setAttribute('aria-expanded',String(!preview.hidden))},'button button-white');toggle.setAttribute('aria-expanded','true');panel.append(title,preview,toggle);cue.append(panel);
-    const summary=el('div','','discovery-summary'),label=el('strong'),meter=el('progress');meter.max=n;meter.setAttribute('aria-label',tr('القطع في مكانها','Correctly placed pieces'));summary.append(label,meter);cue.append(summary);
-    const grid=el('div','','extra-puzzle discovery-puzzle');const sizePuzzle=()=>{if(preview.naturalWidth&&preview.naturalHeight)grid.style.aspectRatio=preview.naturalWidth+'/'+preview.naturalHeight};preview.addEventListener('load',sizePuzzle);if(preview.complete)sizePuzzle();grid.style.setProperty('--cols',cols);grid.style.setProperty('--rows',rows);grid.dir='ltr';options.append(grid);
-    function draw(focus=-1){const count=arrangement.filter((v,i)=>v===i).length;label.textContent=tr('القطع الصحيحة: ','Correct pieces: ')+count+' / '+n+' · '+tr('الحركات: ','Moves: ')+moves;meter.value=count;grid.replaceChildren(...arrangement.map((piece,index)=>{const b=button('',()=>{if(finished)return;if(first<0){first=index;draw(index);return}if(first===index){first=-1;draw(index);return}[arrangement[first],arrangement[index]]=[arrangement[index],arrangement[first]];moves++;first=-1;draw(index);if(arrangement.every((v,i)=>v===i))done()},'extra-piece');b.dataset.piece=String(piece);b.dataset.slot=String(index);b.dataset.placed=String(piece===index);b.setAttribute('aria-label',tr('قطعة ','Piece ')+(piece+1));b.setAttribute('aria-pressed',String(first===index));b.style.backgroundImage='url("'+image+'")';b.style.backgroundSize=(cols*100)+'% '+(rows*100)+'%';b.style.backgroundPosition=((piece%cols)*100/(cols-1))+'% '+(Math.floor(piece/cols)*100/(rows-1))+'%';return b}));if(focus>=0)grid.children[focus]?.focus({preventScroll:true})}draw();return;
+  if (kind === 'puzzle') {
+    const {cols, rows, image, rotate} = round;
+    const total = cols * rows;
+    const order = shuffle(Array.from({length: total}, (_, i) => i));
+    if (order.every((piece, slot) => piece === slot)) [order[0], order[1]] = [order[1], order[0]];
+    const turns = Array.from({length: total}, (_, piece) => rotate && piece % 2 === 0 ? 1 + Math.floor(Math.random() * 3) : 0);
+    let selected = -1, moves = 0;
+    let scaleX = 1, scaleY = 1;
+
+    const preview = el('img', '', 'extra-puzzle-preview discovery-preview');
+    preview.classList.toggle('rotating-puzzle-preview', Boolean(rotate));
+    preview.src = image;
+    preview.alt = tr('الصورة الأصلية', 'Original picture');
+    const panel = el('div', '', 'puzzle-reference');
+    const toggle = button(tr('إخفاء الصورة', 'Hide picture'), () => {
+      preview.hidden = !preview.hidden;
+      toggle.textContent = preview.hidden ? tr('عرض الصورة', 'Show picture') : tr('إخفاء الصورة', 'Hide picture');
+      toggle.setAttribute('aria-expanded', String(!preview.hidden));
+    }, 'button button-white');
+    toggle.setAttribute('aria-expanded', 'true');
+    panel.append(el('strong', tr('الصورة المرجعية', 'Reference picture')), preview, toggle);
+    const summary = el('div', '', 'discovery-summary');
+    const label = el('strong');
+    const meter = el('progress');
+    meter.max = total;
+    meter.setAttribute('aria-label', tr('القطع في مكانها', 'Correctly placed pieces'));
+    summary.append(label, meter);
+    cue.append(panel, summary);
+
+    const grid = el('div', '', 'extra-puzzle discovery-puzzle');
+    if (rotate) grid.style.aspectRatio = '1';
+    function sizePuzzle() {
+      if (!preview.naturalWidth || !preview.naturalHeight) return;
+      const ratio = preview.naturalWidth / preview.naturalHeight;
+      if (rotate) {
+        // Use the same centre crop in the reference and across the square board.
+        scaleX = Math.max(1, ratio);
+        scaleY = Math.max(1, 1 / ratio);
+      } else {
+        grid.style.aspectRatio = String(ratio);
+      }
+    }
+    grid.style.setProperty('--cols', cols);
+    grid.style.setProperty('--rows', rows);
+    grid.dir = 'ltr';
+    options.append(grid);
+    const turn = button(tr('دوّر 90°', 'Rotate 90°'), () => {
+      if (selected < 0 || finished) return;
+      const piece = order[selected];
+      turns[piece] = (turns[piece] + 1) % 4;
+      moves++;
+      draw();
+    }, 'button button-primary puzzle-turn');
+    if (rotate) {
+      turn.dataset.rotatePiece = '';
+      options.append(turn);
+    }
+
+    function draw(focus = -1) {
+      const placed = order.map((piece, slot) => piece === slot && turns[piece] === 0);
+      const count = placed.filter(Boolean).length;
+      label.textContent = tr('القطع الصحيحة: ', 'Correct pieces: ') + count + ' / ' + total +
+        ' · ' + tr('الحركات: ', 'Moves: ') + moves;
+      meter.value = count;
+      if (count === total) done();
+      turn.disabled = selected < 0 || finished;
+      grid.replaceChildren(...order.map((piece, slot) => {
+        const tile = button('', () => {
+          if (finished) return;
+          if (selected < 0 || selected === slot) {
+            selected = selected < 0 ? slot : -1;
+          } else {
+            [order[selected], order[slot]] = [order[slot], order[selected]];
+            selected = -1;
+            moves++;
+          }
+          draw(slot);
+        }, 'extra-piece');
+        tile.dataset.piece = String(piece);
+        tile.dataset.slot = String(slot);
+        tile.dataset.placed = String(placed[slot]);
+        tile.setAttribute('aria-pressed', String(selected === slot));
+        tile.disabled = finished;
+        const angle = turns[piece] * 90;
+        const pieceLabel = tr('قطعة ', 'Piece ') + (piece + 1);
+        tile.setAttribute('aria-label', rotate ? pieceLabel + ' · ' + angle + '°' : pieceLabel);
+        const art = rotate ? el('span', '', 'puzzle-piece-art') : tile;
+        art.style.backgroundImage = 'url("' + image + '")';
+        const fullWidth = cols * scaleX;
+        const fullHeight = rows * scaleY;
+        art.style.backgroundSize = (fullWidth * 100) + '% ' + (fullHeight * 100) + '%';
+        const offsetX = (fullWidth - cols) / 2 + piece % cols;
+        const offsetY = (fullHeight - rows) / 2 + Math.floor(piece / cols);
+        art.style.backgroundPosition = offsetX * 100 / (fullWidth - 1) + '% ' +
+          offsetY * 100 / (fullHeight - 1) + '%';
+        if (rotate) {
+          tile.dataset.rotation = String(angle);
+          art.style.transform = 'rotate(' + angle + 'deg)';
+          tile.append(art);
+        }
+        return tile;
+      }));
+      if (finished) next.focus({preventScroll: true});
+      else if (focus >= 0) grid.children[focus].focus({preventScroll: true});
+    }
+
+    preview.addEventListener('load', () => { sizePuzzle(); draw(selected); });
+    sizePuzzle();
+    draw();
+    return;
   }
   if (kind === 'trace') {
     const dictation = Boolean(round.audio);

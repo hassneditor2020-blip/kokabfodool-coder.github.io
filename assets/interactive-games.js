@@ -1,5 +1,5 @@
 import {illustrate} from './learning-art.js?v=2';
-import {bindJourney,shuffle} from './game-progress.js?v=13';
+import {bindJourney,shuffle} from './game-progress.js?v=14';
 const game=JSON.parse(document.getElementById('game-data').textContent), ar=game.lang==='ar', tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'), cue=board.querySelector('[data-cue]'), options=board.querySelector('[data-options]'), feedback=board.querySelector('[data-feedback]'), next=board.querySelector('[data-next]');
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return illustrate(n,txt)};
@@ -24,6 +24,107 @@ function render(round){
    });
    group.append(answer);
   }
+  return;
+ }
+ if (round.kind === 'purchase') {
+  const {items, budget, offers} = round;
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const deals = offers.map(offer => {
+   const discount = offer.percent ? total * offer.percent / 100 : offer.amount;
+   return {...offer, discount, price: total - discount};
+  });
+  const best = deals[0].price < deals[1].price ? 0 : 1;
+  const money = amount => amount + tr(' د.إ', ' AED');
+  const scene = el('section', '', 'market-scene purchase-task');
+  const shelf = el('div', '', 'market-shelf');
+  for (const item of items) {
+   const product = el('div', '', 'shop-item market-product');
+   const picture = el('span', item.icon, 'new-picture');
+   picture.setAttribute('aria-hidden', 'true');
+   product.append(picture, el('strong', item.name, 'market-item-name'),
+    el('span', item.quantity + ' × ' + money(item.price), 'purchase-unit-price'));
+   shelf.append(product);
+  }
+  scene.append(el('div', tr('الميزانية ', 'Budget ') + money(budget), 'market-awning'), shelf);
+  cue.append(scene);
+
+  const offerPanel = el('section', '', 'purchase-phase');
+  offerPanel.append(el('h3', tr('اختر العرض الأرخص ضمن الميزانية', 'Choose the cheaper offer within your budget')));
+  const offerCards = el('div', '', 'purchase-offers');
+  offerPanel.append(offerCards);
+  const checkout = el('section', '', 'purchase-phase');
+  checkout.hidden = true;
+  group.append(offerPanel, checkout);
+
+  function showReceipt(deal, alternative) {
+   const receipt = el('div', '', 'market-receipt purchase-receipt');
+   receipt.append(el('h3', tr('فاتورة المشتريات', 'Shopping receipt'), 'market-heading'));
+   const rows = items.map(item => [item.name + ' × ' + item.quantity, money(item.price * item.quantity)]);
+   rows.push([tr('قبل الخصم', 'Subtotal'), money(total)],
+    [tr('الخصم', 'Discount'), '−' + money(deal.discount)],
+    [tr('المجموع بعد الخصم', 'Total after discount'), money(deal.price)],
+    [tr('المبلغ المدفوع', 'Cash paid'), money(budget)]);
+   for (const [label, value] of rows) {
+    const line = el('div', '', 'market-line');
+    line.append(el('span', label), el('strong', value));
+    receipt.append(line);
+   }
+
+   const change = budget - deal.price;
+   const question = el('h3', tr('كم سيعيد لك الصندوق؟', 'How much change should you get?'));
+   question.tabIndex = -1;
+   const choices = el('div', '', 'purchase-change');
+   const amounts = [...new Set([change, deal.discount, deal.price, Math.max(0, budget - alternative.price)])];
+   const checks = shuffle(amounts).map(amount => {
+    const choice = btn(money(amount), () => {
+     if (solved || choice.disabled) return;
+     if (amount !== change) {
+      choice.dataset.state = 'wrong';
+      choice.disabled = true;
+      wrong();
+      say(tr('اطرح مجموع الفاتورة بعد الخصم من المبلغ المدفوع.', 'Subtract the total after discount from the cash paid.'), 'wrong');
+      return;
+     }
+     choice.dataset.state = 'correct';
+     for (const control of checks) control.disabled = true;
+     const line = el('div', '', 'market-line market-total');
+     line.append(el('strong', tr('الباقي', 'Change')), el('strong', money(change)));
+     receipt.append(line);
+     done();
+    });
+    choice.dataset.purchaseChange = String(amount);
+    return choice;
+   });
+   choices.append(...checks);
+   checkout.replaceChildren(receipt, question, choices);
+   checkout.hidden = false;
+   question.focus({preventScroll: true});
+  }
+
+  deals.forEach((deal, i) => {
+   const label = deal.percent
+    ? tr('خصم ', 'Discount ') + deal.percent + '%'
+    : tr('وفّر ', 'Save ') + money(deal.amount);
+   const control = btn('', () => {
+    if (solved || control.disabled) return;
+    if (i !== best || deal.price > budget) {
+     control.dataset.state = 'wrong';
+     control.disabled = true;
+     wrong();
+     say(deal.price > budget
+      ? tr('يتجاوز هذا العرض ميزانيتك. احسب السعر بعد الخصم.', 'This offer exceeds your budget. Work out the price after discount.')
+      : tr('وجدت عرضًا مناسبًا للميزانية. احسب الخصم الآخر للعثور على الأرخص.', 'That fits the budget. Work out the other discount to find the cheaper price.'), 'wrong');
+     return;
+    }
+    control.dataset.state = 'correct';
+    for (const offer of offerCards.children) offer.disabled = true;
+    say('');
+    showReceipt(deal, deals[1 - i]);
+   }, 'game-option purchase-offer');
+   control.dataset.purchaseOffer = String(i);
+   control.append(el('strong', tr('العرض ', 'Offer ') + (i + 1)), el('span', label));
+   offerCards.append(control);
+  });
   return;
  }
  if(round.kind==='shop'){
@@ -119,9 +220,116 @@ function render(round){
   program.append(el('h3',tr('برنامج الأوامر','Command program'),'market-heading'),sequence,status);lab.append(head,grid,program);cue.append(lab);
   const arrows={U:'↑',D:'↓',L:'←',R:'→'},moves={U:[0,-1],D:[0,1],L:[-1,0],R:[1,0]},labels={U:tr('أعلى','Up'),D:tr('أسفل','Down'),L:tr('يسار','Left'),R:tr('يمين','Right')};
   const keypad=el('div','','code-keypad'),actions=el('div','','market-actions'),keys=[];
-  function moveTo(p){pos=p;rover.style.left=((p[0]+.5)/n*100)+'%';rover.style.top=((p[1]+.5)/n*100)+'%';rover.style.width=(88/n)+'%'}
+  function moveTo(p){pos=p;grid.dataset.roboPosition=p.join(',');rover.style.left=((p[0]+.5)/n*100)+'%';rover.style.top=((p[1]+.5)/n*100)+'%';rover.style.width=(88/n)+'%'}
+  function addDirectionKeys(onPick) {
+    for (const direction of ['U', 'L', 'D', 'R']) {
+      const key = btn('', () => onPick(direction), 'game-option code-arrow');
+      key.dataset.command = direction;
+      key.setAttribute('aria-label', labels[direction]);
+      key.append(el('strong', arrows[direction]), el('small', labels[direction]));
+      keys.push(key);
+      keypad.append(key);
+    }
+  }
+  if (round.program) {
+   const original = round.program;
+   commands = original.slice();
+   const stepInProgram = el('div', '', 'market-actions');
+   let cursor = 0, selected = -1, fault = -1, ended = false, note = '';
+   const changed = () => commands.some((command, i) => command !== original[i]);
+
+   function restart() {
+    cursor = 0;
+    fault = -1;
+    ended = false;
+    moveTo(start.slice());
+   }
+
+   function drawDebug(focus = false) {
+    sequence.replaceChildren(...commands.map((direction, i) => {
+     const chip = btn(String(i + 1) + ' ' + arrows[direction], () => {
+      selected = i;
+      drawDebug(true);
+     }, 'code-chip code-edit-chip');
+     chip.dataset.editCommand = String(i);
+     chip.dataset.active = String(i === cursor && !ended);
+     chip.dataset.fault = String(i === fault);
+     chip.dataset.changed = String(direction !== original[i]);
+     chip.setAttribute('aria-pressed', String(i === selected));
+     chip.setAttribute('aria-label', tr('التعليمة ', 'Instruction ') + (i + 1) + ' · ' + labels[direction]);
+     chip.disabled = solved;
+     return chip;
+    }));
+    status.textContent = note;
+    step.disabled = ended || solved;
+    reset.disabled = solved;
+    for (const key of keys) key.disabled = selected < 0 || solved;
+    if (focus && selected >= 0) sequence.children[selected].focus({preventScroll: true});
+   }
+
+   addDirectionKeys(direction => {
+    commands = original.slice();
+    commands[selected] = direction;
+    restart();
+    note = tr('التعليمة ', 'Instruction ') + (selected + 1) +
+     tr(' · اخترت اتجاه ', ' · Direction ') + labels[direction] + tr('. شغّل الأوامر خطوة بخطوة.', '. Run the commands one step at a time.');
+    say('');
+    drawDebug();
+   });
+
+   const step = btn(tr('نفّذ خطوة', 'Run one step'), () => {
+    if (ended || solved) return;
+    const [dx, dy] = moves[commands[cursor]];
+    const nextPosition = [pos[0] + dx, pos[1] + dy];
+    if (!canEnter(...nextPosition)) {
+     fault = selected = cursor;
+     ended = true;
+     note = tr('توقّف روبو عند التعليمة ', 'Robo stopped at instruction ') + (cursor + 1) +
+      tr('. غيّر الاتجاه ثم جرّب مجددًا.', '. Change the direction and try again.');
+     if (changed()) journey.mistake();
+     drawDebug();
+     return;
+    }
+    moveTo(nextPosition);
+    cursor++;
+    note = tr('أُنجزت الخطوة ', 'Completed step ') + cursor + ' / ' + commands.length;
+    if (cursor === commands.length) {
+     ended = true;
+     if (pos[0] === target[0] && pos[1] === target[1]) {
+      lab.dataset.complete = 'true';
+      note = tr('وصل روبو إلى النجمة بعد إصلاح التعليمة.', 'Robo reached the star after you fixed the instruction.');
+      done();
+     } else {
+      note = tr('انتهت الأوامر قبل الوصول إلى النجمة. اختر تعليمة لتعديلها.',
+       'The program ended away from the star. Choose an instruction to edit.');
+      if (changed()) journey.mistake();
+     }
+    }
+    drawDebug();
+   }, 'button button-primary');
+   step.dataset.codeStep = '';
+   const reset = btn(tr('أعد التشغيل من البداية', 'Restart from the beginning'), () => {
+    restart();
+    note = tr('روبو جاهز عند نقطة البداية.', 'Robo is ready at the starting point.');
+    drawDebug();
+   }, 'button button-white');
+   reset.dataset.codeReset = '';
+   stepInProgram.append(step, reset);
+   program.append(stepInProgram);
+   group.append(keypad);
+   restart();
+   note = tr('نفّذ الأوامر بالترتيب. اختر تعليمة ثم غيّر اتجاهها.', 'Run the commands in order. Select an instruction to change its direction.');
+   drawDebug();
+   return;
+  }
+
   function draw(step=-1){sequence.replaceChildren();if(!commands.length)sequence.append(el('span',tr('أضف أوامر الاتجاه','Add direction commands'),'code-placeholder'));commands.forEach((c,i)=>{const chip=el('span',arrows[c],'code-chip');chip.dataset.step=String(i);chip.dataset.active=String(i===step);chip.setAttribute('aria-label',labels[c]);sequence.append(chip)});status.textContent=running?tr('روبو ينفّذ الأوامر…','Robo is running…'):tr('عدد الأوامر: ','Commands: ')+commands.length+(round.limit?' / '+limit:'');for(const b of keys)b.disabled=running||solved||commands.length>=limit;undo.disabled=clear.disabled=run.disabled=running||solved||!commands.length}
-  for(const c of ['U','L','D','R']){const b=btn('',()=>{if(!solved&&!running&&commands.length<limit){commands.push(c);draw()}},'game-option code-arrow');b.dataset.command=c;b.setAttribute('aria-label',labels[c]);b.append(el('strong',arrows[c]),el('small',labels[c]));keys.push(b);keypad.append(b)}
+  addDirectionKeys(direction => {
+    if (!solved && !running && commands.length < limit) {
+      commands.push(direction);
+      draw();
+    }
+  });
   const undo=btn(tr('احذف آخر أمر','Undo last command'),()=>{if(!running&&!solved){commands.pop();draw()}},'button button-white');
   const clear=btn(tr('امسح','Clear'),()=>{if(!running&&!solved){commands=[];moveTo(start.slice());draw()}},'button button-white');
   const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));

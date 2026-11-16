@@ -1,7 +1,9 @@
-name: Fudool V6.4 writing review and Android verification
+name: Fudool V6.4 game challenges and Android verification
 on:
   push:
     branches: [development/fudool-writing-v6-4]
+    paths-ignore:
+      - 'downloads/apps/**'
   workflow_dispatch:
 concurrency:
   group: fudool-worlds-android-${{ github.ref }}
@@ -72,7 +74,7 @@ jobs:
       - name: Upload APKs and checksums (not website deployment)
         uses: actions/upload-artifact@v4
         with:
-          name: Kokab-Fodool-V6.4-review-${{ steps.signing.outputs.kind }}
+          name: Kokab-Fodool-V6.4-${{ steps.signing.outputs.kind }}
           path: build/android-v6/
           if-no-files-found: error
           retention-days: 14
@@ -86,7 +88,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
-      contents: read
+      contents: write
       actions: read
     steps:
       - uses: actions/checkout@v4
@@ -97,10 +99,15 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: node scripts/test-v5-browser.cjs
       - run: node scripts/test-v6-worlds.cjs
+      - run: node scripts/test-v6-challenges.cjs
       - uses: actions/download-artifact@v4
         with:
-          name: Kokab-Fodool-V6.4-review-release
+          name: Kokab-Fodool-V6.4-release
           path: build/android-v6/
+      - name: Verify all advanced levels from the signed Android package
+        run: |
+          unzip -q build/android-v6/kawkab-fudool-unified.apk 'assets/site/*' -d build/apk-verification
+          FUDOOL_TEST_ROOT=build/apk-verification/assets/site node scripts/test-v6-challenges.cjs
       - name: Enable emulator hardware acceleration
         run: sudo chmod a+rw /dev/kvm
       - name: Verify Android upgrade and offline game launch
@@ -111,10 +118,21 @@ jobs:
           arch: x86_64
           disable-animations: true
           script: bash scripts/test-v6-android.sh
+      - name: Stage the verified Android package for release
+        run: |
+          python3 scripts/stage-v5-release.py
+          python3 scripts/verify-v5.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads/apps/
+          if ! git diff --cached --quiet; then
+            git commit -m "Stage signed Kokab Fodool V6.4 APK"
+            git push origin HEAD:refs/heads/development/fudool-writing-v6-4
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: V6.4-review-screenshots
+          name: V6.4-gameplay-screenshots
           path: |
             build/v5-screenshots/
             build/v6-screenshots/

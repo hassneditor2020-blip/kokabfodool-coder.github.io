@@ -111,7 +111,7 @@ async function validateMaps(browser, language, width) {
   }
   assert.deepEqual(errors, [], language + ' ' + width);
   await page.close();
-  console.log('PASS', language, width, '20 games and all 300 levels open under their allowed age groups');
+  console.log('PASS', language, width, '20 games and all 306 levels open under their allowed age groups');
 }
 
 async function validateDriving(browser, language) {
@@ -261,7 +261,7 @@ async function validateAgePaths(browser, language) {
     await expectRound(11, 1);
     await page.locator('[data-game] [data-level-menu]').click();
     await expectPlay(11, '8-10');
-    assert.deepEqual(await map.locator('.game-level').evaluateAll(items => items.map(item => +item.dataset.levelNumber)), [11,12,13,14]);
+    assert.deepEqual(await map.locator('.game-level').evaluateAll(items => items.map(item => +item.dataset.levelNumber)), [11,12,13,14,15]);
     assert(await levelButton(12).isDisabled());
 
     await play.click();
@@ -565,7 +565,7 @@ async function validateOffline(browser) {
   let browser;
   try {
     assert.equal(Object.keys(games).length, 20);
-    assert.equal(Object.values(games).reduce((total, count) => total + count, 0), 300);
+    assert.equal(Object.values(games).reduce((total, count) => total + count, 0), 306);
     for (let i = 0; i < 30; i++) {
       try {
         if ((await fetch(origin)).ok) break;

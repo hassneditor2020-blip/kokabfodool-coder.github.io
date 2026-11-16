@@ -41,8 +41,54 @@ for lang,prefix in [('ar',''),('en','en/')]:
                     assert len(task['word']) in lengths
                     assert task['kind'] == 'trace' and task['word'] not in task['prompt']
                     assert task['audio'] in paths and task['image'] in paths
+        if page.parent.name == 'memory':
+            assert [stage['rounds'][0]['match'] for stage in levels[-2:]] == ['word', 'sound']
+            for stage in levels[-2:]:
+                for task in stage['rounds']:
+                    assert len({pair['id'] for pair in task['pairs']}) == len(task['pairs'])
+                    if task['match'] == 'sound':
+                        assert all(pair['audio'] in paths for pair in task['pairs'])
+        if page.parent.name == 'robo-lab':
+            for task in levels[-1]['rounds']:
+                assert task['kind'] == 'magnet-distance'
+                assert len(task['results']) == len(set(task['distances'])) == 3
+                assert 0 <= min(task['results']) < max(task['results']) <= task['clips']
+        if page.parent.name == 'fudool-shop':
+            for task in levels[-1]['rounds']:
+                assert task['kind'] == 'purchase'
+                subtotal = sum(item['price'] * item['quantity'] for item in task['items'])
+                offers = [subtotal - offer.get('amount', subtotal * offer.get('percent', 0) / 100)
+                          for offer in task['offers']]
+                assert all(price > 0 and int(price) == price for price in offers)
+                assert min(offers) < max(offers) and min(offers) <= task['budget']
+        if page.parent.name == 'code-robo':
+            directions = {(0, -1): 'U', (-1, 0): 'L', (0, 1): 'D', (1, 0): 'R'}
+            for task in levels[-1]['rounds']:
+                coordinates = task['path']
+                commands = [directions[b[0]-a[0], b[1]-a[1]] for a, b in zip(coordinates, coordinates[1:])]
+                assert len(commands) == len(task['program'])
+                assert sum(a != b for a, b in zip(commands, task['program'])) == 1
+                original = task['program']
+                open_cells = set(map(tuple, coordinates))
+                deltas = {direction: delta for delta, direction in directions.items()}
+                solutions = 0
+                for slot in range(len(original)):
+                    for command in set(deltas) - {original[slot]}:
+                        trial = original[:slot] + [command] + original[slot+1:]
+                        x, y = coordinates[0]
+                        for direction in trial:
+                            dx,dy = deltas[direction]
+                            x,y = x + dx,y + dy
+                            if (x,y) not in open_cells:
+                                break
+                        else:
+                            solutions += int([x,y] == coordinates[-1])
+                assert solutions == 1
+        if page.parent.name == 'puzzle':
+            assert all(task['rotate'] and task['cols'] == task['rows'] and task['image'] in paths
+                       for task in levels[-1]['rounds'])
         level_count+=len(levels)
-    assert level_count==300,(lang,level_count)
+    assert level_count==306,(lang,level_count)
     assert all('/'+p.parent.as_posix()+'/' in paths for p in pages)
     download=(root/(prefix+'app/index.html')).read_text()
     assert download.count('data-release-mode="unified"')==1

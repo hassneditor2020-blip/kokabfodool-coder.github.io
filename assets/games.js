@@ -1,6 +1,6 @@
 import {illustrate} from './learning-art.js?v=2';
-import { bindJourney, shuffle } from './game-progress.js?v=13';
-import {renderExtra,stopSpeech} from './game-extra.js?v=18';
+import { bindJourney, shuffle } from './game-progress.js?v=14';
+import {renderExtra,stopSpeech} from './game-extra.js?v=19';
 
 const board = document.querySelector('[data-game]');
 const game = JSON.parse(document.getElementById('game-data').textContent);

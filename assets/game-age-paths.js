@@ -29,7 +29,7 @@ const curriculum = {
   memory: {
     '3-5': [3, 'احفظ أماكن 4 إلى 8 بطاقات', 'Remember 4 to 8 cards'],
     '6-7': [6, 'احفظ أماكن 10 إلى 14 بطاقة', 'Remember 10 to 14 cards'],
-    '8-10': [12, 'احفظ أماكن 16 إلى 24 بطاقة', 'Remember 16 to 24 cards'],
+    '8-10': [14, 'طابق صورًا مع أسمائها وأصواتها', 'Match pictures to names and sounds'],
   },
   trace: {
     '3-5': [2, 'تتبّع الحروف الأولى فوق النموذج', 'Trace the first letters over a guide'],
@@ -39,12 +39,12 @@ const curriculum = {
   'robo-lab': {
     '3-5': [2, 'صنّف الصور وتعرّف إلى مواطن الحيوانات', 'Sort pictures and identify animal habitats'],
     '6-7': [10, 'تعرّف إلى الضوء والمادة والطقس والطاقة', 'Explore light, matter, weather and energy'],
-    '8-10': [14, 'خطّط لتجربة عادلة واقرأ البيانات واستدلّ بها', 'Plan fair tests, read data and reason from evidence'],
+    '8-10': [15, 'نفّذ تجربة، وسجّل القياسات واستدلّ بها', 'Run a test, record measurements and explain the results'],
   },
   puzzle: {
     '3-5': [4, 'ركّب صورًا من 4 أو 6 قطع', 'Rebuild pictures with 4 or 6 pieces'],
     '6-7': [7, 'ركّب صورًا من 9 قطع', 'Rebuild 9-piece pictures'],
-    '8-10': [11, 'ركّب صورًا من 16 أو 25 قطعة', 'Rebuild pictures with 16 or 25 pieces'],
+    '8-10': [12, 'ركّب الصور ودوّر القطع لتلائم أماكنها', 'Rebuild pictures and rotate pieces to fit'],
   },
   'sound-quiz': {
     '3-5': [3, 'تعرّف إلى أصوات الحيوانات والحديقة', 'Recognize animal and garden sounds'],
@@ -52,7 +52,7 @@ const curriculum = {
   },
   'fudool-shop': {
     '6-7': [15, 'اجمع الأسعار وادفع بالعملات', 'Add prices and pay with coins'],
-    '8-10': [17, 'احسب الباقي واختر سلة تناسب الميزانية', 'Calculate change and choose baskets within a budget'],
+    '8-10': [18, 'قارن العروض واحسب الباقي من الفاتورة', 'Compare deals and calculate change from a receipt'],
   },
   'word-factory': {
     '6-7': [15, 'رتّب الحروف لتكوين أسماء الصور', 'Arrange letters to spell picture names'],
@@ -64,7 +64,7 @@ const curriculum = {
   'code-robo': {
     '3-5': [5, 'حرّك روبو على شبكة صغيرة', 'Move Robo on a small grid'],
     '6-7': [12, 'رتّب أوامر الاتجاه على مسارات أطول', 'Sequence direction commands on longer paths'],
-    '8-10': [21, 'خطّط حول الحواجز ضمن عدد محدّد من الأوامر', 'Plan around obstacles within a command limit'],
+    '8-10': [22, 'خطّط حول الحواجز وأصلح الأوامر الخاطئة', 'Plan around obstacles and debug commands'],
   },
   'world-mishaal': {
     '6-7': [15, 'تعرّف إلى الأعلام والبلدان والمعالم', 'Recognize flags, countries and landmarks'],
