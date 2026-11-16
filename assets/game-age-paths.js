@@ -29,7 +29,7 @@ const curriculum = {
   memory: {
     '3-5': [3, 'احفظ أماكن 4 إلى 8 بطاقات', 'Remember 4 to 8 cards'],
     '6-7': [6, 'احفظ أماكن 10 إلى 14 بطاقة', 'Remember 10 to 14 cards'],
-    '8-10': [14, 'طابق صورًا مع أسمائها وأصواتها', 'Match pictures to names and sounds'],
+    '8-10': [14, 'طابق صورًا مع أسمائها واستخداماتها وأصواتها', 'Match pictures to names, uses and sounds'],
   },
   trace: {
     '3-5': [2, 'تتبّع الحروف الأولى فوق النموذج', 'Trace the first letters over a guide'],
@@ -52,7 +52,7 @@ const curriculum = {
   },
   'fudool-shop': {
     '6-7': [15, 'اجمع الأسعار وادفع بالعملات', 'Add prices and pay with coins'],
-    '8-10': [18, 'قارن العروض واحسب الباقي من الفاتورة', 'Compare deals and calculate change from a receipt'],
+    '8-10': [18, 'قارن العروض وراجع الفاتورة واحسب الباقي', 'Compare deals, check receipts and calculate change'],
   },
   'word-factory': {
     '6-7': [15, 'رتّب الحروف لتكوين أسماء الصور', 'Arrange letters to spell picture names'],

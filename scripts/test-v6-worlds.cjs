@@ -267,7 +267,16 @@ async function validateAgePaths(browser, language) {
     await play.click();
     const rounds = await page.locator('#game-data').evaluate(element => JSON.parse(element.textContent).levels[10].rounds);
     for (const question of rounds) {
-      await page.getByRole('button', {name: question.choices[question.answer], exact: true}).click();
+      if (question.kind === 'ice-experiment') {
+        await page.locator('.ice-cup[data-temperature="warm"] button').first().click();
+        await page.locator('[data-ice-add="0"]').click();
+        await page.locator('[data-ice-add="1"]').click();
+        await page.locator('[data-ice-prediction="1"]').click();
+        await page.locator('[data-ice-start]').click();
+        await page.locator('.ice-conclusion button').nth(1).click();
+      } else {
+        await page.getByRole('button', {name: question.choices[question.answer], exact: true}).click();
+      }
       await page.locator('[data-next]').click();
     }
     assert(await page.locator('[data-level-next]').isVisible());

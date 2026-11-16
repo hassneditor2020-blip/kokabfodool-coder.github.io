@@ -115,8 +115,12 @@ export function evaluateTrace(guide, inkCanvas) {
   const coverRadius = guide.word ? 6 : 4.5;
   const precisionRadius = guide.word ? 7 : 5.5;
   let covered = 0, inside = 0, inkTotal = 0;
+  const missed = [];
   for (let i = 0; i < size; i++) {
-    if (guide.mask[i] && inkDistance[i] <= coverRadius) covered++;
+    if (guide.mask[i]) {
+      if (inkDistance[i] <= coverRadius) covered++;
+      else missed.push(i);
+    }
     if (ink[i]) {
       inkTotal++;
       if (guide.distance[i] <= precisionRadius) inside++;
@@ -131,7 +135,7 @@ export function evaluateTrace(guide, inkCanvas) {
     coverage = coverage * 0.3 + meanPart * 0.7;
   }
   const precision = inkTotal ? inside / inkTotal : 0;
-  return {coverage, precision, ...traceGrade(coverage, precision)};
+  return {coverage, precision, missed, ...traceGrade(coverage, precision)};
 }
 
 export function drawGuide(image, canvas, word = false) {

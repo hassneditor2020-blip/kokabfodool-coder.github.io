@@ -1,11 +1,13 @@
+import {instructionButton, readInstruction, readOrder, stopSpeech} from './game-voice.js?v=1';
 import {illustrate} from './learning-art.js?v=2';
-import {bindJourney,shuffle} from './game-progress.js?v=14';
+import {bindJourney,shuffle} from './game-progress.js?v=15';
 const game=JSON.parse(document.getElementById('game-data').textContent), ar=game.lang==='ar', tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'), cue=board.querySelector('[data-cue]'), options=board.querySelector('[data-options]'), feedback=board.querySelector('[data-feedback]'), next=board.querySelector('[data-next]');
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return illustrate(n,txt)};
 const btn=(txt,cb,cls='game-option')=>{const b=el('button',txt,cls);b.type='button';b.addEventListener('click',cb);return b};
 let generation=0;
 function render(round){
+ stopSpeech();
  const ticket=++generation;
  const active=()=>ticket===generation&&!board.hidden;
  board.dataset.immersive=round.kind;
@@ -127,46 +129,186 @@ function render(round){
   });
   return;
  }
- if(round.kind==='shop'){
-  let paid=0,payments=[];
-  const total=round.items.reduce((sum,item)=>sum+item.price,0);
-  const change=Number.isInteger(round.changeFrom);
-  const target=change?round.changeFrom-total:total;
-  const market=el('section','','market-scene'),awning=el('div',tr('متجر فضول','Fudool Market'),'market-awning');
-  const shelf=el('div','','market-shelf');shelf.setAttribute('aria-label',tr('المنتجات المطلوبة','Shopping items'));
-  for(const item of round.items){
-    const tile=el('div','','shop-item market-product'),picture=el('span',item.icon,'new-picture');
-    picture.setAttribute('aria-hidden','true');
-    const tag=el('strong',String(item.price),'market-price');
-    tag.setAttribute('aria-label',item.price+' '+tr('عملة','coins'));
-    tile.append(picture,el('span',item.name,'market-item-name'),tag);shelf.append(tile);
+ if (round.kind === 'receipt-audit') {
+  const panel = el('section', '', 'receipt-audit');
+  panel.append(el('h3', tr('أسعار الرف', 'Shelf prices')));
+  const shelf = el('div', '', 'market-shelf');
+  for (const item of round.items) {
+    const card = el('div', '', 'market-product audit-product');
+    const image = el('span', item.icon, 'new-picture');
+    image.setAttribute('aria-hidden', 'true');
+    card.append(image, el('strong', item.name), el('span', String(item.price), 'market-price'));
+    shelf.append(card);
   }
-  market.append(awning,shelf);
-  const checkout=el('div','','market-checkout'),receipt=el('div','','market-receipt');
-  receipt.append(el('h3',tr('فاتورة المشتريات','Shopping receipt'),'market-heading'));
-  for(const item of round.items){const line=el('div','','market-line');line.append(el('span',item.name),el('strong',String(item.price)));receipt.append(line)}
-  const line=el('div','','market-line market-total');line.append(el('span',tr('المجموع','Total')),el('strong',round.showTotal?String(total):'؟'));receipt.append(line);
-  if(change){
-    const tender=el('div','','market-line');
-    tender.append(el('span',tr('دفع الزبون','Customer paid')),el('strong',String(round.changeFrom)));
+  panel.append(shelf);
+  cue.append(panel);
+  const audit = el('div', '', 'receipt-audit audit-rows');
+  audit.append(el('h3', tr('فاتورة الزبون', 'Customer receipt')));
+  const rows = round.items.map((item, i) => {
+    const price = i === round.error ? round.printedPrice : item.price;
+    const row = btn('', () => {
+      if (solved) return;
+      if (i !== round.error) {
+        row.dataset.state = 'wrong';
+        row.disabled = true;
+        wrong();
+        return;
+      }
+      row.querySelector('strong').textContent = String(item.price);
+      row.dataset.state = 'correct';
+      rows.forEach(control => { control.disabled = true; });
+      done();
+    });
+    row.dataset.receiptItem = String(i);
+    row.append(el('span', item.name), el('strong', String(price)));
+    return row;
+  });
+  audit.append(...rows);
+  group.append(audit);
+  return;
+ }
+ if (round.kind === 'shop') {
+  let paid = 0, payments = [];
+  const basket = new Set();
+  const total = round.items.reduce((sum, item) => sum + item.price, 0);
+  const change = Number.isInteger(round.changeFrom);
+  const target = change ? round.changeFrom - total : total;
+  const market = el('section', '', 'market-scene');
+  const awning = el('div', tr('متجر فضول', 'Fudool Market'), 'market-awning');
+  const shelf = el('div', '', 'market-shelf');
+  shelf.setAttribute('aria-label', tr('المنتجات المطلوبة', 'Shopping list'));
+  const items = round.items.map((item, i) => {
+    const tile = btn('', () => {
+      if (solved || basket.has(i)) return;
+      basket.add(i);
+      tile.setAttribute('aria-pressed', 'true');
+      journey.effect('add');
+      draw();
+      if (basket.size === items.length) coinControls.firstElementChild.focus({preventScroll: true});
+    }, 'shop-item market-product market-pick');
+    tile.dataset.basketItem = String(i);
+    tile.setAttribute('aria-pressed', 'false');
+    const picture = el('span', item.icon, 'new-picture');
+    picture.setAttribute('aria-hidden', 'true');
+    const tag = el('strong', String(item.price), 'market-price');
+    tag.setAttribute('aria-label', item.price + ' ' + tr('عملة', 'coins'));
+    tile.append(picture, el('span', item.name, 'market-item-name'), tag);
+    return tile;
+  });
+  shelf.append(...items);
+  const basketState = el('p', '', 'market-basket-state');
+  basketState.setAttribute('role', 'status');
+  const request = round.items.map(item => item.name).join(tr('، ', ', '));
+  const instruction = instructionButton(() => {
+    readInstruction('shop', tr(
+      'ضع المشتريات في السلة واحسب السعر ثم ادفع بالعملات.',
+      'Put the items in the basket, work out the total, and pay with your coins.'),
+      game.lang, () => { basketState.textContent = request; });
+  }, tr('استمع إلى الإرشاد', 'Listen to instructions'));
+  const customer = instructionButton(() => {
+    readOrder(round.items.map(item => item.name), game.lang, () => {
+      basketState.textContent = request;
+    });
+  }, tr('اسمع طلب الزبون', 'Listen to the order'));
+  const instructions = el('div', '', 'market-voice-controls');
+  instructions.append(instruction, customer);
+  market.append(awning, instructions, shelf, basketState);
+
+  const checkout = el('div', '', 'market-checkout');
+  const receipt = el('div', '', 'market-receipt');
+  const heading = el('h3', tr('السلة', 'Basket'), 'market-heading');
+  const receiptItems = el('div');
+  const sum = el('strong');
+  const line = el('div', '', 'market-line market-total');
+  line.append(el('span', tr('المجموع', 'Total')), sum);
+  receipt.append(heading, receiptItems, line);
+  if (change) {
+    const tender = el('div', '', 'market-line');
+    tender.append(el('span', tr('دفع الزبون', 'Customer paid')), el('strong', String(round.changeFrom)));
     receipt.append(tender);
   }
-  const register=el('div','','market-register'),display=el('strong','0','market-display');display.dir='ltr';display.setAttribute('aria-live','polite');
-  const registerLabel=change?tr('الباقي للزبون','Customer change'):tr('المبلغ المدفوع','Amount paid');
-  display.setAttribute('aria-label',registerLabel);
-  const tray=el('div','','market-tray');
-  register.append(el('span',registerLabel,'market-heading'),display,tray);
-  checkout.append(receipt,register);cue.append(market,checkout);
-  const wallet=el('div','','market-wallet'),coinControls=el('div','','market-coins'),actions=el('div','','market-actions');
-  wallet.append(el('h3',tr('محفظتي — اختر العملات','My wallet — choose coins'),'market-heading'),coinControls,actions);group.append(wallet);
-  const coinFace=(v)=>{const face=el('span',String(v),'market-coin-face');face.setAttribute('aria-hidden','true');return face};
-  const undo=btn(tr('تراجع','Undo'),()=>{if(solved||!payments.length)return;paid-=payments.pop();draw()},'button button-white');
-  const clear=btn(tr('مسح المبلغ','Clear'),()=>{if(solved)return;paid=0;payments=[];draw()},'button button-white');
-  const pay=btn(change?tr('أعد الباقي','Give change'):tr('ادفع','Pay'),()=>{if(solved)return;if(paid===target){market.dataset.paid='true';draw();done();for(const b of coinControls.children)b.disabled=true;undo.disabled=clear.disabled=pay.disabled=true}else{wrong();paid=0;payments=[];draw()}},'button button-primary');
-  actions.append(undo,clear,pay);
-  function draw(){display.textContent=String(paid);const visible=payments.slice(-12);tray.replaceChildren(...visible.map(coinFace));if(payments.length>12)tray.prepend(el('small','+'+(payments.length-12),'market-more'));undo.disabled=clear.disabled=!payments.length;pay.disabled=!payments.length&&target!==0}
-  for(const v of round.coins){const b=btn('',()=>{if(!solved&&paid<999){payments.push(v);paid+=v;draw()}},'market-coin');b.dataset.coin=String(v);b.setAttribute('aria-label',tr('أضف '+v+' عملة','Add '+v+' coins'));b.append(coinFace(v));coinControls.append(b)}
-  draw();return;
+  const register = el('div', '', 'market-register');
+  const display = el('strong', '0', 'market-display');
+  display.dir = 'ltr';
+  display.setAttribute('aria-live', 'polite');
+  const registerLabel = change ? tr('الباقي للزبون', 'Customer change') : tr('المبلغ المدفوع', 'Amount paid');
+  display.setAttribute('aria-label', registerLabel);
+  const tray = el('div', '', 'market-tray');
+  register.append(el('span', registerLabel, 'market-heading'), display, tray);
+  checkout.append(receipt, register);
+  cue.append(market, checkout);
+
+  const wallet = el('div', '', 'market-wallet');
+  const coinControls = el('div', '', 'market-coins');
+  const actions = el('div', '', 'market-actions');
+  const coinFace = value => {
+    const face = el('span', String(value), 'market-coin-face');
+    face.setAttribute('aria-hidden', 'true');
+    return face;
+  };
+  const undo = btn(tr('تراجع', 'Undo'), () => {
+    if (!payments.length || solved) return;
+    paid -= payments.pop();
+    draw();
+  }, 'button button-white');
+  const clear = btn(tr('مسح المبلغ', 'Clear'), () => {
+    if (solved) return;
+    paid = 0;
+    payments = [];
+    draw();
+  }, 'button button-white');
+  const pay = btn(change ? tr('أعد الباقي', 'Give change') : tr('ادفع', 'Pay'), () => {
+    if (solved || basket.size !== items.length) return;
+    if (paid === target) {
+      market.dataset.paid = 'true';
+      heading.textContent = tr('فاتورة المشتريات', 'Shopping receipt');
+      done();
+      draw();
+    } else {
+      wrong();
+      paid = 0;
+      payments = [];
+      draw();
+    }
+  }, 'button button-primary');
+  actions.append(undo, clear, pay);
+  for (const value of round.coins) {
+    const coin = btn('', () => {
+      if (solved || basket.size !== items.length || paid >= 999) return;
+      payments.push(value);
+      paid += value;
+      journey.effect('coin');
+      draw();
+    }, 'market-coin');
+    coin.dataset.coin = String(value);
+    coin.setAttribute('aria-label', tr('أضف ' + value + ' عملة', 'Add ' + value + ' coins'));
+    coin.append(coinFace(value));
+    coinControls.append(coin);
+  }
+  wallet.append(el('h3', tr('محفظتي', 'My wallet'), 'market-heading'), coinControls, actions);
+  group.append(wallet);
+
+  function draw() {
+    const ready = basket.size === items.length;
+    basketState.textContent = (ready ? tr('السلة جاهزة ', 'Basket ready ') : tr('اضغط لإضافة المنتجات ', 'Tap the products to add them ')) +
+      basket.size + ' / ' + items.length;
+    const chosen = round.items.filter((item, i) => basket.has(i));
+    receiptItems.replaceChildren(...chosen.map(item => {
+      const row = el('div', '', 'market-line');
+      row.append(el('span', item.name), el('strong', String(item.price)));
+      return row;
+    }));
+    sum.textContent = round.showTotal ? String(chosen.reduce((value, item) => value + item.price, 0)) : tr('؟', '?');
+    display.textContent = String(paid);
+    tray.replaceChildren(...payments.slice(-12).map(coinFace));
+    if (payments.length > 12) tray.prepend(el('small', '+' + (payments.length - 12), 'market-more'));
+    for (const control of coinControls.children) control.disabled = !ready || solved;
+    undo.disabled = clear.disabled = !payments.length || solved;
+    pay.disabled = !ready || solved || (!payments.length && target !== 0);
+    if (solved) items.forEach(control => { control.disabled = true; });
+  }
+  draw();
+  return;
  }
  if(round.kind==='word'){
   let pos=0;const target=Array.from(round.word),slots=el('div','','word-slots factory-slots');slots.dir='rtl';
@@ -346,3 +488,6 @@ function render(round){
 
 }
 const journey=bindJourney(game,board,render);next.addEventListener('click',journey.advance);
+
+board.querySelector('[data-level-menu]').addEventListener('click', stopSpeech);
+window.addEventListener('pagehide', stopSpeech);

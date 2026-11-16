@@ -1,6 +1,7 @@
+import {watchInstructionAudio} from './game-audio.js?v=6';
 import {driveAudioSource,repairedPartialClips} from './vowel-audio-routing.js?v=2';
 import {pronunciation} from './arabic-pronunciation.js?v=1';
-import {bindJourney, shuffle,totalStars} from './game-progress.js?v=14';
+import {bindJourney, shuffle,totalStars} from './game-progress.js?v=15';
 
 const data = JSON.parse(document.querySelector('#drive-data').textContent);
 const board = document.querySelector('[data-drive]');
@@ -31,6 +32,7 @@ let selectedLane = 1;
 let steeringPointer = null;
 const audio = new Audio();
 audio.preload = 'none';
+watchInstructionAudio(audio);
 let playback = 0;
 let driveTimer;
 const routeMeter=document.createElement('div');routeMeter.className='drive-route-meter';routeMeter.setAttribute('aria-label',tr('تقدم الرحلة','Journey progress'));scene.before(routeMeter);
@@ -54,7 +56,7 @@ function showVisual(round){
   const position=parts.findIndex(part=>part.startsWith(base)&&part.includes(vowels[round.vowel][0]));
   drivePrompt.textContent=round.mode==='missing'?tr('اختر الحركة الناقصة: ','Choose the missing vowel: '):tr('اختر حركة الحرف المحدد: ','Choose the marked letter’s vowel: ');
   const word=document.createElement('span');word.lang='ar';word.dir='rtl';
-  parts.forEach((part,i)=>{if(i!==position){word.append(document.createTextNode(part));return}const marked=document.createElement('mark');marked.textContent=round.mode==='missing'?part.replace(vowels[round.vowel][0],'◌'):part;word.append(marked)});
+  parts.forEach((part,i)=>{if(i!==position){word.append(document.createTextNode(part));return}const marked=document.createElement('mark');marked.textContent=round.mode==='missing'?part.replace(vowels[round.vowel][0],''):part;word.append(marked)});
   drivePrompt.append(word);
 }
 async function hear(){
@@ -134,8 +136,12 @@ function choose(button, lane, vowel) {
   selectLane(lane);
   gates.querySelectorAll('[data-result]').forEach((gate) => delete gate.dataset.result);
 
+  window.clearTimeout(driveTimer);
+  delete scene.dataset.driveState;
   if (vowel !== target.vowel) {
     button.dataset.result = 'wrong';
+    scene.dataset.driveState = 'blocked';
+    driveTimer = window.setTimeout(() => { delete scene.dataset.driveState; }, 280);
     feedback.textContent = isApproved(target)?tr('جرّب بابًا آخر. يمكنك سماع الحرف مرة ثانية.', 'Try another gate. You can listen again.'):tr('جرّب بابًا آخر. انظر إلى حركة الحرف الملوّن.', 'Try another gate. Look at the highlighted letter.');
     feedback.dataset.state='wrong';
     journey.mistake();
@@ -163,11 +169,14 @@ function choose(button, lane, vowel) {
   feedback.replaceChildren(tr('أحسنت! ', 'Well done! '), sound, tr(' مثل ', ' as in '), word);
   next.textContent = journey.nextLabel();
   next.hidden = false;
-  driveTimer = window.setTimeout(() => {
-    scene.dataset.driveState = 'pass';
-  }, 240);
+  const track = scene.getBoundingClientRect();
+  const gate = button.getBoundingClientRect();
+  scene.style.setProperty('--gate-x', (gate.left + gate.width / 2 - track.left) / track.width * 100 + '%');
+  scene.style.setProperty('--gate-y', (gate.top + gate.height * .72 - track.top) / track.height * 100 + '%');
+  scene.dataset.driveState = 'pass';
   drawRoute(true);
   journey.solve();
+  journey.effect('drive');
 }
 
 function renderRound(round) {

@@ -1,5 +1,7 @@
+import {renderSpaceMission} from './space-mission.js?v=1';
+import {stopSpeech} from './game-voice.js?v=1';
 import {createIllustration, illustrate} from './learning-art.js?v=2';
-import {bindJourney,shuffle} from './game-progress.js?v=14';
+import {bindJourney,shuffle} from './game-progress.js?v=15';
 const game=JSON.parse(document.getElementById('game-data').textContent), ar=game.lang==='ar', tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'), cue=board.querySelector('[data-cue]'), options=board.querySelector('[data-options]'), feedback=board.querySelector('[data-feedback]'), next=board.querySelector('[data-next]');
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return illustrate(n,txt)};
@@ -26,11 +28,17 @@ const geoShapes={'🔺':['polygon','60,13 108,102 12,102','#f18a9e'],'🟦':['re
 function engineeringShape(value){const data=geoShapes[value];if(!data)return null;const [kind,coords,color]=data,ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),shape=document.createElementNS(ns,kind);svg.setAttribute('viewBox','0 0 120 120');svg.setAttribute('class','geo-art');svg.setAttribute('aria-hidden','true');const attrs=kind==='polygon'?{points:coords}:kind==='rect'?{x:coords[0],y:coords[1],width:coords[2],height:coords[3]}:{cx:coords[0],cy:coords[1],r:coords[2]};for(const [k,v] of Object.entries({...attrs,fill:color,stroke:'#51416e','stroke-width':3,'stroke-linejoin':'round'}))shape.setAttribute(k,v);svg.append(shape);return svg}
 function geoTile(node,value){const art=engineeringShape(value);if(art){node.replaceChildren(art);node.classList.add('geo-tile');node.setAttribute('aria-label',value)}return node}
 function render(round){
+ stopSpeech();
  const label=journey.roundLabel();board.querySelector('[data-progress]').textContent=label;const meter=board.querySelector('[data-visual-round-meter]');const numbers=label.match(/\d+/g)?.map(Number);if(meter&&numbers?.length>=3){meter.max=numbers[2];meter.value=Math.max(0,numbers[1]-1)}board.querySelector('[data-prompt]').textContent=round.prompt;
  cue.replaceChildren();options.replaceChildren();options.dataset.columns='1';feedback.textContent='';delete feedback.dataset.state;next.hidden=true;next.textContent=journey.nextLabel();let solved=false;
  const say=(t,state)=>{feedback.textContent=t;feedback.dataset.state=state||''};
  const wrong=()=>{if(!solved){journey.mistake();say(tr('جرّب مرة أخرى.','Try again.'),'wrong')}};
  const done=()=>{if(solved)return;solved=true;journey.solve();const meter=board.querySelector('[data-visual-round-meter]');if(meter)meter.value=Math.min(meter.max,meter.value+1);say(round.explanation??tr('أحسنت! أكملت الجولة.','Well done! Round complete.'),'correct');next.hidden=false};
+ if (round.kind === 'space-mission') {
+   board.dataset.discovery = 'space';
+   renderSpaceMission(round, {cue, options, journey, el, btn, tr, wrong, done});
+   return;
+ }
  const group=el('div','','new-controls');options.append(group);if(game.id==='planet-engineer'){board.dataset.discovery='engineering';}if(game.id==='space-journey'){board.dataset.discovery='space';const index=(numbers?.[0]||1)-1;cue.append(spaceScene(spaceTopics[index]||'rocket'));}
  if(round.kind==='quiz'||round.kind==='pattern'){
   if(round.kind==='pattern'){
@@ -55,3 +63,6 @@ function render(round){
  }
 }
 const journey=bindJourney(game,board,render);next.addEventListener('click',journey.advance);
+
+board.querySelector('[data-level-menu]').addEventListener('click', stopSpeech);
+window.addEventListener('pagehide', stopSpeech);

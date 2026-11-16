@@ -1,0 +1,26 @@
+{
+  "synthesis": "Piper 1.4.2",
+  "ar": {
+    "voice": "ar_JO-kareem-medium",
+    "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/ar/ar_JO/kareem/medium"
+  },
+  "en": {
+    "voice": "en_US-libritts_r-medium",
+    "speaker": 0,
+    "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/libritts_r/medium",
+    "dataset": "LibriTTS-R, OpenSLR 141",
+    "license": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "script": {
+    "ar": {
+      "ice": "ضَعْ قِطْعَةَ ثَلْجٍ فِي كُلِّ كُوب. تَوَقَّعْ أَيَّ القِطْعَتَيْنِ تَذُوبُ أَوَّلًا. ثُمَّ شَغِّلِ المُؤَقِّت.",
+      "shop": "ضَعِ المُشْتَرَيَاتِ فِي السَّلَّة. اِحْسِبِ السِّعْرَ ثُمَّ ادْفَعْ بِالعُمُلَات.",
+      "space": "اِخْتَرِ المَسَارَ الَّذِي يَصِلُ إِلَى المَحَطَّة، فِي الوَقْتِ المُحَدَّد وَضِمْنَ الوُقُودِ المُتَاح."
+    },
+    "en": {
+      "ice": "Place one ice cube in each cup. Predict which cube will melt first. Then start the timer.",
+      "shop": "Put the items in the basket, work out the total, and pay with your coins.",
+      "space": "Choose a route that reaches the station within the time limit and the fuel you have."
+    }
+  }
+}
