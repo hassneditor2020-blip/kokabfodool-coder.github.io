@@ -1,3 +1,5 @@
+import {audioPreferences, listenToAudioPreferences, setAudioPreference} from './audio-settings.js?v=1';
+
 const sounds = {
   correct: [[523, 0, .12], [784, .09, .18]],
   wrong: [[392, 0, .14], [330, .11, .18]],
@@ -11,7 +13,6 @@ const sounds = {
   launch: [[220, 0, .20], [330, .12, .20], [440, .25, .22]],
   arrive: [[523, 0, .13], [659, .10, .14], [880, .19, .23]],
 };
-const preferenceKey = 'fudool-game-sound';
 const instructionSources = new Set();
 const observedPlayers = new WeakSet();
 const instructionListeners = new Set();
@@ -23,9 +24,12 @@ export function setInstructionPlaying(source, playing) {
   for (const listener of instructionListeners) listener();
 }
 
-export function watchInstructionAudio(player) {
+export function watchInstructionAudio(player, strength = 1) {
   if (observedPlayers.has(player)) return;
   observedPlayers.add(player);
+  const applyVolume = () => { player.volume = strength * audioPreferences().voice / 100; };
+  applyVolume();
+  listenToAudioPreferences(applyVolume);
   player.addEventListener('playing', () => setInstructionPlaying(player, true));
   for (const event of ['pause', 'ended', 'error', 'emptied']) {
     player.addEventListener(event, () => setInstructionPlaying(player, false));
@@ -34,21 +38,22 @@ export function watchInstructionAudio(player) {
 
 export function bindGameAudio(button) {
   const Audio = window.AudioContext ?? window.webkitAudioContext;
-  if (!Audio || !button) return () => {};
+  if (!Audio) return () => {};
   let context;
   let output;
-  let enabled = true;
   let request = 0;
-  try { enabled = localStorage.getItem(preferenceKey) !== 'off'; } catch {}
 
   function mix() {
-    const gain = !enabled ? 0 : instructionSources.size ? .19 : 1;
+    const gain = audioPreferences().effects / 100 * (instructionSources.size ? .19 : 1);
     output?.gain.setTargetAtTime(gain, context.currentTime, .028);
   }
 
   function updateButton() {
-    button.setAttribute('aria-pressed', String(enabled));
-    button.querySelector('[data-sound-icon]').textContent = enabled ? '🔊' : '🔇';
+    if (button) {
+      const enabled = audioPreferences().effects > 0;
+      button.setAttribute('aria-pressed', String(enabled));
+      button.querySelector('[data-sound-icon]').textContent = enabled ? '🔊' : '🔇';
+    }
     mix();
   }
 
@@ -71,18 +76,18 @@ export function bindGameAudio(button) {
 
   async function play(sound, won = false) {
     const notes = sounds[sound];
-    if (!enabled || !notes) return;
+    if (!audioPreferences().effects || !notes) return;
     const id = ++request;
     try {
       if (!context) {
         context = new Audio();
         output = context.createGain();
-        output.gain.value = instructionSources.size ? .19 : 1;
+        output.gain.value = audioPreferences().effects / 100 * (instructionSources.size ? .19 : 1);
         output.connect(context.destination);
         instructionListeners.add(mix);
       }
       if (context.state !== 'running') await context.resume();
-      if (!enabled || id !== request || context.state !== 'running') return;
+      if (!audioPreferences().effects || id !== request || context.state !== 'running') return;
       const start = context.currentTime + .015;
       schedule(notes, start, sound === 'correct' || sound === 'wrong' ? .07 : .048);
       if (won) schedule(sounds.win, start + .27, .065);
@@ -91,14 +96,16 @@ export function bindGameAudio(button) {
     }
   }
 
-  button.addEventListener('click', () => {
-    enabled = !enabled;
-    request++;
-    try { localStorage.setItem(preferenceKey, enabled ? 'on' : 'off'); } catch {}
-    updateButton();
-    if (enabled) play('correct');
-  });
-  button.hidden = false;
+  if (button) {
+    button.addEventListener('click', () => {
+      const {effects, lastEffects} = audioPreferences();
+      request++;
+      setAudioPreference('effects', effects ? 0 : lastEffects);
+      if (!effects) play('correct');
+    });
+    button.hidden = false;
+  }
+  listenToAudioPreferences(updateButton);
   updateButton();
   return play;
 }

@@ -1,6 +1,6 @@
-import {instructionButton, readInstruction, readOrder, stopSpeech} from './game-voice.js?v=1';
+import {instructionButton, readInstruction, readOrder, stopSpeech} from './game-voice.js?v=2';
 import {illustrate} from './learning-art.js?v=2';
-import {bindJourney,shuffle} from './game-progress.js?v=15';
+import {bindJourney,shuffle} from './game-progress.js?v=16';
 const game=JSON.parse(document.getElementById('game-data').textContent), ar=game.lang==='ar', tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'), cue=board.querySelector('[data-cue]'), options=board.querySelector('[data-options]'), feedback=board.querySelector('[data-feedback]'), next=board.querySelector('[data-next]');
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return illustrate(n,txt)};

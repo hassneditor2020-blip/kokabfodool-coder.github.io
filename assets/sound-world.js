@@ -1,8 +1,9 @@
+import {watchInstructionAudio} from './game-audio.js?v=7';
 import {createIllustration} from './learning-art.js?v=2';
-import {bindJourney,shuffle} from './game-progress.js?v=15';
+import {bindJourney,shuffle} from './game-progress.js?v=16';
 const game=JSON.parse(document.querySelector('#game-data').textContent),ar=game.lang==='ar',tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'),cue=board.querySelector('[data-cue]'),options=board.querySelector('[data-options]'),prompt=board.querySelector('[data-prompt]'),feedback=board.querySelector('[data-feedback]'),next=board.querySelector('[data-next]'),progress=board.querySelector('[data-progress]');
-const audio=new Audio();audio.preload='none';audio.volume=.7;
+const audio=new Audio();audio.preload='none';watchInstructionAudio(audio, .7);
 let serial=0;
 function stop(){serial++;audio.pause();audio.currentTime=0;audio.onended=null;audio.onerror=null;audio.ontimeupdate=null;}
 const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return n};

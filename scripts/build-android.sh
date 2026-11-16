@@ -28,15 +28,27 @@ export FUDOOL_STORE_PASSWORD FUDOOL_KEY_PASSWORD
 for mode in unified; do
   W="$WORK/$mode";mkdir -p "$W/res/drawable" "$W/classes" "$W/dex" "$W/assets"
   cp assets/app-icon-512.png "$W/res/drawable/app_icon.png"
-  # All assets are bundled; external HTTPS links use Android ACTION_VIEW, not the app network.
-  permission=""
+  # Bundled play remains offline. The optional parent account enables only its Firebase endpoints.
+  permission=$(python3 - <<'PY_CONFIG'
+import json
+import re
+from pathlib import Path
+
+config = json.loads(Path('assets/parent-backup-config.json').read_text())
+if config:
+    assert re.fullmatch(r'[a-z][a-z0-9-]{4,28}[a-z0-9]', config['projectId'])
+    assert re.fullmatch(r'AIza[a-zA-Z0-9_-]{30,45}', config['apiKey'])
+    print('<uses-permission android:name="android.permission.INTERNET"/>')
+PY_CONFIG
+)
   mkdir -p "$W/res/values" "$W/res/values-ar"
   printf '%s\n' '<resources><string name="app_name">Kokab Fodool</string></resources>' > "$W/res/values/app_name.xml"
   printf '%s\n' '<resources><string name="app_name">كوكب فضول</string></resources>' > "$W/res/values-ar/app_name.xml"
   cat > "$W/AndroidManifest.xml" <<EOF
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="67" android:versionName="6.6.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="68" android:versionName="6.7.0">
 <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="32"/>
 $permission
+<queries><intent><action android:name="android.intent.action.TTS_SERVICE"/></intent></queries>
 <application android:label="@string/app_name" android:icon="@drawable/app_icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:usesCleartextTraffic="false">
 <activity android:name="com.kokabfodool.shell.MainActivity" android:exported="true" android:configChanges="orientation|screenSize|keyboardHidden">
 <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
@@ -55,7 +67,7 @@ print('Bundled',len(pack['files']),'files')
 PY
   "$BT/aapt2" compile --dir "$W/res" -o "$W/res.zip"
   "$BT/aapt2" link -o "$W/base.apk" -I "$PLATFORM" --manifest "$W/AndroidManifest.xml" -A "$W/assets" "$W/res.zip"
-  javac -source 8 -target 8 -classpath "$PLATFORM" -d "$W/classes" android-app/MainActivity.java
+  javac -source 8 -target 8 -classpath "$PLATFORM" -d "$W/classes" android-app/*.java
   "$BT/d8" --lib "$PLATFORM" --min-api 23 --output "$W/dex" $(find "$W/classes" -name '*.class')
   (cd "$W/dex"; zip -q "$W/base.apk" classes.dex)
   "$BT/zipalign" -f 4 "$W/base.apk" "$W/aligned.apk"
@@ -92,8 +104,8 @@ with zipfile.ZipFile(apk) as archive:
         assert archive.read(name) == source, name
 release = {'unified': {
     'file': apk.name,
-    'version': '6.6.0',
-    'versionCode': 67,
+    'version': '6.7.0',
+    'versionCode': 68,
     'bytes': apk.stat().st_size,
     'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'certificate_sha256': (output / 'unified-certificate.txt').read_text().strip(),

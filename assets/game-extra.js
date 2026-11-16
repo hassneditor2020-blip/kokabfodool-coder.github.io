@@ -1,11 +1,11 @@
 import {vowelClipId} from './vowel-audio-review.js?v=2';
-import {playRecording, speak, stopSpeech, tones} from './game-voice.js?v=1';
-import {renderIceExperiment} from './ice-experiment.js?v=1';
-export {playRecording, speak, stopSpeech} from './game-voice.js?v=1';
+import {playRecording, speak, stopSpeech, tones} from './game-voice.js?v=2';
+import {renderIceExperiment} from './ice-experiment.js?v=2';
+export {playRecording, speak, stopSpeech} from './game-voice.js?v=2';
 import {drawGuide,evaluateTrace} from './trace-assessment.js?v=3';
 import {drawWritingReview, startingMarker} from './writing-review.js?v=1';
 import {createIllustration,illustrate} from './learning-art.js?v=2';
-import {shuffle} from './game-progress.js?v=15';
+import {shuffle} from './game-progress.js?v=16';
 const ar=document.documentElement.lang==='ar';
 const tr=(a,b)=>ar?a:b;
 const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};

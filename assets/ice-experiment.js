@@ -1,4 +1,4 @@
-import {instructionButton, readInstruction, stopSpeech} from './game-voice.js?v=1';
+import {instructionButton, readInstruction, stopSpeech} from './game-voice.js?v=2';
 
 const ar = document.documentElement.lang === 'ar';
 const tr = (arabic, english) => ar ? arabic : english;

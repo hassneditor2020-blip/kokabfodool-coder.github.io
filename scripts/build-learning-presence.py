@@ -415,7 +415,11 @@ def app_details(text, lang, version, release_date):
                '</h2><div class="app-device-grid">' + ''.join(screens) + '</div></section>') if screens else ''
     notes = '<section><h2>' + tr(lang, 'سجل التحديثات', 'Release notes') + '</h2><ul>'
     notes += '<li><bdi>' + version + '</bdi> · <time datetime="' + release_date + '">' + date + '</time> · '
-    notes += tr(lang, 'توحيد الاسم والروابط التعليمية في واجهة الموقع والتطبيق.', 'Brand name and education links aligned across the site and app.') + '</li>'
+    notes += tr(lang, 'مستويات للصوت واسم للاعب وتشجيع شخصي ونقل التقدّم بملف قابل للاستعادة.',
+                'Separate audio levels, a player nickname, personal encouragement and a transferable progress file.') + '</li>'
+    notes += '<li><bdi>6.6.0</bdi> · ' + tr(
+        lang, 'توحيد الاسم والروابط التعليمية في واجهة الموقع والتطبيق.',
+        'Brand name and education links aligned across the site and app.') + '</li>'
     notes += '<li><bdi>6.5.0</bdi> · ' + tr(
         lang, 'تجربة الثلج ومسار السيارة والإملاء ومطابقة الذاكرة وفواتير المتجر ومهام الفضاء.',
         'Melting ice, steering, dictation, memory matching, market receipts and space missions.') + '</li></ul></section>'

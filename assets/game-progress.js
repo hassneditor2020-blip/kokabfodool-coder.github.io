@@ -1,8 +1,9 @@
-import {activeProfile,prefix} from './profile-state.js?v=1';
+import {activeProfile,prefix} from './profile-state.js?v=2';
 import {setupWorld,updateMap,decorateLevel,renderTrailStage,celebrate,enhanceRewards} from './reward-worlds.js?v=3';
 import {createIllustration} from './learning-art.js?v=2';
-import { bindGameAudio } from './game-audio.js?v=6';
-import {ageGroups,ageLabel,gameCounts,pathsForGame,recommendedAge,includesLevel,nextPathLevel} from './game-age-paths.js?v=5';
+import {bindGameAudio} from './game-audio.js?v=7';
+import {speak, stopSpeech} from './game-voice.js?v=2';
+import {ageGroups,ageLabel,gameCounts,pathsForGame,recommendedAge,includesLevel,nextPathLevel} from './game-age-paths.js?v=6';
 
 const language = document.documentElement.lang;
 const tr = (ar, en) => language === 'ar' ? ar : en;
@@ -96,7 +97,7 @@ function renderRewards(rewards) {
 
 const rewards = document.querySelector('[data-game-rewards]');
 const cert=document.querySelector('[data-certificate]');
-if(cert)cert.addEventListener('click',()=>{const total=totalStars();const section=document.createElement('section');section.className='fudool-certificate';const h=document.createElement('h1');h.textContent=tr('شهادة إنجاز من كوكب فضول','Kawkab Fudool Achievement Certificate');const p=document.createElement('p');p.textContent=tr(`أحسنت يا مستكشفنا الصغير! جمعت ${total} نجمة.`,`Well done, little explorer! You earned ${total} stars.`);const img=document.createElement('img');img.src='/assets/lumaa.webp';img.alt='';section.append(img,h,p);document.body.append(section);const clean=()=>section.remove();window.addEventListener('afterprint',clean,{once:true});window.print();});
+if(cert)cert.addEventListener('click',()=>{const total=totalStars();const section=document.createElement('section');section.className='fudool-certificate';const h=document.createElement('h1');h.textContent=tr('شهادة إنجاز من كوكب فضول','Kawkab Fudool Achievement Certificate');const p=document.createElement('p');const name=activeProfile().name||tr('مستكشفنا الصغير','little explorer');p.textContent=tr(`أحسنت يا ${name}! جمعت ${total} نجمة.`,`Well done, ${name}! You earned ${total} stars.`);const img=document.createElement('img');img.src='/assets/lumaa.webp';img.alt='';section.append(img,h,p);document.body.append(section);const clean=()=>section.remove();window.addEventListener('afterprint',clean,{once:true});window.print();});
 if (rewards) {
   renderRewards(rewards);
   window.addEventListener('pageshow', () => renderRewards(rewards));
@@ -162,6 +163,8 @@ export function bindJourney({id, levels}, board, renderRound) {
   let solved = false;
   let roundOrder = null;
   let previousTotal = totalStars();
+  let encouragement;
+  let encouraged = false;
   setupWorld(id,board,map,result);
 
   function currentPath(state) {
@@ -251,6 +254,7 @@ export function bindJourney({id, levels}, board, renderRound) {
   }
 
   function showMap(focus = true) {
+    if (focus) stopSpeech();
     const state = progress(id, levels.length);
     const {scores, checkpoints} = state;
     const activePath = paths.length ? currentPath(state) : undefined;
@@ -298,6 +302,7 @@ export function bindJourney({id, levels}, board, renderRound) {
   }
 
   function playRound() {
+    if (encouragement) encouragement.hidden = true;
     solved = false;
     show(board, false);
     renderRound(levels[level].rounds[roundOrder?.[round] ?? round]);
@@ -306,6 +311,7 @@ export function bindJourney({id, levels}, board, renderRound) {
 
   function start(index, replay = false) {
     level = index;
+    encouraged = false;
     previousTotal = totalStars();
     const length=levels[level].rounds.length;
     const previous=progress(id, levels.length);
@@ -331,6 +337,23 @@ export function bindJourney({id, levels}, board, renderRound) {
     return mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
   }
 
+  function encourage(retry) {
+    const player = activeProfile().name;
+    if (!player || encouraged) return;
+    encouraged = true;
+    if (!encouragement) {
+      encouragement = document.createElement('p');
+      encouragement.className = 'player-encouragement';
+      encouragement.setAttribute('role', 'status');
+      board.querySelector('h2').after(encouragement);
+    }
+    const text = retry ? tr(`خذ وقتك يا ${player}. جرّب مرة أخرى!`, `Take your time, ${player}. Try again!`)
+      : tr(`عمل رائع يا ${player}! واصل اللعب.`, `Nice work, ${player}! Keep going.`);
+    encouragement.textContent = text;
+    encouragement.hidden = false;
+    speak(text, language, undefined, {localOnly: true});
+  }
+
   function showResult() {
     const {scores} = progress(id, levels.length);
     const path = pathForLevel(level);
@@ -345,9 +368,15 @@ export function bindJourney({id, levels}, board, renderRound) {
         : tr(`أكملت المستوى ${level + 1}!`, `Level ${level + 1} complete!`);
     result.querySelector('[data-result-stars]').textContent = starText(score());
     const best = scores[level];
-    result.querySelector('[data-result-message]').textContent = best > score()
+    const player = activeProfile().name;
+    const congratulations = player ? tr(`أحسنت يا ${player}!`, `Well done, ${player}!`)
+      : tr('أحسنت!', 'Well done!');
+    const resultMessage = best > score()
       ? tr(`أفضل نتيجة لك: ${starText(best)}`, `Your best: ${starText(best)}`)
-      : tr('أحسنت! كل جولة تجعلك أفضل.', 'Well done! Keep exploring.');
+      : tr('كل جولة تجعلك أفضل.', 'Keep exploring.');
+    result.querySelector('[data-result-message]').textContent =
+      player || best <= score() ? congratulations + ' ' + resultMessage : resultMessage;
+    if (player) speak(congratulations, language, undefined, {localOnly: true});
     const badges = result.querySelector('[data-result-badges]');
     const unlocked = starBadges.filter(([threshold]) => total >= threshold).at(-1);
     badges.hidden = !unlocked;
@@ -371,6 +400,7 @@ export function bindJourney({id, levels}, board, renderRound) {
   document.querySelectorAll('[data-level-menu]').forEach((button) => button.addEventListener('click', () => showMap()));
   nextLevel.addEventListener('click', () => start(level + 1));
   result.querySelector('[data-level-replay]').addEventListener('click', () => start(level, true));
+  window.addEventListener('pagehide', stopSpeech);
   window.addEventListener('pageshow', (event) => { if (event.persisted && !map.hidden) showMap(false); });
   window.addEventListener('storage', () => { if (!map.hidden) showMap(false); });
   const requested = Number(query.get('level')) - 1;
@@ -407,13 +437,16 @@ export function bindJourney({id, levels}, board, renderRound) {
         state.lastLevel = level;
       });
       playSound('wrong');
+      encourage(true);
     },
     correct: () => playSound('correct'),
     effect: cue => playSound(cue),
     solve() {
       if (solved) return;
       solved = true;
-      playSound('correct', round + 1 === levels[level].rounds.length);
+      const finished = round + 1 === levels[level].rounds.length;
+      playSound('correct', finished);
+      if (!finished) encourage(false);
       save(id, levels.length, (state) => {
         const {scores, checkpoints} = state;
         state.lastPlayed = Date.now();

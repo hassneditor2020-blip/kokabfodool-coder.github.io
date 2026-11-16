@@ -9,10 +9,10 @@ mkdir -p build/v6-screenshots
 adb shell wm size 390x844
 adb shell wm density 160
 adb shell input keyevent 82
-adb install downloads/apps/Kokab-Fodool-V6.5.apk
+adb install downloads/apps/Kokab-Fodool-V6.6.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=67'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.6.0'
+adb shell dumpsys package "$package" | grep -F 'versionCode=68'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.7.0'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -82,6 +82,16 @@ raise SystemExit('Offline Android view did not display: ' + label)
 PY
 }
 
+find_label 'الإعدادات' yes
+find_label 'اسم اللاعب' no
+find_label 'مستويات الصوت' no
+find_label 'مثل النجم الصغير' yes
+adb shell input text 'Fudool'
+find_label 'حفظ الاسم' yes
+find_label 'حُفظ اسم اللاعب' no
+adb exec-out screencap -p > build/v6-screenshots/android-offline-settings.png
+find_label 'الرئيسية' yes
+find_label 'أهلًا، Fudool!' no
 find_label 'الألعاب' yes
 find_label 'سيارة الحركات' yes
 find_label 'ابدأ المستوى 1' no
@@ -131,4 +141,4 @@ find_label 'تُقبل الكتابة عند تجاوز 75%' no
 find_label 'اسمع الكلمة' yes
 find_label 'استمع ببطء' yes
 adb exec-out screencap -p > build/v6-screenshots/android-offline-writing.png
-echo 'PASS Android 6.6.0 upgrades from 6.5 and opens dictation, memory and age-based games in airplane mode.'
+echo 'PASS Android 6.7.0 upgrades from 6.6 and opens settings, dictation, memory and age-based games in airplane mode.'

@@ -1,0 +1,25 @@
+.app-settings{max-width:760px;padding-block-end:4.3rem}
+.app-settings .app-top{margin-block-end:1rem}
+.settings-intro{margin-block:0 1.25rem}
+.settings-intro h1{margin:0;font-size:clamp(1.65rem,5vw,2.45rem)}
+.settings-intro p,.settings-note{margin-block:.25rem .75rem;color:#5e5176;line-height:1.55}
+.settings-card{margin-block:1rem;padding:clamp(1rem,4vw,1.6rem);border:1px solid #dfd0f5;border-radius:22px;background:#fff;box-shadow:0 4px 0 #e8def6}
+.settings-card h2{margin-block:0 .45rem;font-size:clamp(1.18rem,4vw,1.45rem)}
+.settings-card h3{margin-block:.75rem .3rem;font-size:1.08rem}
+.settings-card form{display:grid;gap:.65rem}
+.settings-card form[hidden],.settings-card [hidden]{display:none}
+.settings-card label:not(.settings-check){display:grid;gap:.3rem;font-weight:750}
+.settings-card input:not([type=range],[type=checkbox]),.settings-card select{width:100%;min-height:44px;border:1px solid #b8a6dc;border-radius:12px;padding:.48rem .65rem;background:#fcfaff;color:#30234e;font:inherit;box-sizing:border-box}
+.settings-card input[type=range]{width:100%;min-height:42px;accent-color:#6946bb;margin:0}
+.settings-range-title,.settings-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem}
+.settings-actions{justify-content:flex-start}
+.settings-actions .button{margin:0;min-height:44px;text-align:center}
+.settings-card .settings-range-title output{color:#5a3bb1;font-weight:800;font-variant-numeric:tabular-nums}
+.settings-alert{color:#46357b;font-size:.89rem;font-weight:700;margin:0}
+.settings-alert:not(:empty){margin-block-start:.6rem}
+.settings-check{display:flex;align-items:flex-start;gap:.55rem;color:#4c3d6b}
+.settings-check input{inline-size:1.13rem;block-size:1.13rem;flex:none;margin-block-start:.23rem;accent-color:#6946bb}
+.settings-profile-link{margin-inline-start:auto}
+@media(max-width:450px){.settings-profile-link{margin-inline-start:0}.app-settings .app-top-actions{gap:.4rem}.app-settings .app-top{align-items:flex-start}}
+.settings-card [data-parent-backup]{border-block-start:1px solid #e5d9f4;margin-block-start:1.2rem;padding-block-start:.55rem}
+.settings-card [data-parent-tools] .settings-actions{margin-block-start:.65rem}

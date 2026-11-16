@@ -1,6 +1,6 @@
 import {worldCover} from './world-art.js?v=1';
-import {profiles,activeProfile,switchProfile,addProfile,avatars,scoresFor,read} from './profile-state.js?v=1';
-import {ageGroups,ageLabel,agePreferenceKey,gameCounts,pathsForGame} from './game-age-paths.js?v=5';
+import {profiles,activeProfile,switchProfile,addProfile,avatars,scoresFor,read} from './profile-state.js?v=2';
+import {ageGroups,ageLabel,agePreferenceKey,gameCounts,pathsForGame} from './game-age-paths.js?v=6';
 
 const games=[["vowel-drive","سيارة الحركات","Arabic Vowel Drive","letters","🚗","mint","car"],["letter-match","صِل الحرف بالصورة","Match Letters to Pictures","letters","بَ","lilac","book"],["letter-hunt","اكتشف الحرف","Arabic Letter Hunt","letters","بَ","lilac","pencil"],["counting","عدّ واختر","Count & Pick","math","123","sun","apple"],["english-abc","العب مع ABC","Play with ABC","letters","ABC","sky","book"],["memory","ذاكرة فضول","Fudool Memory","puzzles","⭐","sun","star"],["trace","اكتب مع لُمعة","Write with Lumaa","letters","✏","lilac","pencil"],["robo-lab","مختبر روبو","Robo Lab","puzzles","🤖","sky","robot"],["puzzle","بازل كوكب فضول","Fudool Puzzle","puzzles","🧩","mint","puzzle"],["sound-quiz","خمّن الصوت","Guess the Sound","puzzles","🎧","sky","headphones"],["fudool-shop","متجر فضول","Fudool Shop","math","🛒","mint","coin"],["word-factory","مصنع الكلمات","Word Factory","letters","ب","lilac","book"],["lumaa-clock","ساعة لُمعة","Lumaa’s Clock","math","🕒","sky","clock"],["code-robo","برمج روبو","Code Robo","puzzles","🤖","sky","robot"],["world-mishaal","حول العالم مع مشعال","Around the World","science","🌍","mint","globe"],["planet-engineer","مهندس الكوكب","Planet Engineer","math","🔶","sun","shapes-diamond"],["healthy-hero","بطل العادات الصحية","Healthy Habits Hero","science","🍎","mint","apple"],["space-journey","رحلة إلى الفضاء","Journey to Space","science","🚀","lilac","rocket"],["spot-differences","اكتشف الاختلافات","Spot the Differences","puzzles","🔍","sun","puzzle"],["grand-challenge","تحدي فضول الكبير","Fudool Grand Challenge","puzzles","🏆","sun","crown"]].map(([id,...info])=>[id,gameCounts.get(id),...info]);
 const ar=document.documentElement.lang==='ar',tr=(a,e)=>ar?a:e,pre=ar?'':'/en',profile=activeProfile(),root=document.querySelector('[data-app-dashboard]'),family=document.querySelector('[data-family-dashboard]');
@@ -9,6 +9,15 @@ const name=p=>p.name||tr('المستكشف الأول','First explorer');
 const image=(id,cls='')=>{const n=el('img','',cls);n.src='/assets/'+id+'.webp';n.alt='';n.loading='lazy';return n};
 function link(text,href,cls=''){const n=el('a',text,cls);n.href=href;return n}
 const entries=games.map(g=>({g,...scoresFor(g[0],g[1],profile.id)}));
+window.addEventListener('pageshow', event => {
+  if (!event.persisted) return;
+  const current = activeProfile();
+  if (current.id !== profile.id || current.name !== profile.name ||
+      entries.some(entry => {
+        const state = scoresFor(entry.g[0], entry.g[1], current.id);
+        return state.lastPlayed !== entry.lastPlayed || state.scores.some((n, i) => n !== entry.scores[i]);
+      })) location.reload();
+});
 const sum=a=>a.reduce((n,x)=>n+x,0),stars=sum(entries.map(e=>sum(e.scores))),completed=sum(entries.map(e=>e.scores.filter(Boolean).length));
 function stats(target){for(const [num,label] of [[stars,tr('نجمة','Stars')],[completed,tr('مستوى مكتمل','Levels done')],[entries.filter(e=>e.scores.some(Boolean)).length,tr('لعبة بدأت بها','Games explored')]]){const c=el('div','','app-stat');c.append(el('strong',String(num)),el('span',label));target.append(c)}}
 function profileList(target){for(const p of profiles()){const b=el('button','','app-profile-choice');b.type='button';b.setAttribute('aria-pressed',String(p.id===profile.id));b.append(image(p.avatar),el('span',name(p)));b.addEventListener('click',()=>{try{switchProfile(p.id);location.reload()}catch{alert(tr('تعذر تبديل الملف.','Could not switch profile.'))}});target.append(b)}}
