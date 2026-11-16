@@ -9,10 +9,10 @@ mkdir -p build/v6-screenshots
 adb shell wm size 390x844
 adb shell wm density 160
 adb shell input keyevent 82
-adb install downloads/apps/Kokab-Fodool-V6.4.apk
+adb install downloads/apps/Kokab-Fodool-V6.5.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=66'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.5.0'
+adb shell dumpsys package "$package" | grep -F 'versionCode=67'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.6.0'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -131,4 +131,4 @@ find_label 'تُقبل الكتابة عند تجاوز 75%' no
 find_label 'اسمع الكلمة' yes
 find_label 'استمع ببطء' yes
 adb exec-out screencap -p > build/v6-screenshots/android-offline-writing.png
-echo 'PASS Android 6.5.0 upgrades from 6.4 and opens dictation, memory and age-based games in airplane mode.'
+echo 'PASS Android 6.6.0 upgrades from 6.5 and opens dictation, memory and age-based games in airplane mode.'

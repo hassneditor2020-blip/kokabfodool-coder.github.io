@@ -59,7 +59,7 @@ for page_name in home_pages:
 
 integration='<link rel="manifest" href="/manifest.webmanifest"/>\n<link rel="apple-touch-icon" href="/assets/app-icon-192.png"/>\n<link rel="stylesheet" href="/assets/pwa.css"/>\n<script defer src="/assets/pwa.js"></script>\n'
 for p in root.rglob('index.html'):
-    if '.git' in p.parts:continue
+    if '.git' in p.parts or 'build' in p.parts:continue
     s=p.read_text()
     if 'assets/site.js' not in s or 'name="robots" content="noindex' in s or 'content="noindex' in s:continue
     if '/manifest.webmanifest' not in s:s=s.replace('</head>',integration+'</head>',1)
@@ -87,7 +87,7 @@ for p in sorted((root / 'games').glob('*/index.html')):
 home_counts = [len(level_counts), sum(level_counts.values()), round_count]
 age_style='<link rel="stylesheet" href="/assets/game-age-paths.css?v=2"/>\n'
 for p in root.rglob('index.html'):
-    if '.git' in p.parts:continue
+    if '.git' in p.parts or 'build' in p.parts:continue
     s=p.read_text()
     s=re.sub(r'(/assets/pwa\.(?:js|css))(?:\?v=\d+)?(?=["\'])',lambda m:m[1]+'?v=2',s)
     if re.fullmatch(r'(?:en/)?games/[^/]+/index\.html',p.as_posix()):
@@ -103,7 +103,7 @@ for p in root.rglob('index.html'):
         s=re.sub(r'(/assets/'+name+r'\.js\?v=)\d+',lambda m:m[1]+str(ver),s)
     p.write_text(s)
 # Pack includes the current canonical app/game pages, all local media and code required by the games.
-pages=['/','/en/','/games/','/en/games/','/app/','/en/app/','/play-app/','/en/play-app/','/app/family/','/en/app/family/','/offline/','/en/offline/','/grown-ups/','/en/grown-ups/','/episodes/','/en/episodes/','/privacy/','/en/privacy/']
+pages=['/','/en/','/games/','/en/games/','/app/','/en/app/','/play-app/','/en/play-app/','/app/family/','/en/app/family/','/offline/','/en/offline/','/grown-ups/','/en/grown-ups/','/episodes/','/en/episodes/','/privacy/','/en/privacy/','/terms/','/en/terms/','/faq/','/en/faq/']
 for prefix in ['', 'en/']:
     pages += ['/'+p.parent.as_posix()+'/' for p in (root/(prefix+'games')).glob('*/index.html')]
 assert len([x for x in pages if re.match(r'^/(?:en/)?games/[^/]+/$',x)])==40

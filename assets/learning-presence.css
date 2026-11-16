@@ -1,0 +1,38 @@
+.learning-document{max-width:870px;margin-inline:auto}
+.learning-document h2,.play-guide h2,.episode-objectives h2{margin-block:1.05rem .36rem;font-size:clamp(1.06rem,3vw,1.32rem)}
+.learning-document p,.play-guide p,.episode-objectives li{line-height:1.7}
+.learning-document .lead{font-size:1.08rem;color:var(--muted,#625477)}
+.learning-crosslinks{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-block:.7rem}
+.learning-crosslinks .button{min-height:44px;text-wrap:balance}
+.learning-crosslinks a:focus-visible,.play-guide a:focus-visible{outline:3px solid #6344b1;outline-offset:3px}
+.play-guide{margin-block:1.5rem;padding:clamp(.8rem,3vw,1.4rem);background:#fcfaff;border:1px solid #e4d9f3;border-radius:20px;color:#3f315d}
+.play-guide h2:first-child{margin-block-start:0}
+.play-guide ul,.episode-objectives ul{padding-inline-start:1.25rem;margin-block:.35rem .65rem}
+.play-guide li{margin-block:.35rem}
+.play-guide li strong{display:inline-block;margin-inline-end:.3rem}
+.episode-objectives{margin-block:.8rem}
+.episode-objectives .learning-crosslinks{align-items:stretch}
+.video-actions button[data-load-video]{min-height:44px}
+.video-note{font-size:.83rem;color:#544764;margin-block:.4rem 0;line-height:1.5}
+.app-device-gallery{margin-block:1.25rem}
+.app-device-gallery figure{margin:0;text-align:center;min-width:0}
+.app-device-gallery figure img{display:block;width:min(100%,240px);height:auto;margin:auto;border-radius:18px;border:1px solid #ddcbed}
+.app-device-grid{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(min(130px,100%),1fr))}
+.app-device-gallery figcaption{padding:.5rem;font-weight:750}
+
+.download-app-bubble{
+  position:fixed;z-index:16;inset-inline-end:.85rem;inset-block-end:calc(.85rem + env(safe-area-inset-bottom,0px));
+  min-block-size:44px;display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .78rem;
+  border:2px solid #e1d4fb;border-radius:999px;background:#4930a5;color:#fff;
+  box-shadow:0 4px 14px #2c1d6250;font-size:.86rem;font-weight:800;line-height:1.2;text-decoration:none
+}
+.download-app-bubble span{
+  width:1.35rem;height:1.35rem;display:grid;place-items:center;border-radius:50%;background:#ffffff26;
+  font-size:1.05rem;line-height:1
+}
+.download-app-bubble:hover{background:#3a258c;color:#fff}
+.download-app-bubble:focus-visible{outline:3px solid #4b2f9d;outline-offset:3px}
+.v5-body .download-app-bubble{inset-block-end:calc(94px + env(safe-area-inset-bottom,0px))}
+.premium-game-page{scroll-padding-block-end:62px}
+.fudool-android-shell .download-app-bubble{display:none}
+@media print{.download-app-bubble{display:none!important}}
