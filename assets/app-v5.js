@@ -1,6 +1,9 @@
+if (/FudoolAndroidUnified/.test(navigator.userAgent)) {
+  document.documentElement.classList.add('fudool-android-shell');
+}
 (()=>{"use strict";
 const ar=document.documentElement.lang==='ar',tr=(a,e)=>ar?a:e,pre=ar?'':'/en';
-const views=[...document.querySelectorAll('[data-v5-view]')],nav=[...document.querySelectorAll('.v5-nav a')],detail=document.querySelector('#v5-series-detail'),series=document.querySelector('#v5-series'),latest=document.querySelector('#v5-latest');
+const views=[...document.querySelectorAll('[data-v5-view]')],nav=[...document.querySelectorAll('.v5-nav a')],detail=document.querySelector('#v5-series-detail'),series=document.querySelector('#v5-series'),latest=document.querySelector('#v5-latest'),popular=document.querySelector('#v5-popular');
 const offline=location.hostname==='appassets.androidplatform.net'||/FudoolAndroidOffline|FudoolAndroidUnified/.test(navigator.userAgent),nativeApp=/FudoolAndroid/.test(navigator.userAgent);
 const config={'arabic-letters':['الحروف العربية','Arabic letters','letters.webp','letter-match',true],'arabic-numbers':['الأرقام العربية','Arabic numbers','numbers.webp','counting',true],'english-fun':['الإنجليزية مع لُمعة','English with Lumaa','english-round.webp','english-abc',true],'english-numbers':['الأرقام الإنجليزية مع لُمعة','English numbers with Lumaa','english-numbers-badge.webp','counting',true],mishal:['مغامرات مشعال','Mishaal adventures','mishal.webp','world-mishaal',false],robo:['واو! مع روبّو','Wow with Robo','robo.webp','robo-lab',false],guess:['خمّن مع فضول','Guess with Fudool','guess.webp','sound-quiz',false],'what-if':['ماذا لو؟','What if?','what-if-cover.webp','space-journey',false],'short-stories':['القصص التعليمية','Learning stories','stories-round.webp','memory',false]};
 const node=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el};
@@ -11,7 +14,7 @@ let promise;
 function catalog(){return promise||(promise=fetch('/assets/app-learning-v5.json',{cache:offline?'default':'no-cache'}).then(r=>{if(!r.ok)throw Error('catalog');return r.json()}).catch(e=>{promise=null;throw e}))}
 let token=0;
 function showSeries(id,slug){
- const current=++token,c=config[id];detail.hidden=false;series.hidden=true;latest.hidden=true;detail.replaceChildren();
+ const current=++token,c=config[id];detail.hidden=false;series.hidden=true;latest.hidden=true;if(popular)popular.hidden=true;detail.replaceChildren();
  detail.append(link(tr('كل السلاسل','All series'),'v5-text-button','#v5-watch'));
  const hero=node('div','v5-series-detail-hero'),copy=node('div');copy.append(node('h1','',c[ar?0:1]),node('p','',tr('شاهد الحلقات واختر نشاطك التالي.','Watch episodes and choose your next activity.')));hero.append(copy,image('/assets/'+c[2]));detail.append(hero);
  const holder=node('div','v5-detail-content');holder.append(node('p','app-note',tr('جاري تحميل الحلقات…','Loading episodes…')));detail.append(holder);

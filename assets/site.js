@@ -1,3 +1,7 @@
+if (/FudoolAndroidUnified/.test(navigator.userAgent)) {
+  document.documentElement.classList.add('fudool-android-shell');
+}
+
 const bySelector = (selector, root = document) => root.querySelector(selector);
 const menu = bySelector('.mobile-nav');
 menu.addEventListener('click', (event) => {
@@ -48,10 +52,10 @@ if (loader) {
   loader.hidden = false;
   loader.addEventListener('click', () => {
     const frame = document.createElement('iframe');
-    frame.src = 'https://www.youtube-nocookie.com/embed/' + loader.dataset.loadVideo;
+    frame.src = 'https://www.youtube-nocookie.com/embed/' + loader.dataset.loadVideo + '?autoplay=1&playsinline=1';
     frame.title = loader.dataset.videoTitle;
     frame.referrerPolicy = 'strict-origin-when-cross-origin';
-    frame.allow = 'encrypted-media; picture-in-picture; fullscreen';
+    frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     frame.allowFullscreen = true;
     bySelector('[data-player]').replaceChildren(frame);
     loader.hidden = true;
@@ -88,6 +92,15 @@ if (letterQuestion) {
 }
 
 document.addEventListener('click', (event) => {
+  const educationLink = event.target.closest('.learning-crosslinks a');
+  if (educationLink && /FudoolAndroidUnified/.test(navigator.userAgent)) {
+    const destination = new URL(educationLink.href);
+    if (!/^\/(?:en\/)?(?:games|app|privacy|terms|faq)(?:\/|$)/.test(destination.pathname)) {
+      event.preventDefault();
+      const website = 'https://kokabfodool.com' + destination.pathname + destination.search + destination.hash;
+      location.href = '/play-app/external/?url=' + encodeURIComponent(website);
+    }
+  }
   const link = event.target.closest('a[data-youtube]');
   if (link) document.dispatchEvent(new CustomEvent('fudool:youtube-click', {
     detail: { destination:link.dataset.youtube },

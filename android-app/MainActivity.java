@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
     }
     private boolean allowedPage(String p){
         if(p==null)return false;
-        return p.equals("/")||p.equals("/en/")||p.matches("^/(en/)?(play-app|games|app|privacy)(/.*)?$");
+        return p.equals("/")||p.equals("/en/")||p.matches("^/(en/)?(play-app|games|app|privacy|terms|faq)(/.*)?$");
     }
     private static WebResourceResponse error(int code,String message){
         return new WebResourceResponse("text/plain","UTF-8",code,message,Collections.emptyMap(),new ByteArrayInputStream(message.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
