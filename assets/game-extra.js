@@ -1,26 +1,14 @@
 import {vowelClipId} from './vowel-audio-review.js?v=2';
-import {sharedAudioSource} from './vowel-audio-routing.js?v=2';
-import {drawGuide,evaluateTrace} from './trace-assessment.js?v=2';
+import {playRecording, speak, stopSpeech, tones} from './game-voice.js?v=1';
+import {renderIceExperiment} from './ice-experiment.js?v=1';
+export {playRecording, speak, stopSpeech} from './game-voice.js?v=1';
+import {drawGuide,evaluateTrace} from './trace-assessment.js?v=3';
+import {drawWritingReview, startingMarker} from './writing-review.js?v=1';
 import {createIllustration,illustrate} from './learning-art.js?v=2';
-import {shuffle} from './game-progress.js?v=14';
+import {shuffle} from './game-progress.js?v=15';
 const ar=document.documentElement.lang==='ar';
 const tr=(a,b)=>ar?a:b;
 const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};
-let voiceToken=0, toneContext, recording;
-const activeTones=new Set();
-export function stopSpeech(){voiceToken++;recording?.pause();for(const tone of activeTones){try{tone.stop();}catch{}}activeTones.clear();if('speechSynthesis' in window)window.speechSynthesis.cancel();}
-export async function playRecording(src,fallback){stopSpeech();src=sharedAudioSource(src);if(!src){fallback?.();return false;}const token=voiceToken;recording??=new Audio();recording.src=src;try{await recording.play();return true;}catch{if(token===voiceToken)fallback?.();return false;}}
-export function speak(text,lang='ar',fallback){
-  stopSpeech();const token=voiceToken;
-  if(!('speechSynthesis' in window)){fallback?.();return false;}
-  const voices=speechSynthesis.getVoices(),language=lang.split('-')[0].toLowerCase(),voice=voices.find(v=>v.lang.toLowerCase()===lang.toLowerCase())||voices.find(v=>v.lang.toLowerCase().startsWith(language));
-  if(!voice){fallback?.();return false;}
-  const utterance=new SpeechSynthesisUtterance(text);utterance.lang=voice.lang||lang;utterance.rate=.76;if(voice)utterance.voice=voice;
-  utterance.onerror=()=>{if(token===voiceToken)fallback?.();};speechSynthesis.speak(utterance);return true;
-}
-export async function tones(n){
-  try{stopSpeech();const token=voiceToken;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;toneContext??=new AC();await toneContext.resume();if(token!==voiceToken)return false;const start=toneContext.currentTime+.05;for(let i=0;i<n;i++){const o=toneContext.createOscillator(),g=toneContext.createGain();o.frequency.value=660;g.gain.value=.07;o.connect(g).connect(toneContext.destination);o.start(start+i*.36);o.stop(start+i*.36+.18);activeTones.add(o);o.onended=()=>{activeTones.delete(o);o.disconnect();g.disconnect();};}return true;}catch{return false;}
-}
 export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}){
   const {kind}=round;let finished=false;
   const say=(text,state='')=>{feedback.textContent=text;feedback.dataset.state=state;};
@@ -57,6 +45,10 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
     const buttons=round.choices.map((v,i)=>makeOption(v,i===round.answer,round.explanation));options.dataset.columns=Math.min(4,round.choices.length);options.replaceChildren(...shuffle(buttons));const hint=button(tr('💡 تلميح','💡 Hint'),()=>{if(next.hidden){buttons[round.answer].dataset.hint='true';say(tr('جرّب الاختيار المضيء.','Try the highlighted choice.'));}},'button button-white');cue.append(hint);return;
   }
   options.dataset.columns='1';
+  if (kind === 'ice-experiment') {
+    renderIceExperiment(round, {cue, options, journey, button, done, wrong, say});
+    return;
+  }
   if(kind==='order'){
     const target=round.target;let pos=0;const seq=el('div','','extra-sequence');seq.dir=typeof target[0]==='number'||/^[A-Z]$/.test(target[0])?'ltr':'rtl';cue.append(illustrate(el('span',round.cue,'extra-cue'),round.cue),seq);
     const group=el('div','','extra-order');group.dir=seq.dir;options.append(group);
@@ -188,7 +180,9 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
       ? tr('اضغط بطاقات السماعة لتسمع الأصوات، ثم ابدأ المطابقة.', 'Tap the speaker cards to hear the sounds, then start matching.')
       : mode === 'word'
         ? tr('احفظ أماكن الصور وأسمائها ثم ابدأ المطابقة.', 'Remember where the pictures and words are, then start matching.')
-        : tr('احفظ أماكن الصور ثم ابدأ المطابقة.', 'Look at the pictures and remember their places.'), 'memory-instructions');
+        : mode === 'relation'
+          ? tr('احفظ أماكن كل شيئين يرتبطان معًا.', 'Remember the positions of the objects that work together.')
+          : tr('احفظ أماكن الصور ثم ابدأ المطابقة.', 'Look at the pictures and remember their places.'), 'memory-instructions');
     let first = null, busy = false, matched = 0, tries = 0;
     next.hidden = false;
     next.disabled = true;
@@ -205,15 +199,32 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
       const position = card.dataset.index;
       const item = deck[Number(position) - 1];
       const label = item.type === 'sound' ? tr('اسمع بطاقة الصوت', 'Play sound card')
-        : item.pair.name ?? tr('الصورة ' + (pairs.indexOf(item.pair) + 1), 'picture ' + (pairs.indexOf(item.pair) + 1));
+        : item.type === 'relation' ? item.pair.relatedName
+          : item.pair.name ?? tr('الصورة ' + (pairs.indexOf(item.pair) + 1), 'picture ' + (pairs.indexOf(item.pair) + 1));
+      const match = card.dataset.matched ? tr('، اكتمل الزوج', ', matched') : '';
       card.setAttribute('aria-label', visible
-        ? tr('البطاقة ' + position + '، ', 'Card ' + position + ', ') + label
+        ? tr('البطاقة ' + position + '، ', 'Card ' + position + ', ') + label + match
         : tr('بطاقة مغلقة ' + position, 'Hidden card ' + position));
     }
     function playSound(pair) {
       playRecording(pair.audio, () => say(tr('تعذّر تشغيل الصوت. جرّب البطاقة مجددًا.', 'The sound could not play. Try the card again.')));
     }
-    const ready = button(tr('ابدأ المطابقة', 'Start matching'), () => {
+    let tick;
+    const previewTime = deck.length <= 8 ? 12 : 18;
+    const countdown = el('div', '', 'memory-countdown');
+    countdown.hidden = true;
+    const countdownMeter = el('progress');
+    countdownMeter.max = previewTime;
+    countdownMeter.setAttribute('aria-label', tr('وقت المعاينة المتبقي', 'Preview time remaining'));
+    const remaining = el('bdi');
+    remaining.dir = 'ltr';
+    countdown.append(remaining, countdownMeter);
+
+    function startMatch() {
+      if (grid.dataset.memoryPhase !== 'preview') return;
+      clearInterval(tick);
+      countdown.hidden = true;
+      previewActions.hidden = true;
       if (mode === 'sound') stopSpeech();
       grid.dataset.memoryPhase = 'match';
       for (const card of grid.children) {
@@ -226,9 +237,36 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
         picture: tr('اكشف بطاقتين متطابقتين.', 'Turn over two matching cards.'),
         word: tr('طابق كل صورة مع اسمها.', 'Match each picture to its name.'),
         sound: tr('طابق كل صورة مع صوتها.', 'Match each picture to its sound.'),
+        relation: tr('طابق كل شيئين يُستخدمان معًا.', 'Match the two things used together.'),
       }[mode];
       grid.firstElementChild.focus({preventScroll: true});
-    }, 'button button-primary memory-start');
+    }
+    const previewActions = el('div', '', 'memory-preview-actions');
+    const ready = button(tr('ابدأ المطابقة', 'Start matching'), startMatch, 'button button-primary memory-start');
+    previewActions.append(ready);
+    if (mode !== 'sound') {
+      const timed = button(tr('معاينة بالمؤقّت', 'Timed preview'), () => {
+        timed.hidden = true;
+        countdown.hidden = false;
+        let seconds = previewTime;
+        function display() {
+          countdownMeter.value = seconds;
+          remaining.textContent = seconds + tr(' ث', ' s');
+        }
+        display();
+        ready.focus({preventScroll: true});
+        tick = setInterval(() => {
+          if (!grid.isConnected || grid.closest('[hidden]')) {
+            clearInterval(tick);
+            return;
+          }
+          seconds--;
+          display();
+          if (!seconds) startMatch();
+        }, 1000);
+      }, 'button button-white memory-timed');
+      previewActions.append(timed);
+    }
 
     deck.forEach(({pair, type}, index) => {
       const card = button('', () => {
@@ -239,6 +277,7 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
         }
         showFace(card, true);
         if (type === 'sound') playSound(pair);
+        else journey.effect('flip');
         if (!first) { first = card; return; }
         const previous = first;
         first = null;
@@ -246,8 +285,10 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
         if (previous.dataset.pair === pair.id) {
           previous.disabled = card.disabled = true;
           previous.dataset.matched = card.dataset.matched = 'true';
+          showFace(previous, true);
+          showFace(card, true);
           matched++;
-          journey.correct();
+          if (matched < pairs.length) journey.effect('pair');
           say(tr('وجدت زوجًا!', 'You found a pair!'), 'correct');
           update();
           if (matched === pairs.length) {
@@ -281,6 +322,9 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
         face = el('span', pair.name, 'memory-face memory-word');
       } else if (type === 'sound') {
         face = illustrate(el('span', '🔊', 'memory-face memory-speaker'), '🔊');
+      } else if (type === 'relation') {
+        face = el('span', '', 'memory-face memory-illustration memory-relation');
+        face.append(createIllustration(pair.related));
       } else if (pair.image) {
         face = el('img', '', 'memory-face');
         face.src = pair.image;
@@ -296,8 +340,8 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
       grid.append(card);
     });
     summary.append(matchedLabel, meter);
-    cue.append(summary, instructions);
-    options.append(grid, ready);
+    cue.append(summary, instructions, countdown);
+    options.append(grid, previewActions);
     update();
     return;
   }
@@ -426,13 +470,19 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
     if (dictation) {
       const audioStatus = el('span', '', 'trace-audio-status');
       audioStatus.setAttribute('role', 'status');
-      const listen = button(tr('اسمع الكلمة', 'Listen to the Arabic word'), () => {
+      function readWord(rate) {
         audioStatus.textContent = '';
         playRecording(round.audio, () => speak(round.word, 'ar', () => {
           audioStatus.textContent = tr('تعذّر تشغيل الكلمة. أعد المحاولة.', 'The word could not play. Please try again.');
-        }));
-      }, 'button button-primary trace-listen');
-      studio.append(listen, audioStatus);
+        }, {rate: rate * .9}), {rate});
+      }
+      const listen = button(tr('اسمع الكلمة', 'Listen to the Arabic word'), () => readWord(1),
+        'button button-primary trace-listen');
+      const slow = button(tr('استمع ببطء', 'Listen slowly'), () => readWord(.72),
+        'button button-white trace-slow');
+      const recordings = el('div', '', 'trace-recordings');
+      recordings.append(listen, slow);
+      studio.append(recordings, audioStatus);
     }
 
     const wrap = el('div', '', 'extra-trace');
@@ -453,18 +503,23 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
     const assessment = el('div', '', 'trace-assessment');
     const metrics = el('p', tr('جاري تجهيز لوحة الكتابة…', 'Preparing the writing board…'), 'trace-metrics');
     const tip = el('p', '', 'trace-tip');
+    const review = el('canvas', '', 'trace-review');
+    review.hidden = true;
+    review.setAttribute('aria-label', tr('نموذج يوضح أجزاء الكتابة التي تحتاج مراجعة', 'Model showing the areas to practise'));
     assessment.setAttribute('aria-live', 'polite');
-    assessment.append(metrics, tip);
+    assessment.append(metrics, tip, review);
     studio.append(assessment);
     cue.append(studio);
 
     let target = null;
+    let marker;
     let strokes = [], pointer = null, ink = '#6b4bc3';
     const ctx = canvas.getContext('2d');
     const instructions = tr('تُقبل الكتابة عند تجاوز 75%.', 'A score above 75% passes.');
     function resetResult() {
       if (!assessment.dataset.result) return;
       delete assessment.dataset.result;
+      review.hidden = true;
       metrics.textContent = instructions;
       tip.textContent = '';
       say('');
@@ -485,6 +540,7 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
         for (let i = 1; i < points.length; i++) ctx.lineTo(...points[i]);
         ctx.stroke();
       }
+      if (marker) marker.hidden = finished || strokes.length > 0;
       undo.disabled = clear.disabled = finished || !strokes.length || pointer !== null;
       complete.disabled = undo.disabled || !target;
     }
@@ -549,11 +605,13 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
       percent.dir = 'ltr';
       metrics.replaceChildren(tr('دقة الكتابة ', 'Writing score '), percent);
       assessment.dataset.result = score.pass ? 'pass' : 'retry';
+      drawWritingReview(review, model, score.pass ? null : score.missed);
+      review.hidden = false;
       if (!score.pass) {
         journey.mistake();
         tip.textContent = dictation
-          ? tr('أعد سماع الكلمة وراجع الحروف ونقاطها.', 'Listen again and check the letters and their dots.')
-          : tr('تتبّع جميع أجزاء النموذج وحافظ على مساره.', 'Follow the guide and trace all its parts.');
+          ? tr('راجع الأجزاء البرتقالية ثم أعد الكتابة.', 'Practise the orange areas, then try writing again.')
+          : tr('راجع الأجزاء البرتقالية واتبع المسار المنقّط.', 'Check the orange areas and follow the dotted guide.');
         say(tr('حاول مرة أخرى.', 'Try again.'), 'wrong');
         return;
       }
@@ -578,6 +636,13 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
       try {
         target = drawGuide(image, model, dictation);
         metrics.textContent = instructions;
+        if (!dictation) {
+          marker = startingMarker(round.image, target.box, model);
+          if (marker) {
+            wrap.append(marker);
+            tip.textContent = tr('ابدأ من السهم واتبع اتجاهه.', 'Start at the arrow and follow its direction.');
+          }
+        }
         paint();
       } catch {
         loadingFailed();

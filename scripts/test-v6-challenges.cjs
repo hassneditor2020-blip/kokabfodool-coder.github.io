@@ -91,8 +91,9 @@ async function verifyMemory(page, prefix) {
   }
   for (const [index, task] of words.entries()) {
     assert.equal(await grid.getAttribute('data-memory-phase'), 'preview');
-    assert.equal(await grid.locator('.memory-word:not([hidden])').count(), task.pairs.length);
-    assert.equal(await grid.locator('.memory-illustration:not([hidden])').count(), task.pairs.length);
+    const face = task.match === 'relation' ? 'relation' : 'word';
+    assert.equal(await grid.locator('[data-face="' + face + '"] .memory-face:not([hidden])').count(), task.pairs.length);
+    assert.equal(await grid.locator('[data-face="picture"] .memory-illustration:not([hidden])').count(), task.pairs.length);
     if (!index) await screenshot(page, prefix, 'memory-words', '.discovery-memory');
     await enterMatch();
     assert.equal(await grid.locator('.memory-face:not([hidden])').count(), 0);
@@ -103,7 +104,7 @@ async function verifyMemory(page, prefix) {
       assert(await next.isDisabled());
       await grid.locator('.extra-memory-card.revealed').first().waitFor({state: 'hidden'});
     }
-    await matchRound(task.pairs, 'word');
+    await matchRound(task.pairs, face);
   }
   await verifyCompleted(page, prefix, 'memory');
   await page.locator('[data-level-next]').click();

@@ -1,5 +1,5 @@
 import {createIllustration} from './learning-art.js?v=2';
-import {bindJourney,shuffle} from './game-progress.js?v=14';
+import {bindJourney,shuffle} from './game-progress.js?v=15';
 const game=JSON.parse(document.querySelector('#game-data').textContent),ar=game.lang==='ar',tr=(a,e)=>ar?a:e;
 const board=document.querySelector('[data-game]'),cue=board.querySelector('[data-cue]'),options=board.querySelector('[data-options]'),prompt=board.querySelector('[data-prompt]'),feedback=board.querySelector('[data-feedback]'),next=board.querySelector('[data-next]'),progress=board.querySelector('[data-progress]');
 const audio=new Audio();audio.preload='none';audio.volume=.7;

@@ -1,5 +1,5 @@
 import {activeProfile,read,scoresFor} from './profile-state.js?v=1';
-import {ageGroups,ageLabel,agePreferenceKey,gameCounts,pathsForGame,nextPathLevel} from './game-age-paths.js?v=4';
+import {ageGroups,ageLabel,agePreferenceKey,gameCounts,pathsForGame,nextPathLevel} from './game-age-paths.js?v=5';
 import {worldCover} from './world-art.js?v=1';
 
 const root = document.querySelector('[data-age-journey]');
