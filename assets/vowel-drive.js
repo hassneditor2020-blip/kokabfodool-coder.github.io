@@ -1,6 +1,6 @@
 import {driveAudioSource,repairedPartialClips} from './vowel-audio-routing.js?v=2';
 import {pronunciation} from './arabic-pronunciation.js?v=1';
-import {bindJourney, shuffle,totalStars} from './game-progress.js?v=11';
+import {bindJourney, shuffle,totalStars} from './game-progress.js?v=12';
 
 const data = JSON.parse(document.querySelector('#drive-data').textContent);
 const board = document.querySelector('[data-drive]');

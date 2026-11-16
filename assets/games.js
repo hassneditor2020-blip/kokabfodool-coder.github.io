@@ -1,6 +1,6 @@
 import {illustrate} from './learning-art.js?v=2';
-import { bindJourney, shuffle } from './game-progress.js?v=11';
-import {renderExtra,stopSpeech} from './game-extra.js?v=16';
+import { bindJourney, shuffle } from './game-progress.js?v=12';
+import {renderExtra,stopSpeech} from './game-extra.js?v=17';
 
 const board = document.querySelector('[data-game]');
 const game = JSON.parse(document.getElementById('game-data').textContent);
@@ -142,6 +142,7 @@ function renderRound(round) {
   delete feedback.dataset.state;
   solved = false;
   next.hidden = true;
+  next.disabled = false;
   next.textContent = journey.nextLabel();
   options.replaceChildren();
   stopSpeech();

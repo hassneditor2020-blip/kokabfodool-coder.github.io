@@ -33,7 +33,7 @@ for lang,prefix in [('ar',''),('en','en/')]:
         levels=json.loads(data.group(1))['levels']
         assert all(level['rounds'] for level in levels),page
         level_count+=len(levels)
-    assert level_count==275,(lang,level_count)
+    assert level_count==297,(lang,level_count)
     assert all('/'+p.parent.as_posix()+'/' in paths for p in pages)
     download=(root/(prefix+'app/index.html')).read_text()
     assert download.count('data-release-mode="unified"')==1

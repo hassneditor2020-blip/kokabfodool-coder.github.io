@@ -9,11 +9,11 @@ data=json.loads((src/'release.json').read_text())
 assert list(data)==['unified']
 row=data['unified']
 path=src/row['file']
-assert row['version']=='6.2.1' and row['versionCode']==63
+assert row['version']=='6.3.0' and row['versionCode']==64
 assert row['certificate_sha256']==fingerprint
 assert path.stat().st_size==row['bytes']
 assert hashlib.sha256(path.read_bytes()).hexdigest()==row['sha256']
-name='Kokab-Fodool-V6.2.1.apk'
+name='Kokab-Fodool-V6.3.apk'
 shutil.copyfile(path,dst/name)
 shutil.copyfile(path,dst/'kawkab-fudool.apk')
 idsig=Path(str(path)+'.idsig')
@@ -26,4 +26,4 @@ for p in dst.iterdir():
         p.unlink()
 row['file']=name
 (dst/'release.json').write_text(json.dumps(data,indent=2)+'\n')
-print('Official unified V6.2.1 staged; separate Android APKs retired.')
+print('Official unified V6.3 staged; separate Android APKs retired.')
