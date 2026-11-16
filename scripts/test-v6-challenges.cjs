@@ -245,7 +245,7 @@ async function verifyRotation(page, prefix) {
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       page.on('response', response => {
-        if (response.url().startsWith(origin + '/assets/') && !response.ok()) errors.push(response.status() + ' ' + response.url());
+        if (response.url().startsWith(origin + '/assets/') && response.status() >= 400) errors.push(response.status() + ' ' + response.url());
       });
       await page.addInitScript(entries => {
         for (const [id, first] of Object.entries(entries)) {
