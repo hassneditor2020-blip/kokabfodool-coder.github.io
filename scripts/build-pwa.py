@@ -1,5 +1,6 @@
 """Regenerate PWA icons, integration and the versioned offline games pack after site changes."""
 import pathlib,json,hashlib,re,urllib.parse
+from io import BytesIO
 from PIL import Image,ImageOps,ImageDraw
 root=pathlib.Path('.');assets=root/'assets'
 logo=Image.open(assets/'brand.webp').convert('RGBA')
@@ -8,6 +9,54 @@ for size,name,fraction in [(192,'app-icon-192.png',.88),(512,'app-icon-512.png',
     inner=ImageOps.contain(logo,(round(size*fraction),round(size*fraction)),Image.Resampling.LANCZOS)
     icon.alpha_composite(inner,((size-inner.width)//2,(size-inner.height)//2))
     icon.convert('RGB').save(assets/name,optimize=True)
+# Use a smaller version for home-page cards while retaining the original for
+# high-density screens, crawlers and every watch page.
+home_pages = ('index.html', 'en/index.html')
+cover_tags = re.compile(r'(<div class="episode-art portrait-cover">\s*<img)([^>]*)(>)')
+thumbnail_width = 256
+thumb_folder = assets / 'home-thumbnails'
+existing_sources = {}
+
+def responsive_home_covers(match):
+    attributes = match[2]
+    original = re.search(r'\bsrc="(/assets/([a-z0-9-]+)\.webp)"', attributes)
+    if not original or 'loading="lazy"' not in attributes:
+        return match[0]
+    srcset = re.search(r'\bsrcset="([^"]*)"', attributes)
+    if srcset:
+        if not srcset[1].startswith('/assets/home-thumbnails/'):
+            return match[0]
+        attributes = re.sub(r'\s(?:srcset|sizes)="[^"]*"', '', attributes)
+    plain = match[1] + attributes + match[3]
+    original_url, stem = original.groups()
+    if original_url not in existing_sources:
+        thumbnail = thumb_folder / (stem + '-256w.webp')
+        original_file = root / original_url.lstrip('/')
+        with Image.open(original_file) as cover:
+            if cover.width <= thumbnail_width:
+                return plain
+            height = round(cover.height * thumbnail_width / cover.width)
+            output = BytesIO()
+            image = cover.resize((thumbnail_width, height), Image.Resampling.LANCZOS)
+            image.save(output, format='WEBP', quality=86, method=6)
+            data = output.getvalue()
+            if len(data) >= original_file.stat().st_size:
+                return plain
+            thumbnail.parent.mkdir(parents=True, exist_ok=True)
+            thumbnail.write_bytes(data)
+            existing_sources[original_url] = (thumbnail, cover.width)
+    thumbnail, original_width = existing_sources[original_url]
+    marker = '/' + thumbnail.as_posix()
+    choices = f'{marker} {thumbnail_width}w, {original_url} {original_width}w'
+    sizes = 'auto, (max-width: 599px) 22vw, (max-width: 899px) 21vw, 128px'
+    src = 'src="' + original_url + '"'
+    attributes = attributes.replace(src, src + f' srcset="{choices}" sizes="{sizes}"', 1)
+    return match[1] + attributes + match[3]
+
+for page_name in home_pages:
+    homepage = root / page_name
+    homepage.write_text(cover_tags.sub(responsive_home_covers, homepage.read_text()))
+
 integration='<link rel="manifest" href="/manifest.webmanifest"/>\n<link rel="apple-touch-icon" href="/assets/app-icon-192.png"/>\n<link rel="stylesheet" href="/assets/pwa.css"/>\n<script defer src="/assets/pwa.js"></script>\n'
 for p in root.rglob('index.html'):
     if '.git' in p.parts:continue
@@ -53,8 +102,11 @@ for prefix in ['', 'en/']:
 assert len([x for x in pages if re.match(r'^/(?:en/)?games/[^/]+/$',x)])==40
 files={u:root/(u.lstrip('/')+'index.html') for u in pages}
 files['/manifest.webmanifest']=root/'manifest.webmanifest'
-# All original audio variants are retained in the pack, including old references that may still occur.
+# Offline home pages fall back to the full covers already in the pack.
+# All original audio variants are retained, including old references that may still occur.
 for p in assets.rglob('*'):
+    if thumb_folder in p.parents:
+        continue
     if p.is_file() and p.suffix.lower() in {'.js','.css','.svg','.webp','.png','.jpg','.jpeg','.mp3','.ogg','.wav','.woff2','.json'}:
         files['/'+urllib.parse.quote(p.as_posix(),safe='/')]=p
 h=hashlib.sha256();total=0
