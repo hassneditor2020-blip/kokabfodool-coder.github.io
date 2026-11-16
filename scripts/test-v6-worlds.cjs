@@ -469,7 +469,10 @@ async function validateWriting(browser, language) {
     await map.locator('[data-path-play]').click();
     await waitForWritingBoard(page);
     assert.match(await page.locator('.game-progress').textContent(), / 11 · /);
-    assert(await page.locator('.trace-word-board').isVisible());
+    const writingBoard = page.locator('.trace-word-board');
+    assert(await writingBoard.isVisible());
+    const line = await writingBoard.evaluate(board => getComputedStyle(board, '::before').borderTopWidth);
+    assert.equal(line, '2px');
     assert.equal(await page.locator('.trace-model').count(), 0);
     assert.doesNotMatch(await page.locator('[data-game]').textContent(), /جمل/);
     await verifyDictationAudio(page);
