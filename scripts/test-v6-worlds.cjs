@@ -111,7 +111,7 @@ async function validateMaps(browser, language, width) {
   }
   assert.deepEqual(errors, [], language + ' ' + width);
   await page.close();
-  console.log('PASS', language, width, '20 games and all 297 levels open under their allowed age groups');
+  console.log('PASS', language, width, '20 games and all 306 levels open under their allowed age groups');
 }
 
 async function validateDriving(browser, language) {
@@ -249,8 +249,8 @@ async function validateAgePaths(browser, language) {
     });
     await page.goto(base + '/games/?age=8-10');
     const suggested = page.locator('.age-journey-card');
-    assert.equal(await suggested.count(), 12);
-    for (const id of ['vowel-drive','letter-match','letter-hunt','trace','english-abc','word-factory','sound-quiz','healthy-hero']) {
+    assert.equal(await suggested.count(), 13);
+    for (const id of ['vowel-drive','letter-match','letter-hunt','english-abc','word-factory','sound-quiz','healthy-hero']) {
       assert.equal(await suggested.locator('xpath=self::*[@data-game-id="' + id + '"]').count(), 0);
     }
     const ageLink = suggested.filter({has: page.locator('a[href*="/games/robo-lab/"]')}).locator('a');
@@ -261,7 +261,7 @@ async function validateAgePaths(browser, language) {
     await expectRound(11, 1);
     await page.locator('[data-game] [data-level-menu]').click();
     await expectPlay(11, '8-10');
-    assert.deepEqual(await map.locator('.game-level').evaluateAll(items => items.map(item => +item.dataset.levelNumber)), [11,12,13,14]);
+    assert.deepEqual(await map.locator('.game-level').evaluateAll(items => items.map(item => +item.dataset.levelNumber)), [11,12,13,14,15]);
     assert(await levelButton(12).isDisabled());
 
     await play.click();
@@ -370,9 +370,153 @@ async function validateMemory(browser, language) {
   }
 }
 
+async function waitForWritingBoard(page) {
+  await page.waitForFunction(() => document.querySelector('.trace-metrics')?.textContent.includes('75%'));
+}
+
+async function verifyDictationAudio(page) {
+  const audio = page.waitForResponse(response =>
+    response.url().endsWith('/assets/tracing/arabic-words/jamal.mp3') && response.ok());
+  await page.locator('.trace-listen').click();
+  await audio;
+  await page.waitForFunction(() => window.playedWritingWord);
+  assert.equal(await page.locator('.trace-audio-status').textContent(), '');
+}
+
+function observeDictationAudio() {
+  const play = HTMLMediaElement.prototype.play;
+  HTMLMediaElement.prototype.play = function () {
+    this.addEventListener('playing', () => {
+      if (this.currentSrc.endsWith('/arabic-words/jamal.mp3')) window.playedWritingWord = true;
+    }, {once: true});
+    return play.call(this);
+  };
+}
+
+async function validateWriting(browser, language) {
+  const mobile = language === 'ar';
+  const page = await browser.newPage({
+    viewport: {width: mobile ? 390 : 1280, height: 844},
+    hasTouch: mobile,
+    userAgent: mobile ? 'Mozilla/5.0 Mobile FudoolAndroidUnified' : undefined,
+  });
+  const session = mobile ? await page.context().newCDPSession(page) : null;
+  const route = origin + (mobile ? '' : '/en') + '/games/trace/';
+  const canvas = page.locator('.trace-ink');
+  const check = page.locator('.trace-actions .button-primary');
+  const next = page.locator('[data-next]');
+  const metric = page.locator('.trace-metrics bdi');
+  const score = async () => parseFloat(await metric.textContent());
+
+  async function draw(strokes) {
+    await canvas.scrollIntoViewIfNeeded();
+    const rect = await canvas.boundingBox();
+    for (const stroke of strokes) {
+      const points = stroke.map(([x, y]) => ({x: rect.x + x * rect.width / 600, y: rect.y + y * rect.height / 320}));
+      if (session) {
+        await session.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: [points[0]]});
+        for (const point of points.slice(1)) {
+          await session.send('Input.dispatchTouchEvent', {type: 'touchMove', touchPoints: [point]});
+        }
+        await session.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
+      } else {
+        await page.mouse.move(points[0].x, points[0].y);
+        await page.mouse.down();
+        for (const point of points.slice(1)) await page.mouse.move(point.x, point.y);
+        await page.mouse.up();
+      }
+    }
+    assert(await check.isEnabled());
+    await check.click();
+  }
+
+  try {
+    await page.addInitScript(observeDictationAudio);
+    await page.goto(route);
+    const map = page.locator('[data-level-map]');
+    await map.locator('[data-age-path="3-5"]').click();
+    await map.locator('[data-path-play]').click();
+    await waitForWritingBoard(page);
+    assert(await page.locator('.trace-model').isVisible());
+    assert(await check.isDisabled());
+
+    const thresholds = await page.evaluate(async () => {
+      const {traceGrade} = await import('/assets/trace-assessment.js?v=2');
+      return [traceGrade(.749, 1), traceGrade(.75, 1), traceGrade(.751, 1), traceGrade(1, .751)];
+    });
+    assert.deepEqual(thresholds, [
+      {percent: 74.9, pass: false}, {percent: 75, pass: false},
+      {percent: 75.1, pass: true}, {percent: 75.1, pass: true},
+    ]);
+
+    // Stop tracing the first alif early to exercise a passing result close to the cutoff.
+    const alif = [[294, 42], [308, 79], [307, 102], [304, 123], [306, 145], [305, 165], [309, 187], [310, 261]];
+    await draw([alif.slice(0, -2)]);
+    assert(await score() < 75);
+    assert(await next.isHidden());
+    await page.locator('.trace-actions .button-white').last().click();
+    await draw([alif]);
+    const traced = await score();
+    assert(traced > 75 && traced < 80, 'A sufficiently accurate alif must pass: ' + traced);
+    assert(await next.isVisible());
+    await next.click();
+    assert.match(await page.locator('.game-progress').textContent(), /(?:الجولة|Round) 2 /);
+
+    await page.locator('[data-game] [data-level-menu]').click();
+    await map.locator('[data-age-path="8-10"]').click();
+    assert.deepEqual(await map.locator('[data-level-number]').evaluateAll(items =>
+      items.map(button => +button.dataset.levelNumber)), [11, 12, 13]);
+    await map.locator('[data-path-play]').click();
+    await waitForWritingBoard(page);
+    assert.match(await page.locator('.game-progress').textContent(), / 11 · /);
+    const writingBoard = page.locator('.trace-word-board');
+    assert(await writingBoard.isVisible());
+    const line = await writingBoard.evaluate(board => getComputedStyle(board, '::before').borderTopWidth);
+    assert.equal(line, '2px');
+    assert.equal(await page.locator('.trace-model').count(), 0);
+    assert.doesNotMatch(await page.locator('[data-game]').textContent(), /جمل/);
+    await verifyDictationAudio(page);
+
+    await draw([[[40, 60], [500, 240], [520, 90], [60, 280]]]);
+    assert(await score() <= 75);
+    assert(await next.isHidden());
+    await page.locator('.trace-actions .button-white').last().click();
+
+    // Hand-positioned strokes for جمل, shifted and reduced to a realistic handwriting size.
+    const handwriting = [
+      [[366, 146], [373, 138], [388, 134], [411, 140], [438, 157], [467, 173], [487, 173],
+        [460, 176], [438, 183], [414, 194], [391, 200], [352, 203], [330, 200]],
+      [[330, 200], [316, 188], [306, 160], [296, 139], [281, 139], [264, 153],
+        [252, 174], [257, 188], [284, 200], [311, 203]],
+      [[252, 193], [234, 202], [215, 197]],
+      [[197, 51], [199, 87], [205, 133], [211, 178], [214, 217], [203, 236], [183, 253],
+        [166, 262], [139, 267], [122, 261], [111, 249], [105, 226], [108, 207]],
+    ].map(stroke => stroke.map(([x, y]) => [x * .67 + 64, y * .68 + 33]));
+    await draw(handwriting);
+    const missingDot = await score();
+    assert(missingDot <= 75, 'The word shape without the dot must be retried: ' + missingDot);
+    assert(await next.isHidden());
+    await draw([[[352, 198], [358, 198]]]);
+    const wordScore = await score();
+    assert(wordScore > 75, 'Properly placed Arabic handwriting must pass: ' + wordScore);
+    assert(await next.isVisible());
+    assert.match(await page.locator('.trace-tip').textContent(), /جمل/);
+    await next.click();
+    await waitForWritingBoard(page);
+    assert.match(await page.locator('.game-progress').textContent(), /(?:الجولة|Round) 2 /);
+    assert.doesNotMatch(await page.locator('[data-game]').textContent(), /قمر/);
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2));
+    await page.screenshot({path: 'build/v6-screenshots/writing-' + language + '.png'});
+    console.log('PASS writing', language, mobile ? 'touch' : 'mouse', 'guide, threshold, Arabic dictation, retry and Next');
+  } finally {
+    await page.close();
+  }
+}
+
 async function validateOffline(browser) {
   const context = await browser.newContext({viewport: {width: 390, height: 844}});
   const page = await context.newPage();
+  await page.addInitScript(observeDictationAudio);
   await page.goto(origin + '/play-app/');
   const count = await page.evaluate(async () => {
     const registration = await navigator.serviceWorker.ready;
@@ -410,15 +554,18 @@ async function validateOffline(browser) {
   await page.goto(origin + '/games/robo-lab/');
   await page.locator('[data-path-play]').click();
   assert.match(await page.locator('[data-game] .game-progress').textContent(), /المستوى 11 ·/);
+  await page.goto(origin + '/games/trace/?path=8-10&level=11');
+  await waitForWritingBoard(page);
+  await verifyDictationAudio(page);
   await context.close();
-  console.log('PASS offline games, experiments and V6.3 age-based entry');
+  console.log('PASS offline games, experiments, age-based entry and Arabic dictation audio');
 }
 
 (async () => {
   let browser;
   try {
     assert.equal(Object.keys(games).length, 20);
-    assert.equal(Object.values(games).reduce((total, count) => total + count, 0), 297);
+    assert.equal(Object.values(games).reduce((total, count) => total + count, 0), 306);
     for (let i = 0; i < 30; i++) {
       try {
         if ((await fetch(origin)).ok) break;
@@ -430,6 +577,7 @@ async function validateOffline(browser) {
     for (const language of ['ar', 'en']) {
       await validateAgePaths(browser, language);
       await validateMemory(browser, language);
+      await validateWriting(browser, language);
       await validateDriving(browser, language);
       const labPage = await browser.newPage({
         viewport: {width: language === 'ar' ? 390 : 1280, height: 844},

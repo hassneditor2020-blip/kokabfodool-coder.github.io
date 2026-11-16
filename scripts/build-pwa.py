@@ -24,8 +24,9 @@ for p in root.rglob('index.html'):
 # Refresh dependencies for every game engine and public page, including existing offline clients.
 for p in assets.glob('*.js'):
     s=p.read_text()
-    s=re.sub(r'(game-progress\.js\?v=)\d+',lambda m:m[1]+'12',s)
-    s=re.sub(r'(game-extra\.js\?v=)\d+',lambda m:m[1]+'17',s)
+    s=re.sub(r'(game-progress\.js\?v=)\d+',lambda m:m[1]+'14',s)
+    s=re.sub(r'(game-extra\.js\?v=)\d+',lambda m:m[1]+'19',s)
+    s=re.sub(r'(game-age-paths\.js\?v=)\d+',lambda m:m[1]+'4',s)
     p.write_text(s)
 level_counts = {}
 for p in sorted((root / 'games').glob('*/index.html')):
@@ -40,9 +41,9 @@ for p in root.rglob('index.html'):
         s=re.sub(r'<link rel="stylesheet" href="/assets/game-age-paths\.css\?v=\d+"\s*/?>\n?', '', s)
         s=s.replace('</head>',age_style+'</head>',1)
     s=re.sub(r'(data-game-id="([a-z-]+)" data-level-count=")\d+',lambda m:m[1]+str(level_counts[m[2]]),s)
-    s=re.sub(r'(/assets/age-journey\.js\?v=)\d+',lambda m:m[1]+'7',s)
+    s=re.sub(r'(/assets/age-journey\.js\?v=)\d+',lambda m:m[1]+'9',s)
     # Bump entry points whose imports were changed.
-    for name,ver in [('games',18),('letter-match',15),('vowel-drive',18),('interactive-games',11),('planet-adventures',10),('sound-world',5),('game-progress',12),('app-experience',5)]:
+    for name,ver in [('games',20),('letter-match',17),('vowel-drive',20),('interactive-games',13),('planet-adventures',12),('sound-world',7),('game-progress',14),('app-experience',7)]:
         s=re.sub(r'(/assets/'+name+r'\.js\?v=)\d+',lambda m:m[1]+str(ver),s)
     p.write_text(s)
 # Pack includes the current canonical app/game pages, all local media and code required by the games.

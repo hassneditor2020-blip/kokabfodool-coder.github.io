@@ -1,0 +1,102 @@
+/* Equipment and controls for the advanced game levels. */
+.magnet-bench {
+  display: grid;
+  gap: .65rem;
+  width: min(100%, 480px);
+  padding: clamp(.45rem, 2.5vw, 1rem);
+  background: #f2fbf7;
+  border: 2px solid #c1e5d9;
+  border-radius: 22px;
+  color: #214b43;
+}
+.magnet-note, .magnet-observation {
+  margin: 0;
+  font-size: .86rem;
+  font-weight: 700;
+}
+.magnet-distance-track {
+  position: relative;
+  direction: ltr;
+  min-height: 110px;
+  background: linear-gradient(#fefefe 0 75%, #e0eae6 75% 79%, #edf8f5 79%);
+  border: 1px solid #c6e1d8;
+  border-radius: 14px;
+}
+.distance-magnet {
+  position: absolute;
+  top: 4px;
+  left: var(--magnet-position);
+  width: 64px;
+  height: 64px;
+  transform: translateX(-50%);
+}
+.distance-magnet .fudool-art { width: 100%; height: 100%; }
+.distance-clip {
+  position: absolute;
+  top: calc(28px + var(--clip-row) * 24px);
+  left: calc(78% + var(--clip-column) * 14px);
+  width: 10px;
+  height: 22px;
+  border: 2px solid #526a80;
+  border-radius: 9px;
+  box-shadow: inset 1px 0 #fff, 0 1px 1px #33425050;
+  background: #eef5fa;
+  transform: rotate(15deg);
+}
+.distance-clip[data-pulled="true"] {
+  left: calc(var(--magnet-position) + var(--clip-column) * 14px - 20px);
+  top: calc(62px + var(--clip-row) * 22px);
+  border-color: #28755e;
+  transform: rotate(30deg);
+  transition: left 280ms ease, top 280ms ease, transform 280ms ease;
+}
+.magnet-distance-choices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .4rem;
+}
+.magnet-distance-choices .button { min-height: 44px; font-size: .81rem; padding-inline: .65rem; }
+.magnet-distance-choices button[aria-pressed="true"] { outline: 2px solid #277861; outline-offset: -3px; background: #e5f7ef; }
+.magnet-distance-choices button:disabled { opacity: .58; }
+.magnet-bench .science-observations { margin: 0; }
+.magnet-conclusion:not([hidden]) { display: grid; gap: .55rem; }
+.magnet-conclusion h3 { font-size: 1rem; margin: .2rem 0; }
+
+.discovery-memory .memory-face[hidden] { display: none !important; }
+.memory-face:not(img) { display: grid; place-items: center; width: 100%; min-width: 0; }
+.discovery-memory .memory-word {
+  padding-inline: 1px;
+  color: #412d75;
+  font-size: clamp(.7rem, 2.4vw, 1.05rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.memory-face .fudool-art { width: min(88%, 72px); aspect-ratio: 1; height: auto; }
+.discovery-memory .memory-speaker .fudool-art { width: min(72%, 62px); }
+.discovery-memory .extra-memory-card[data-face="sound"]:not(:disabled).revealed { cursor: pointer; }
+
+.discovery-puzzle .extra-piece:has(.puzzle-piece-art) { position: relative; overflow: hidden; }
+.discovery-preview.rotating-puzzle-preview { object-fit: cover; }
+.puzzle-piece-art { position: absolute; inset: 0; display: block; pointer-events: none; background-repeat: no-repeat; }
+.puzzle-turn { justify-self: center; min-height: 44px; margin-top: .3rem; }
+.puzzle-turn:disabled { opacity: .6; }
+
+.purchase-phase:not([hidden]) { width: 100%; display: grid; gap: .6rem; }
+.purchase-phase h3 { margin: 0; font-size: 1rem; }
+.purchase-offers, .purchase-change { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
+.purchase-offer { display: grid; place-content: center; gap: .28rem; min-height: 66px; }
+.purchase-offer span { font-weight: 700; }
+.purchase-unit-price { color: #754315; font-size: .8rem; }
+.purchase-receipt { width: min(100%, 425px); justify-self: center; }
+.purchase-receipt .market-line:nth-last-child(2) { border-block-start: 1px dashed #c7b9aa; }
+
+.code-edit-chip { min-height: 44px; font: inherit; font-weight: 900; cursor: pointer; touch-action: manipulation; }
+.code-edit-chip[aria-pressed="true"] { outline: 2px solid #6747b0; outline-offset: 1px; }
+.code-edit-chip[data-fault="true"] { color: #931b2e; background: #ffe6e8; border-color: #e999a7; }
+.code-edit-chip[data-changed="true"] { text-decoration: underline; text-underline-offset: 3px; }
+.code-program .market-actions { margin-top: .65rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .distance-clip[data-pulled="true"] { transition: none; }
+}
