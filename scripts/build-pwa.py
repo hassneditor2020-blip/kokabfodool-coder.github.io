@@ -78,9 +78,13 @@ for p in assets.glob('*.js'):
     s=re.sub(r'(game-age-paths\.js\?v=)\d+',lambda m:m[1]+'4',s)
     p.write_text(s)
 level_counts = {}
+round_count = 0
 for p in sorted((root / 'games').glob('*/index.html')):
     source = re.search(r'<script id="(?:game|drive|match)-data" type="application/json">(.*?)</script>', p.read_text(), re.S)
-    level_counts[p.parent.name] = len(json.loads(source[1])['levels'])
+    levels = json.loads(source[1])['levels']
+    level_counts[p.parent.name] = len(levels)
+    round_count += sum(len(level['rounds']) for level in levels)
+home_counts = [len(level_counts), sum(level_counts.values()), round_count]
 age_style='<link rel="stylesheet" href="/assets/game-age-paths.css?v=2"/>\n'
 for p in root.rglob('index.html'):
     if '.git' in p.parts:continue
@@ -89,6 +93,9 @@ for p in root.rglob('index.html'):
     if re.fullmatch(r'(?:en/)?games/[^/]+/index\.html',p.as_posix()):
         s=re.sub(r'<link rel="stylesheet" href="/assets/game-age-paths\.css\?v=\d+"\s*/?>\n?', '', s)
         s=s.replace('</head>',age_style+'</head>',1)
+    if p.as_posix() in home_pages:
+        stats = r'(<li class="home-stat home-stat-([1-3])"[^>]*>.*?<strong dir="ltr">)[\d,]+(</strong>)'
+        s = re.sub(stats, lambda m: m[1] + format(home_counts[int(m[2])-1], ',') + m[3], s)
     s=re.sub(r'(data-game-id="([a-z-]+)" data-level-count=")\d+',lambda m:m[1]+str(level_counts[m[2]]),s)
     s=re.sub(r'(/assets/age-journey\.js\?v=)\d+',lambda m:m[1]+'9',s)
     # Bump entry points whose imports were changed.
