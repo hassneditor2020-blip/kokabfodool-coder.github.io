@@ -13,6 +13,17 @@ document.addEventListener('pointerdown', (event) => {
   if (menu.open && !menu.contains(event.target)) menu.open = false;
 });
 
+// The smaller homepage covers are optional on the web. The offline pack
+// already contains the full covers referenced by each image's src.
+for (const cover of document.querySelectorAll('img[srcset^="/assets/home-thumbnails/"]')) {
+  const useOriginal = () => {
+    cover.removeAttribute('srcset');
+    cover.removeAttribute('sizes');
+  };
+  if (!navigator.onLine || (cover.complete && !cover.naturalWidth)) useOriginal();
+  else cover.addEventListener('error', useOriginal, { once: true });
+}
+
 const filter = bySelector('[data-filter]');
 if (filter) {
   const scope = filter.closest('[data-filter-scope]');
