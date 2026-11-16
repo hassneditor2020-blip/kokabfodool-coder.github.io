@@ -1,7 +1,7 @@
 import {vowelClipId} from './vowel-audio-review.js?v=2';
 import {illustrate} from './learning-art.js?v=2';
-import {speak,stopSpeech,playRecording} from './game-extra.js?v=17';
-import { bindJourney, shuffle } from './game-progress.js?v=12';
+import {speak,stopSpeech,playRecording} from './game-extra.js?v=18';
+import { bindJourney, shuffle } from './game-progress.js?v=13';
 
 const game = document.querySelector('[data-letter-match]');
 const data = JSON.parse(document.getElementById('match-data').textContent);

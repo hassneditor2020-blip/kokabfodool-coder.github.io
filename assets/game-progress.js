@@ -2,7 +2,7 @@ import {activeProfile,prefix} from './profile-state.js?v=1';
 import {setupWorld,updateMap,decorateLevel,renderTrailStage,celebrate,enhanceRewards} from './reward-worlds.js?v=3';
 import {createIllustration} from './learning-art.js?v=2';
 import { bindGameAudio } from './game-audio.js?v=5';
-import {ageGroups,ageLabel,gameCounts,pathsForGame,recommendedAge,includesLevel,nextPathLevel} from './game-age-paths.js?v=2';
+import {ageGroups,ageLabel,gameCounts,pathsForGame,recommendedAge,includesLevel,nextPathLevel} from './game-age-paths.js?v=3';
 
 const language = document.documentElement.lang;
 const tr = (ar, en) => language === 'ar' ? ar : en;

@@ -32,8 +32,17 @@ for lang,prefix in [('ar',''),('en','en/')]:
         assert data,page
         levels=json.loads(data.group(1))['levels']
         assert all(level['rounds'] for level in levels),page
+        if page.parent.name == 'trace':
+            dictation = levels[10:]
+            assert [len(level['rounds']) for level in dictation] == [3, 3, 3]
+            assert all('audio' not in task for level in levels[:10] for task in level['rounds'])
+            for stage, lengths in zip(dictation, [{3}, {4}, {5, 6}]):
+                for task in stage['rounds']:
+                    assert len(task['word']) in lengths
+                    assert task['kind'] == 'trace' and task['word'] not in task['prompt']
+                    assert task['audio'] in paths and task['image'] in paths
         level_count+=len(levels)
-    assert level_count==297,(lang,level_count)
+    assert level_count==300,(lang,level_count)
     assert all('/'+p.parent.as_posix()+'/' in paths for p in pages)
     download=(root/(prefix+'app/index.html')).read_text()
     assert download.count('data-release-mode="unified"')==1

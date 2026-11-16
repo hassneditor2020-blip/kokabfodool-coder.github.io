@@ -1,8 +1,8 @@
 import {vowelClipId} from './vowel-audio-review.js?v=2';
 import {sharedAudioSource} from './vowel-audio-routing.js?v=2';
-import {drawGuide,evaluateTrace} from './trace-assessment.js?v=1';
+import {drawGuide,evaluateTrace} from './trace-assessment.js?v=2';
 import {illustrate} from './learning-art.js?v=2';
-import {shuffle} from './game-progress.js?v=12';
+import {shuffle} from './game-progress.js?v=13';
 const ar=document.documentElement.lang==='ar';
 const tr=(a,b)=>ar?a:b;
 const el=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};
@@ -164,20 +164,181 @@ export function renderExtra(round,{cue,options,feedback,next,journey,makeOption}
     const grid=el('div','','extra-puzzle discovery-puzzle');const sizePuzzle=()=>{if(preview.naturalWidth&&preview.naturalHeight)grid.style.aspectRatio=preview.naturalWidth+'/'+preview.naturalHeight};preview.addEventListener('load',sizePuzzle);if(preview.complete)sizePuzzle();grid.style.setProperty('--cols',cols);grid.style.setProperty('--rows',rows);grid.dir='ltr';options.append(grid);
     function draw(focus=-1){const count=arrangement.filter((v,i)=>v===i).length;label.textContent=tr('القطع الصحيحة: ','Correct pieces: ')+count+' / '+n+' · '+tr('الحركات: ','Moves: ')+moves;meter.value=count;grid.replaceChildren(...arrangement.map((piece,index)=>{const b=button('',()=>{if(finished)return;if(first<0){first=index;draw(index);return}if(first===index){first=-1;draw(index);return}[arrangement[first],arrangement[index]]=[arrangement[index],arrangement[first]];moves++;first=-1;draw(index);if(arrangement.every((v,i)=>v===i))done()},'extra-piece');b.dataset.piece=String(piece);b.dataset.slot=String(index);b.dataset.placed=String(piece===index);b.setAttribute('aria-label',tr('قطعة ','Piece ')+(piece+1));b.setAttribute('aria-pressed',String(first===index));b.style.backgroundImage='url("'+image+'")';b.style.backgroundSize=(cols*100)+'% '+(rows*100)+'%';b.style.backgroundPosition=((piece%cols)*100/(cols-1))+'% '+(Math.floor(piece/cols)*100/(rows-1))+'%';return b}));if(focus>=0)grid.children[focus]?.focus({preventScroll:true})}draw();return;
   }
-  if(kind==='trace'){
-    const studio=el('div','','trace-studio'),bar=el('div','','trace-studio-bar'),title=el('strong',tr('لوحة الكتابة','Writing board')),guide=el('img');guide.src='/assets/lumaa.webp';guide.alt='';guide.width=42;guide.height=42;bar.append(guide,title);studio.append(bar);
-    const img=new Image(),wrap=el('div','','extra-trace'),model=el('canvas','','trace-model');model.width=600;model.height=320;model.setAttribute('aria-label',tr('نموذج الكتابة المنقّط','Dotted writing guide'));wrap.append(model);const canvas=el('canvas','','trace-ink');canvas.width=600;canvas.height=320;canvas.setAttribute('aria-label',tr('مساحة الرسم','Drawing area'));wrap.append(canvas);studio.append(wrap);cue.append(studio);
-    const assessment=el('div','','trace-assessment'),metrics=el('p',tr('جاري تحميل نموذج الكتابة…','Loading writing guide…'),'trace-metrics'),tip=el('p','','trace-tip');metrics.setAttribute('aria-live','polite');assessment.append(metrics,tip);studio.append(assessment);let targetGuide=null;
-    const ctx=canvas.getContext('2d');let down=false,pointer=null,active=null,strokes=[],ink='#6b4bc3',length=0;
-    const point=e=>{const r=canvas.getBoundingClientRect();return [(e.clientX-r.left)*canvas.width/r.width,(e.clientY-r.top)*canvas.height/r.height]};
-    function paint(){ctx.clearRect(0,0,600,320);length=0;for(const stroke of strokes){ctx.lineWidth=9;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=stroke.ink;ctx.fillStyle=stroke.ink;const p=stroke.points;ctx.beginPath();ctx.arc(p[0][0],p[0][1],4.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(...p[0]);for(let i=1;i<p.length;i++){length+=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);ctx.lineTo(...p[i])}ctx.stroke()}undo.disabled=finished||!strokes.length;clear.disabled=finished||!strokes.length;complete.disabled=finished||!targetGuide||!strokes.length;}
-    canvas.addEventListener('pointerdown',e=>{if(finished||down||!targetGuide)return;down=true;pointer=e.pointerId;canvas.setPointerCapture(e.pointerId);active={ink,points:[point(e)]};strokes.push(active);paint()});
-    canvas.addEventListener('pointermove',e=>{if(!down||e.pointerId!==pointer)return;const p=point(e);const prev=active.points.at(-1);if(Math.hypot(p[0]-prev[0],p[1]-prev[1])<1)return;active.points.push(p);paint()});
-    for(const name of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(name,e=>{if(e.pointerId===pointer){down=false;pointer=null;active=null}});
-    const palette=el('div','','trace-palette'),colors=[['#6b4bc3',tr('بنفسجي','Purple')],['#267bb1',tr('أزرق','Blue')],['#23835d',tr('أخضر','Green')],['#bd4d70',tr('وردي','Pink')]];
-    for(const [color,name] of colors){const b=button('',()=>{if(finished)return;ink=color;for(const c of palette.children)c.setAttribute('aria-pressed',String(c===b))},'trace-color');b.style.backgroundColor=color;b.setAttribute('aria-label',name);b.setAttribute('aria-pressed',String(color===ink));palette.append(b)}
-    const actions=el('div','','game-actions trace-actions'),undo=button(tr('تراجع','Undo'),()=>{if(!finished&&!down){strokes.pop();paint()}},'button button-white'),clear=button(tr('امسح','Clear'),()=>{if(!finished&&!down){strokes=[];paint()}},'button button-white'),complete=button(tr('تحقّق من كتابتي','Check my tracing'),()=>{if(finished||down||!targetGuide)return;const score=evaluateTrace(targetGuide,canvas,length);const coverage=Math.round(score.coverage*100),accuracy=Math.round(score.precision*100);metrics.textContent=tr('تغطية النموذج: ','Guide coverage: ')+coverage+'% · '+tr('دقة المسار: ','Path accuracy: ')+accuracy+'%';assessment.dataset.result=score.pass?'pass':'retry';if(!score.pass){journey.mistake();tip.textContent=score.precision<.83?tr('اتبع النقاط ولا ترسم خارج الحرف.','Follow the dots; avoid drawing outside the letter.'):!score.groupsOK?tr('لا تنسَ النقاط والأجزاء المنفصلة.','Remember the dots and separate parts.'):tr('أكمل التتبّع على جميع أجزاء النموذج.','Trace all parts of the guide.');say(tr('لم يكتمل التتبّع بعد، حاول مرة أخرى.','Tracing not complete yet. Try again.'),'wrong');return}tip.textContent=tr('رائع! غطيت النموذج بدقة جيدة.','Great! You followed the guide accurately.');done();paint();for(const b of palette.children)b.disabled=true},'button button-primary');
-    actions.append(undo,clear,complete);options.append(palette,actions);cue.append(el('small',tr('تقييم هندسي لتغطية النقاط ودقة المسار، ولا يقيس ترتيب كتابة الحرف.','Checks guide coverage and path accuracy, not stroke order.')));img.onload=()=>{try{targetGuide=drawGuide(img,model);metrics.textContent=tr('اتبع النموذج ثم اضغط تحقّق من كتابتي.','Trace the guide, then check your tracing.');paint()}catch{metrics.textContent=tr('تعذّر تجهيز النموذج. أعد تحميل الصفحة.','Guide could not load. Reload the page.');paint()}};img.onerror=()=>{metrics.textContent=tr('تعذّر تحميل النموذج. أعد تحميل الصفحة.','Guide could not load. Reload the page.');paint()};img.src=round.image;paint();return;
+  if (kind === 'trace') {
+    const dictation = Boolean(round.audio);
+    const studio = el('div', '', 'trace-studio');
+    const bar = el('div', '', 'trace-studio-bar');
+    const guide = el('img');
+    guide.src = '/assets/lumaa.webp';
+    guide.alt = '';
+    guide.width = guide.height = 42;
+    bar.append(guide, el('strong', tr('لوحة الكتابة', 'Writing board')));
+    studio.append(bar);
+
+    if (dictation) {
+      const audioStatus = el('span', '', 'trace-audio-status');
+      audioStatus.setAttribute('role', 'status');
+      const listen = button(tr('اسمع الكلمة', 'Listen to the Arabic word'), () => {
+        audioStatus.textContent = '';
+        playRecording(round.audio, () => speak(round.word, 'ar', () => {
+          audioStatus.textContent = tr('تعذّر تشغيل الكلمة. أعد المحاولة.', 'The word could not play. Please try again.');
+        }));
+      }, 'button button-primary trace-listen');
+      studio.append(listen, audioStatus);
+    }
+
+    const wrap = el('div', '', 'extra-trace');
+    const model = el('canvas', '', 'trace-model');
+    const canvas = el('canvas', '', 'trace-ink');
+    model.width = canvas.width = 600;
+    model.height = canvas.height = 320;
+    if (dictation) {
+      wrap.classList.add('trace-word-board');
+    } else {
+      model.setAttribute('aria-label', tr('نموذج الكتابة المنقّط', 'Dotted writing guide'));
+      wrap.append(model);
+    }
+    canvas.setAttribute('aria-label', tr('مساحة الكتابة بالإصبع', 'Finger writing area'));
+    wrap.append(canvas);
+    studio.append(wrap);
+
+    const assessment = el('div', '', 'trace-assessment');
+    const metrics = el('p', tr('جاري تجهيز لوحة الكتابة…', 'Preparing the writing board…'), 'trace-metrics');
+    const tip = el('p', '', 'trace-tip');
+    assessment.setAttribute('aria-live', 'polite');
+    assessment.append(metrics, tip);
+    studio.append(assessment);
+    cue.append(studio);
+
+    let target = null;
+    let strokes = [], pointer = null, ink = '#6b4bc3';
+    const ctx = canvas.getContext('2d');
+    const instructions = tr('تُقبل الكتابة عند تجاوز 75%.', 'A score above 75% passes.');
+    function resetResult() {
+      if (!assessment.dataset.result) return;
+      delete assessment.dataset.result;
+      metrics.textContent = instructions;
+      tip.textContent = '';
+      say('');
+    }
+    function paint() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const stroke of strokes) {
+        const {points} = stroke;
+        const [x, y] = points[0];
+        ctx.lineWidth = 9;
+        ctx.lineCap = ctx.lineJoin = 'round';
+        ctx.strokeStyle = ctx.fillStyle = stroke.ink;
+        ctx.beginPath();
+        ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        for (let i = 1; i < points.length; i++) ctx.lineTo(...points[i]);
+        ctx.stroke();
+      }
+      undo.disabled = clear.disabled = finished || !strokes.length || pointer !== null;
+      complete.disabled = undo.disabled || !target;
+    }
+    const point = event => {
+      const rect = canvas.getBoundingClientRect();
+      return [(event.clientX - rect.left) * canvas.width / rect.width,
+        (event.clientY - rect.top) * canvas.height / rect.height];
+    };
+    canvas.addEventListener('pointerdown', event => {
+      if (finished || pointer !== null || !target || event.button !== 0) return;
+      resetResult();
+      pointer = event.pointerId;
+      canvas.setPointerCapture(pointer);
+      strokes.push({ink, points: [point(event)]});
+      paint();
+    });
+    canvas.addEventListener('pointermove', event => {
+      if (event.pointerId !== pointer) return;
+      const nextPoint = point(event);
+      const points = strokes.at(-1).points;
+      const previous = points.at(-1);
+      if (Math.hypot(nextPoint[0] - previous[0], nextPoint[1] - previous[1]) < 1) return;
+      points.push(nextPoint);
+      paint();
+    });
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      canvas.addEventListener(event, e => {
+        if (e.pointerId !== pointer) return;
+        pointer = null;
+        paint();
+      });
+    }
+
+    const palette = el('div', '', 'trace-palette');
+    const colors = [['#6b4bc3', tr('بنفسجي', 'Purple')], ['#267bb1', tr('أزرق', 'Blue')],
+      ['#23835d', tr('أخضر', 'Green')], ['#bd4d70', tr('وردي', 'Pink')]];
+    for (const [color, name] of colors) {
+      const swatch = button('', () => {
+        ink = color;
+        for (const other of palette.children) other.setAttribute('aria-pressed', String(other === swatch));
+      }, 'trace-color');
+      swatch.style.backgroundColor = color;
+      swatch.setAttribute('aria-label', name);
+      swatch.setAttribute('aria-pressed', String(color === ink));
+      palette.append(swatch);
+    }
+
+    const actions = el('div', '', 'game-actions trace-actions');
+    const undo = button(tr('تراجع', 'Undo'), () => {
+      strokes.pop();
+      resetResult();
+      paint();
+    }, 'button button-white');
+    const clear = button(tr('امسح', 'Clear'), () => {
+      strokes = [];
+      resetResult();
+      paint();
+    }, 'button button-white');
+    const complete = button(tr('تحقّق من كتابتي', 'Check my writing'), () => {
+      const score = evaluateTrace(target, canvas);
+      const percent = el('bdi', score.percent + '%');
+      percent.dir = 'ltr';
+      metrics.replaceChildren(tr('دقة الكتابة ', 'Writing score '), percent);
+      assessment.dataset.result = score.pass ? 'pass' : 'retry';
+      if (!score.pass) {
+        journey.mistake();
+        tip.textContent = dictation
+          ? tr('أعد سماع الكلمة وراجع الحروف ونقاطها.', 'Listen again and check the letters and their dots.')
+          : tr('تتبّع جميع أجزاء النموذج وحافظ على مساره.', 'Follow the guide and trace all its parts.');
+        say(tr('حاول مرة أخرى.', 'Try again.'), 'wrong');
+        return;
+      }
+
+      if (dictation) {
+        const word = el('bdi', round.word);
+        word.lang = 'ar';
+        tip.replaceChildren(tr('أحسنت! كتبت ', 'Well done! You wrote '), word, '.');
+      }
+      done();
+      paint();
+      for (const swatch of palette.children) swatch.disabled = true;
+    }, 'button button-primary');
+    actions.append(undo, clear, complete);
+    options.append(palette, actions);
+
+    const image = new Image();
+    const loadingFailed = () => {
+      metrics.textContent = tr('تعذّر تجهيز لوحة الكتابة. أعد تحميل الصفحة.', 'The writing board could not load. Reload the page.');
+    };
+    image.onload = () => {
+      try {
+        target = drawGuide(image, model, dictation);
+        metrics.textContent = instructions;
+        paint();
+      } catch {
+        loadingFailed();
+      }
+    };
+    image.onerror = loadingFailed;
+    image.src = round.image;
+    paint();
+    return;
   }
 
 }

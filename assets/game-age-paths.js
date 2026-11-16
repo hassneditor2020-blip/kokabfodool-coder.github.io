@@ -34,6 +34,7 @@ const curriculum = {
   trace: {
     '3-5': [2, 'تتبّع الحروف الأولى فوق النموذج', 'Trace the first letters over a guide'],
     '6-7': [10, 'تدرّب على كتابة حروف وأعداد أكثر', 'Practise tracing more letters and numbers'],
+    '8-10': [13, 'اسمع كلمات عربية واكتبها كاملة', 'Listen and write whole Arabic words'],
   },
   'robo-lab': {
     '3-5': [2, 'صنّف الصور وتعرّف إلى مواطن الحيوانات', 'Sort pictures and identify animal habitats'],

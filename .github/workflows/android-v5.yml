@@ -1,9 +1,7 @@
-name: Fudool V6.3 age-based games and Android verification
+name: Fudool V6.4 writing review and Android verification
 on:
   push:
-    branches: [development/fudool-game-ages-v6-3]
-    paths-ignore:
-      - 'downloads/apps/**'
+    branches: [development/fudool-writing-v6-4]
   workflow_dispatch:
 concurrency:
   group: fudool-worlds-android-${{ github.ref }}
@@ -74,7 +72,7 @@ jobs:
       - name: Upload APKs and checksums (not website deployment)
         uses: actions/upload-artifact@v4
         with:
-          name: Kokab-Fodool-V6.3-${{ steps.signing.outputs.kind }}
+          name: Kokab-Fodool-V6.4-review-${{ steps.signing.outputs.kind }}
           path: build/android-v6/
           if-no-files-found: error
           retention-days: 14
@@ -82,13 +80,13 @@ jobs:
         if: always()
         run: rm -f "$RUNNER_TEMP/fudool-signing.jks"
 
-  stage:
-    if: needs.build.outputs.kind == 'release' && github.ref_name == 'development/fudool-game-ages-v6-3'
+  verify:
+    if: needs.build.outputs.kind == 'release' && github.ref_name == 'development/fudool-writing-v6-4'
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
-      contents: write
+      contents: read
       actions: read
     steps:
       - uses: actions/checkout@v4
@@ -101,7 +99,7 @@ jobs:
       - run: node scripts/test-v6-worlds.cjs
       - uses: actions/download-artifact@v4
         with:
-          name: Kokab-Fodool-V6.3-release
+          name: Kokab-Fodool-V6.4-review-release
           path: build/android-v6/
       - name: Enable emulator hardware acceleration
         run: sudo chmod a+rw /dev/kvm
@@ -113,20 +111,10 @@ jobs:
           arch: x86_64
           disable-animations: true
           script: bash scripts/test-v6-android.sh
-      - name: Stage the verified APK for the release PR
-        run: |
-          python3 scripts/stage-v5-release.py
-          python3 scripts/verify-v5.py
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add downloads/apps/
-          git diff --cached --quiet && exit 0
-          git commit -m "Stage signed Kokab Fodool V6.3 Android release"
-          git push origin HEAD:refs/heads/development/fudool-game-ages-v6-3
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: V6.3-release-visual-screenshots
+          name: V6.4-review-screenshots
           path: |
             build/v5-screenshots/
             build/v6-screenshots/
