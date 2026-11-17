@@ -22,6 +22,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    assert.equal(await page.locator('.v5-featured-scene .world-cover-scene').count(),3);
    assert.equal(await page.locator('.v5-nav use[href*="fudool-premium-art.svg"]').count(),5);
    assert((await page.locator('.v5-nav a[aria-current="page"]').count())===1);
+   assert.equal(await page.locator('.v5-nav a').count(),6);
+   assert.equal(await page.locator('.v5-nav a[href="/stories/"]').innerText(),lang==='ar'?'صفحات':'Stories');
    assert.equal(await page.locator('.v5-daily use[href*="fudool-premium-art.svg#crown"]').count(),1);
    await page.screenshot({path:'build/v5-screenshots/'+lang+'-'+width+'-home.png',fullPage:true});
    await page.locator('.v5-nav a[href="#v5-watch"]').click();await visible('learn');await fit();

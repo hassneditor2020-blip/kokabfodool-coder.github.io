@@ -9,7 +9,7 @@ async function packMatch(path){const info=await status();if(!info)return undefin
 async function cachedStory(path){
  const story=path.match(/^\/stories\/([a-z0-9-]+)\//);
  if(story)return caches.match(path,{cacheName:'fudool-story-v1-'+story[1]});
- const shared=['/stories/','/stories/catalog.json','/assets/fudool-pages.css','/assets/fudool-pages.js','/assets/fudool-pages-cover.webp','/assets/profile-state.js'];
+ const shared=['/stories/','/stories/catalog.json','/assets/fudool-pages.css','/assets/fudool-pages.js','/assets/fudool-pages-cover.webp','/assets/profile-state.js','/assets/audio-settings.js','/assets/story-page-turn.wav'];
  if(!shared.includes(path))return undefined;
  const downloads=(await caches.keys()).filter(key=>key.startsWith('fudool-story-v1-'));
  for(const cacheName of downloads.reverse()){
