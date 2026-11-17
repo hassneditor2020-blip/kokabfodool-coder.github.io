@@ -1,10 +1,10 @@
 {
   "unified": {
     "file": "kawkab-fudool.apk",
-    "version": "6.8.6",
-    "versionCode": 76,
-    "bytes": 23794372,
-    "sha256": "9946ff1f5bac96daf247ab791779a59b00b01477e0d876210e429751f8564756",
+    "version": "6.8.7",
+    "versionCode": 77,
+    "bytes": 23795023,
+    "sha256": "a9ec779256d052cf003e0fd3979c4053d0dd45b4daa910b033e00e4211ec336e",
     "certificate_sha256": "ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729"
   }
 }
