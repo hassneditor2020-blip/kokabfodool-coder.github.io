@@ -24,7 +24,8 @@ const root='http://127.0.0.1:8714';
   await page.getByRole('link',{name:'مشعال والبالون الأزرق'}).waitFor();
   assert.equal(await page.getByRole('link',{name:'روبو والبذرة الصغيرة'}).count(),0);
   await page.locator('[name="age"]').selectOption('7');
-  await page.getByText('قصص جديدة في الطريق!').waitFor();
+  await page.getByRole('link',{name:'فضّول وسرّ الحديقة'}).waitFor();
+  assert.equal(await page.locator('.pages-card').count(),1);
   await page.locator('[name="age"]').selectOption('5');
   await page.getByRole('button',{name:'المفضلة'}).click();
   await page.locator('[name="status"]').selectOption('favorite');
@@ -87,6 +88,35 @@ const root='http://127.0.0.1:8714';
   await page.getByText(/نجوم القراءة: 6/).waitFor();
   await context.close();
   console.log('PASS reader, filters, progress, quiz, awards and offline width='+width);
+ }
+ for(const [id, title, age, total, answers] of [
+  ['fudool-garden-mystery','فضّول وسرّ الحديقة','7',9,[0,1,2,0,1]],
+  ['clean-energy-city','رحلة إلى مدينة الطاقة النظيفة','9',8,[0,1,2,0,1,2]],
+ ]){
+  const context=await browser.newContext({viewport:{width:390,height:844}});
+  const page=await context.newPage();
+  await page.goto(root+'/stories/');
+  await page.locator('[name="age"]').selectOption(age);
+  await page.getByRole('link',{name:title}).click();
+  assert.equal(new URL(page.url()).pathname,'/stories/'+id+'/');
+  for(let i=1;i<=total;i++){
+   await page.getByText(i+'/'+total,{exact:true}).waitFor();
+   await page.locator('figure img').evaluate(image=>image.decode());
+   assert(await page.locator('figcaption').innerText());
+   if(i<total) await page.getByRole('button',{name:'التالي',exact:true}).click();
+  }
+  await page.getByRole('button',{name:'إنهاء القصة'}).click();
+  for(const [index,answer] of answers.entries()) await page.locator(`input[name="${index}"][value="${answer}"]`).check();
+  await page.getByRole('button',{name:'تحقّق من إجاباتي'}).click();
+  await page.getByText(/حصلت على نجمتين/).waitFor();
+  await page.getByRole('button',{name:'تنزيل القصة'}).click();
+  await page.getByText('القصة جاهزة للقراءة دون إنترنت.').waitFor();
+  await context.setOffline(true);
+  await page.reload();
+  await page.getByText(total+'/'+total,{exact:true}).waitFor();
+  await page.locator('figure img').evaluate(image=>image.decode());
+  await context.close();
+  console.log('PASS all pages, comprehension quiz and offline reread: '+id);
  }
  const native=await browser.newPage({userAgent:'Mozilla/5.0 FudoolAndroidUnified'});
  await native.goto(root+'/play-app/');

@@ -143,7 +143,6 @@ function reader(story) {
     let quizShown = false;
     const book = node('div');
     book.className = 'pages-book';
-    book.toggleAttribute('data-embedded-text', story.embeddedText === true);
     const frame = node('figure');
     frame.className = 'pages-frame';
     const image = node('img');
@@ -194,6 +193,7 @@ function reader(story) {
     function seenEnd() { return position === story.pages.length - 1; }
     function render() {
         const page = story.pages[position];
+        book.toggleAttribute('data-embedded-text', story.embeddedText === true || page.embeddedText === true);
         image.src = base + page.image;
         text.textContent = page.text;
         counter.textContent = `${position + 1}/${story.pages.length}`;
