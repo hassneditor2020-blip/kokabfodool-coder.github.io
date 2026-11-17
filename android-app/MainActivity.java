@@ -98,7 +98,11 @@ public class MainActivity extends Activity {
             return ("POST".equals(method) || "OPTIONS".equals(method))
                     && path.matches("/v1/accounts:(signUp|signInWithPassword|lookup|sendOobCode|delete)")
                     && backupKey.equals(url.getQueryParameter("key"));
-        }        if (!"firestore.googleapis.com".equals(url.getHost())) return false;
+        }        if ("securetoken.googleapis.com".equals(url.getHost())) {
+            return ("POST".equals(method) || "OPTIONS".equals(method))
+                    && path.equals("/v1/token") && backupKey.equals(url.getQueryParameter("key"));
+        }
+        if (!"firestore.googleapis.com".equals(url.getHost())) return false;
         String database = "/v1/projects/" + backupProject + "/databases/(default)";
         if (path.equals(database + "/documents:commit")) {
             return "POST".equals(method) || "OPTIONS".equals(method);

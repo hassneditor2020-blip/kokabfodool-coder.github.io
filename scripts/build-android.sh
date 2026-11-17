@@ -45,7 +45,7 @@ PY_CONFIG
   printf '%s\n' '<resources><string name="app_name">Kokab Fodool</string></resources>' > "$W/res/values/app_name.xml"
   printf '%s\n' '<resources><string name="app_name">كوكب فضول</string></resources>' > "$W/res/values-ar/app_name.xml"
   cat > "$W/AndroidManifest.xml" <<EOF
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="68" android:versionName="6.7.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kokabfodool.offline" android:versionCode="69" android:versionName="6.7.1">
 <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="32"/>
 $permission
 <queries><intent><action android:name="android.intent.action.TTS_SERVICE"/></intent></queries>
@@ -104,8 +104,8 @@ with zipfile.ZipFile(apk) as archive:
         assert archive.read(name) == source, name
 release = {'unified': {
     'file': apk.name,
-    'version': '6.7.0',
-    'versionCode': 68,
+    'version': '6.7.1',
+    'versionCode': 69,
     'bytes': apk.stat().st_size,
     'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'certificate_sha256': (output / 'unified-certificate.txt').read_text().strip(),

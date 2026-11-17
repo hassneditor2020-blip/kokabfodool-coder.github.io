@@ -9,10 +9,10 @@ mkdir -p build/v6-screenshots
 adb shell wm size 390x844
 adb shell wm density 160
 adb shell input keyevent 82
-adb install downloads/apps/Kokab-Fodool-V6.6.apk
+adb install downloads/apps/Kokab-Fodool-V6.7.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=68'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.7.0'
+adb shell dumpsys package "$package" | grep -F 'versionCode=69'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.7.1'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -62,7 +62,7 @@ for attempt in range(15):
                 if tap == 'yes' and not (exact or clickable):
                     continue
                 center_y = (y1+y2)//2
-                if tap == 'yes' and label != 'الألعاب' and center_y >= 740:
+                if tap == 'yes' and label not in ('الألعاب', 'المزيد') and center_y >= 740:
                     behind_navigation = True
                     continue
                 priority = (not exact, not clickable)
@@ -86,7 +86,8 @@ raise SystemExit('Offline Android view did not display: ' + label)
 PY
 }
 
-find_label 'الإعدادات' yes
+find_label 'المزيد' yes
+find_label 'الصوت واسم اللاعب' yes
 find_label 'اسم اللاعب' no
 find_label 'مستويات الصوت' no
 find_label 'حقل اسم اللاعب' yes android.widget.EditText
@@ -145,4 +146,4 @@ find_label 'تُقبل الكتابة عند تجاوز 75%' no
 find_label 'اسمع الكلمة' yes
 find_label 'استمع ببطء' yes
 adb exec-out screencap -p > build/v6-screenshots/android-offline-writing.png
-echo 'PASS Android 6.7.0 upgrades from 6.6 and opens settings, dictation, memory and age-based games in airplane mode.'
+echo 'PASS Android 6.7.1 upgrades from 6.7 and opens settings, dictation, memory and age-based games in airplane mode.'
