@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/assets/app-experience.css?v=1">
 <link rel="stylesheet" href="/assets/app-settings.css?v=1">
 <link rel="stylesheet" href="/assets/learning-presence.css?v=1">
-<script type="module" src="/assets/app-settings.js?v=2"></script>
+<script type="module" src="/assets/app-settings.js?v=3"></script>
 </head>
 <body class="app-experience-body">
 <main class="app-experience app-settings" data-settings>
@@ -26,9 +26,9 @@
   <h2 id="player-settings-title">Player</h2>
   <p class="settings-note">Current profile · <bdi data-player-label></bdi></p>
   <form data-player-form>
-    <label>Player name<input name="nickname" type="text" maxlength="20" autocomplete="off" autocapitalize="words" spellcheck="false" dir="auto" placeholder="e.g. Little Star"></label>
+    <label>Player name<input name="nickname" type="text" disabled maxlength="20" autocomplete="off" autocapitalize="words" spellcheck="false" dir="auto" placeholder="e.g. Little Star"></label>
     <p class="settings-note">Choose a nickname for encouragement and congratulations. It is stored on this device. Clear the field to remove it.</p>
-    <div class="settings-actions"><button type="submit" class="button button-primary">Save name</button><a class="button button-white settings-profile-link" href="/en/app/family/">Player profiles</a></div>
+    <div class="settings-actions"><button type="submit" disabled class="button button-primary">Save name</button><a class="button button-white settings-profile-link" href="/en/app/family/">Player profiles</a></div>
   </form>
   <p class="settings-alert" data-player-status role="status"></p>
 </section>
