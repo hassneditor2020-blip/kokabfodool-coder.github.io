@@ -162,5 +162,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A -- downloads/apps
-          git commit -m 'Stage signed Fudool Pages APK 6.8.7 for the website'
+          if ! git diff --cached --quiet; then
+            git commit -m 'Stage signed Fudool Pages APK 6.8.7 for the website'
+          fi
           git push origin HEAD:refs/heads/release/fudool-book-6.8.7

@@ -35,6 +35,8 @@ def normalize(text):
                    if not unicodedata.combining(c) and unicodedata.category(c) != 'Cf').strip()
 
 needle = normalize(label)
+story_cover = label in ('فضّول وسرّ الحديقة', 'رحلة إلى مدينة الطاقة النظيفة')
+story_reader = story_cover or label in ('صفحات فضول', 'التالي', 'كل القصص', 'تكبير الصورة', 'إغلاق')
 visible = []
 for attempt in range(15):
     dump = subprocess.run(['adb','shell','uiautomator','dump','/sdcard/fudool-ui.xml'], capture_output=True)
@@ -62,10 +64,12 @@ for attempt in range(15):
                 if tap == 'yes' and not (exact or clickable):
                     continue
                 center_y = (y1+y2)//2
-                if tap == 'yes' and label not in ('الألعاب', 'المزيد', 'صفحات') and center_y >= (1230 if label in ('صفحات فضول','فضّول وسرّ الحديقة','رحلة إلى مدينة الطاقة النظيفة','التالي','كل القصص','تكبير الصورة','إغلاق') else 740):
+                if story_cover and clickable:
+                    center_y = min(center_y, y1+35)
+                if tap == 'yes' and label not in ('الألعاب', 'المزيد', 'صفحات') and center_y >= (1130 if story_reader else 740):
                     behind_navigation = True
                     continue
-                priority = (not exact, not clickable)
+                priority = (not clickable, not exact) if story_cover else (not exact, not clickable)
                 point = (str((x1+x2)//2),str(center_y))
                 candidates.append((priority,point))
             if candidates:
@@ -79,7 +83,7 @@ for attempt in range(15):
                 time.sleep(.5)
                 continue
     if attempt in (3,6,9,12):
-        subprocess.run(['adb','shell','input','swipe','193', '1110' if label in ('صفحات فضول','فضّول وسرّ الحديقة','رحلة إلى مدينة الطاقة النظيفة','التالي','كل القصص','تكبير الصورة','إغلاق') else '725','193','370','350'],check=True)
+        subprocess.run(['adb','shell','input','swipe','193', '1110' if story_reader else '725','193','370','350'],check=True)
     time.sleep(1)
 print('Visible controls:', visible, flush=True)
 raise SystemExit('Offline Android view did not display: ' + label)
