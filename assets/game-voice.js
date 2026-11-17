@@ -1,8 +1,11 @@
-import {setInstructionPlaying, watchInstructionAudio} from './game-audio.js?v=6';
+import {audioPreferences, listenToAudioPreferences} from './audio-settings.js?v=1';
+import {setInstructionPlaying, watchInstructionAudio} from './game-audio.js?v=7';
 import {sharedAudioSource} from './vowel-audio-routing.js?v=2';
 
 let voiceToken = 0;
 let toneContext;
+let voiceGain;
+let nativeSpeech = false;
 let recording;
 let spoken;
 const orderClips = new Map();
@@ -11,6 +14,8 @@ const activeTones = new Set();
 
 export function stopSpeech() {
   voiceToken++;
+  if (nativeSpeech) window.FudoolDevice?.stopVoice();
+  nativeSpeech = false;
   setInstructionPlaying(playingOrder, false);
   if (recording) {
     setInstructionPlaying(recording, false);
@@ -48,12 +53,19 @@ export async function playRecording(src, fallback, {rate = 1} = {}) {
   }
 }
 
-export function speak(text, lang = 'ar', fallback, {rate = .85} = {}) {
+export function speak(text, lang = 'ar', fallback, {rate = .85, localOnly = false} = {}) {
   stopSpeech();
   const token = voiceToken;
+  const volume = audioPreferences().voice / 100;
+  if (!volume) return true;
+  if (localOnly && window.FudoolDevice?.say) {
+    window.FudoolDevice.say(text, lang, volume);
+    nativeSpeech = true;
+    return true;
+  }
   if (!('speechSynthesis' in window)) { fallback?.(); return false; }
   const language = lang.split('-')[0].toLowerCase();
-  const voices = speechSynthesis.getVoices();
+  const voices = speechSynthesis.getVoices().filter(voice => !localOnly || voice.localService);
   const voice = voices.find(v => v.lang.toLowerCase() === lang.toLowerCase()) ??
     voices.find(v => v.lang.toLowerCase().startsWith(language));
   if (!voice) { fallback?.(); return false; }
@@ -62,6 +74,7 @@ export function speak(text, lang = 'ar', fallback, {rate = .85} = {}) {
   utterance.lang = voice.lang;
   utterance.voice = voice;
   utterance.rate = rate;
+  utterance.volume = volume;
   utterance.onstart = () => {
     if (token === voiceToken) setInstructionPlaying(utterance, true);
   };
@@ -75,13 +88,25 @@ export function speak(text, lang = 'ar', fallback, {rate = .85} = {}) {
   return true;
 }
 
+function prepareToneOutput(Audio) {
+  if (toneContext) return;
+  toneContext = new Audio();
+  voiceGain = toneContext.createGain();
+  voiceGain.connect(toneContext.destination);
+  const applyVolume = () => {
+    voiceGain.gain.value = audioPreferences().voice / 100;
+  };
+  applyVolume();
+  listenToAudioPreferences(applyVolume);
+}
+
 export async function tones(count) {
   try {
     stopSpeech();
     const token = voiceToken;
     const Audio = window.AudioContext || window.webkitAudioContext;
     if (!Audio) return false;
-    toneContext ??= new Audio();
+    prepareToneOutput(Audio);
     await toneContext.resume();
     if (token !== voiceToken) return false;
     const start = toneContext.currentTime + .05;
@@ -90,7 +115,7 @@ export async function tones(count) {
       const gain = toneContext.createGain();
       tone.frequency.value = 660;
       gain.gain.value = .07;
-      tone.connect(gain).connect(toneContext.destination);
+      tone.connect(gain).connect(voiceGain);
       tone.start(start + i * .36);
       tone.stop(start + i * .36 + .18);
       activeTones.add(tone);
@@ -128,7 +153,7 @@ export async function readOrder(items, language, fallback) {
   try {
     const Audio = window.AudioContext || window.webkitAudioContext;
     if (!Audio) { onFailure(); return; }
-    toneContext ??= new Audio();
+    prepareToneOutput(Audio);
     await toneContext.resume();
     if (!orderClips.has(language)) {
       const bank = fetch('/assets/game-instructions/order-' + language + '.mp3')
@@ -156,7 +181,7 @@ export async function readOrder(items, language, fallback) {
     parts.forEach(([offset, duration], i) => {
       const node = toneContext.createBufferSource();
       node.buffer = bank;
-      node.connect(toneContext.destination);
+      node.connect(voiceGain);
       activeTones.add(node);
       node.onended = () => {
         node.disconnect();

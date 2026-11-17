@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /familyBackups/{uid}/slots/{slot} {
+      function owner() {
+        return request.auth != null && request.auth.uid == uid
+          && request.auth.token.email_verified == true && slot.matches('[1-6]');
+      }
+
+      function valid() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['version', 'levels']) && data.keys().hasOnly(['version', 'levels'])
+          && data.version == 1 && data.levels is string && data.levels.size() <= 4000
+          && data.levels.matches('(?:(code-robo|counting|english-abc|fudool-shop|grand-challenge|healthy-hero|letter-hunt|letter-match|lumaa-clock|memory|planet-engineer|puzzle|robo-lab|sound-quiz|space-journey|spot-differences|trace|vowel-drive|word-factory|world-mishaal):[0-3]{1,128}(?:;(code-robo|counting|english-abc|fudool-shop|grand-challenge|healthy-hero|letter-hunt|letter-match|lumaa-clock|memory|planet-engineer|puzzle|robo-lab|sound-quiz|space-journey|spot-differences|trace|vowel-drive|word-factory|world-mishaal):[0-3]{1,128}){0,19})?');
+      }
+
+      allow get, delete: if owner();
+      allow create, update: if owner() && valid();
+    }
+  }
+}

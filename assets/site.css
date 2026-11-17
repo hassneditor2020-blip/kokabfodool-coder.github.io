@@ -650,3 +650,5 @@ ul, ol { margin: 0; }
 .premium-game-page .game-result{background:radial-gradient(ellipse at 50% 0%,#fff0bd,transparent 65%),#fff}
 .premium-game-page .game-result-stars{filter:drop-shadow(0 3px 2px #d6a13a44)}
 @media(prefers-reduced-motion:reduce){.game-board .fudool-art{transition:none;animation:none!important;transform:none!important}}
+
+.player-encouragement{color:#473593;font-weight:700;line-height:1.55;overflow-wrap:anywhere;margin-block:.25rem .65rem;text-align:center}

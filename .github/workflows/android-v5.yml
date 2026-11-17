@@ -1,7 +1,7 @@
-name: Fudool V6.6 gameplay and Android verification
+name: Fudool V6.7 settings and Android verification
 on:
   push:
-    branches: [development/kokab-fodool-digital-presence]
+    branches: [development/app-settings-v67]
     paths-ignore:
       - 'downloads/apps/**'
   workflow_dispatch:
@@ -76,7 +76,7 @@ jobs:
       - name: Upload APKs and checksums (not website deployment)
         uses: actions/upload-artifact@v4
         with:
-          name: Kokab-Fodool-V6.6-${{ steps.signing.outputs.kind }}
+          name: Kokab-Fodool-V6.7-${{ steps.signing.outputs.kind }}
           path: build/android-v6/
           if-no-files-found: error
           retention-days: 14
@@ -85,7 +85,7 @@ jobs:
         run: rm -f "$RUNNER_TEMP/fudool-signing.jks"
 
   verify:
-    if: needs.build.outputs.kind == 'release' && github.ref_name == 'development/kokab-fodool-digital-presence'
+    if: needs.build.outputs.kind == 'release' && github.ref_name == 'development/app-settings-v67'
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -104,9 +104,10 @@ jobs:
       - run: node scripts/test-v6-challenges.cjs
       - run: node scripts/test-v65-play.cjs
       - run: node scripts/test-learning-presence.cjs
+      - run: node scripts/test-app-settings.cjs
       - uses: actions/download-artifact@v4
         with:
-          name: Kokab-Fodool-V6.6-release
+          name: Kokab-Fodool-V6.7-release
           path: build/android-v6/
       - name: Verify all advanced levels from the signed Android package
         run: |
@@ -115,7 +116,7 @@ jobs:
           FUDOOL_TEST_ROOT=build/apk-verification/assets/site node scripts/test-v65-play.cjs
       - name: Enable emulator hardware acceleration
         run: sudo chmod a+rw /dev/kvm
-      - name: Verify Android upgrade and offline game launch
+      - name: Verify Android upgrade, settings and offline game launch
         uses: ReactiveCircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -131,13 +132,13 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add downloads/apps/
           if ! git diff --cached --quiet; then
-            git commit -m "Stage signed Kokab Fodool V6.6 APK"
-            git push origin HEAD:refs/heads/development/kokab-fodool-digital-presence
+            git commit -m "Stage signed Kokab Fodool V6.7 APK"
+            git push origin HEAD:refs/heads/development/app-settings-v67
           fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: V6.6-gameplay-screenshots
+          name: V6.7-gameplay-screenshots
           path: |
             build/v5-screenshots/
             build/v6-screenshots/

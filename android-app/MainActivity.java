@@ -11,12 +11,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
+import org.json.JSONObject;
 import java.io.*;
 import java.util.*;
 public class MainActivity extends Activity {
     private WebView web;
+    private FudoolDevice device;
     private String host;
     private String home;
+    private String backupProject;
+    private String backupKey;
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
         // Preserve the old offline package and origin so saved progress is retained on update.
@@ -35,8 +39,11 @@ public class MainActivity extends Activity {
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         s.setJavaScriptCanOpenWindowsAutomatically(false);s.setSupportMultipleWindows(false);
         s.setMediaPlaybackRequiresUserGesture(true);s.setUserAgentString(s.getUserAgentString()+" FudoolAndroidUnified");
-        s.setBlockNetworkLoads(true);
+        readBackupConfig();
+        s.setBlockNetworkLoads(backupProject == null);
         CookieManager.getInstance().setAcceptThirdPartyCookies(web,false);
+        device = new FudoolDevice(this, web, backupProject != null);
+        web.addJavascriptInterface(device, "FudoolDevice");
         web.setWebChromeClient(new WebChromeClient());
         web.setWebViewClient(new WebViewClient(){
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest req){
@@ -48,6 +55,7 @@ public class MainActivity extends Activity {
             }
             @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest req){
                 Uri u=req.getUrl();
+                if (allowedBackupRequest(req)) return null;
                 if(!"https".equals(u.getScheme())||!host.equals(u.getHost()))return error(403,"Blocked");
                 return local(u,req.getRequestHeaders());
             }
@@ -58,6 +66,49 @@ public class MainActivity extends Activity {
         setContentView(web);
         if(state==null)web.loadUrl(home);else if(web.restoreState(state)==null)web.loadUrl(home);
     }
+    private void readBackupConfig() {
+        try (InputStream input = getAssets().open("site/assets/parent-backup-config.json")) {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = input.read(buffer)) != -1) {
+                if (bytes.size() + read > 1024) return;
+                bytes.write(buffer, 0, read);
+            }
+            JSONObject config = new JSONObject(new String(bytes.toByteArray(), java.nio.charset.StandardCharsets.UTF_8));
+            String project = config.optString("projectId");
+            String key = config.optString("apiKey");
+            if (project.matches("[a-z][a-z0-9-]{4,28}[a-z0-9]") && key.matches("AIza[a-zA-Z0-9_-]{30,45}")) {
+                backupProject = project;
+                backupKey = key;
+            }
+        } catch (IOException | org.json.JSONException ignored) {
+            // With no connected parent backup project, the WebView remains offline.
+        }
+    }
+
+    private boolean allowedBackupRequest(WebResourceRequest request) {
+        if (backupProject == null || request.isForMainFrame()) return false;
+        Uri url = request.getUrl();
+        String path = url.getPath();
+        String method = request.getMethod();
+        if (!"https".equals(url.getScheme()) || url.getUserInfo() != null
+                || (url.getPort() != -1 && url.getPort() != 443) || path == null) return false;
+        if ("identitytoolkit.googleapis.com".equals(url.getHost())) {
+            return ("POST".equals(method) || "OPTIONS".equals(method))
+                    && path.matches("/v1/accounts:(signUp|signInWithPassword|lookup|sendOobCode|delete)")
+                    && backupKey.equals(url.getQueryParameter("key"));
+        }        if (!"firestore.googleapis.com".equals(url.getHost())) return false;
+        String database = "/v1/projects/" + backupProject + "/databases/(default)";
+        if (path.equals(database + "/documents:commit")) {
+            return "POST".equals(method) || "OPTIONS".equals(method);
+        }
+        String base = database + "/documents/familyBackups/";
+        return path.startsWith(base)
+                && path.substring(base.length()).matches("[a-zA-Z0-9_-]{1,128}/slots/[1-6]")
+                && ("GET".equals(method) || "OPTIONS".equals(method));
+    }
+
     private void openExternalLink(String value){
         if(value==null)return;
         Uri u=Uri.parse(value);String h=u.getHost();
@@ -97,7 +148,11 @@ public class MainActivity extends Activity {
     }
     @Override public void onBackPressed(){if(web.canGoBack())web.goBack();else super.onBackPressed();}
     @Override protected void onSaveInstanceState(Bundle out){web.saveState(out);super.onSaveInstanceState(out);}
-    @Override protected void onPause(){super.onPause();web.onPause();}
+    @Override protected void onPause(){super.onPause();device.stopVoice();web.onPause();}
+    @Override protected void onActivityResult(int request,int result,Intent data){
+        super.onActivityResult(request,result,data);
+        device.onActivityResult(request,result,data);
+    }
     @Override protected void onResume(){super.onResume();if(web!=null)web.onResume();}
-    @Override protected void onDestroy(){if(web!=null){web.stopLoading();web.destroy();}super.onDestroy();}
+    @Override protected void onDestroy(){if(device!=null)device.close();if(web!=null){web.stopLoading();web.destroy();}super.onDestroy();}
 }

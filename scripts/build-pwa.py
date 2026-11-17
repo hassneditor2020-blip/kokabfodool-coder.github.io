@@ -73,9 +73,9 @@ for p in root.rglob('index.html'):
 # Refresh dependencies for every game engine and public page, including existing offline clients.
 for p in assets.glob('*.js'):
     s=p.read_text()
-    s=re.sub(r'(game-progress\.js\?v=)\d+',lambda m:m[1]+'15',s)
-    s=re.sub(r'(game-extra\.js\?v=)\d+',lambda m:m[1]+'20',s)
-    s=re.sub(r'(game-age-paths\.js\?v=)\d+',lambda m:m[1]+'5',s)
+    s=re.sub(r'(game-progress\.js\?v=)\d+',lambda m:m[1]+'16',s)
+    s=re.sub(r'(game-extra\.js\?v=)\d+',lambda m:m[1]+'21',s)
+    s=re.sub(r'(game-age-paths\.js\?v=)\d+',lambda m:m[1]+'6',s)
     p.write_text(s)
 level_counts = {}
 round_count = 0
@@ -97,13 +97,13 @@ for p in root.rglob('index.html'):
         stats = r'(<li class="home-stat home-stat-([1-3])"[^>]*>.*?<strong dir="ltr">)[\d,]+(</strong>)'
         s = re.sub(stats, lambda m: m[1] + format(home_counts[int(m[2])-1], ',') + m[3], s)
     s=re.sub(r'(data-game-id="([a-z-]+)" data-level-count=")\d+',lambda m:m[1]+str(level_counts[m[2]]),s)
-    s=re.sub(r'(/assets/age-journey\.js\?v=)\d+',lambda m:m[1]+'10',s)
+    s=re.sub(r'(/assets/age-journey\.js\?v=)\d+',lambda m:m[1]+'11',s)
     # Bump entry points whose imports were changed.
-    for name,ver in [('games',21),('letter-match',18),('vowel-drive',21),('interactive-games',14),('planet-adventures',13),('sound-world',8),('game-progress',15),('app-experience',8)]:
+    for name,ver in [('games',22),('letter-match',19),('vowel-drive',22),('interactive-games',15),('planet-adventures',14),('sound-world',9),('game-progress',16),('app-experience',9)]:
         s=re.sub(r'(/assets/'+name+r'\.js\?v=)\d+',lambda m:m[1]+str(ver),s)
     p.write_text(s)
 # Pack includes the current canonical app/game pages, all local media and code required by the games.
-pages=['/','/en/','/games/','/en/games/','/app/','/en/app/','/play-app/','/en/play-app/','/app/family/','/en/app/family/','/offline/','/en/offline/','/grown-ups/','/en/grown-ups/','/episodes/','/en/episodes/','/privacy/','/en/privacy/','/terms/','/en/terms/','/faq/','/en/faq/']
+pages=['/','/en/','/games/','/en/games/','/app/','/en/app/','/play-app/','/en/play-app/','/app/family/','/en/app/family/','/app/settings/','/en/app/settings/','/offline/','/en/offline/','/grown-ups/','/en/grown-ups/','/episodes/','/en/episodes/','/privacy/','/en/privacy/','/terms/','/en/terms/','/faq/','/en/faq/']
 for prefix in ['', 'en/']:
     pages += ['/'+p.parent.as_posix()+'/' for p in (root/(prefix+'games')).glob('*/index.html')]
 assert len([x for x in pages if re.match(r'^/(?:en/)?games/[^/]+/$',x)])==40

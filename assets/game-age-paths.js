@@ -1,4 +1,4 @@
-import {read} from './profile-state.js?v=1';
+import {read} from './profile-state.js?v=2';
 
 export const ageGroups = ['3-5', '6-7', '8-10'];
 

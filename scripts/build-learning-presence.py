@@ -415,7 +415,11 @@ def app_details(text, lang, version, release_date):
                '</h2><div class="app-device-grid">' + ''.join(screens) + '</div></section>') if screens else ''
     notes = '<section><h2>' + tr(lang, 'سجل التحديثات', 'Release notes') + '</h2><ul>'
     notes += '<li><bdi>' + version + '</bdi> · <time datetime="' + release_date + '">' + date + '</time> · '
-    notes += tr(lang, 'توحيد الاسم والروابط التعليمية في واجهة الموقع والتطبيق.', 'Brand name and education links aligned across the site and app.') + '</li>'
+    notes += tr(lang, 'مستويات للصوت واسم للاعب وتشجيع شخصي ونقل التقدّم بملف قابل للاستعادة.',
+                'Separate audio levels, a player nickname, personal encouragement and a transferable progress file.') + '</li>'
+    notes += '<li><bdi>6.6.0</bdi> · ' + tr(
+        lang, 'توحيد الاسم والروابط التعليمية في واجهة الموقع والتطبيق.',
+        'Brand name and education links aligned across the site and app.') + '</li>'
     notes += '<li><bdi>6.5.0</bdi> · ' + tr(
         lang, 'تجربة الثلج ومسار السيارة والإملاء ومطابقة الذاكرة وفواتير المتجر ومهام الفضاء.',
         'Melting ice, steering, dictation, memory matching, market receipts and space missions.') + '</li></ul></section>'
@@ -429,15 +433,22 @@ def app_details(text, lang, version, release_date):
     return ensure_style(block(text, 'app', content))
 
 
-def privacy_refresh(text, lang, embeds_enabled):
-    content = articles([
+def privacy_refresh(text, lang, embeds_enabled, parent_backup_enabled):
+    sections = [
         (tr(lang, 'محتوى الأطفال والروابط', 'Children’s content and links'),
          tr(lang, 'الألعاب لا تتطلب حسابًا على الموقع. تحفظ نقاط اللعب وإعداداته محليًا على الجهاز. يظهر غلاف الحلقة من الموقع، ويتصل مشغّل يوتيوب بخدمته عند طلب تشغيل الفيديو. تتبع المواقع الأخرى سياساتها عند فتحها.',
              'The games do not require a site account. Game progress and settings are saved locally. Episode covers load from this site, and the YouTube player connects to YouTube when a visitor requests playback. External sites apply their own policies when opened.')),
         (tr(lang, 'إدارة البيانات المحلية', 'Manage local data'),
          tr(lang, 'يمكن للبالغ إزالة تقدم اللعب وملفات الحزمة من إعدادات بيانات الموقع أو التطبيق على الجهاز. تواصل عبر رابط البالغين عند وجود استفسار عن الخصوصية.',
              'An adult can remove progress and downloaded game files through the site or app data settings on the device. Use the adult contact link for a privacy question.')),
-    ])
+    ]
+    if parent_backup_enabled:
+        sections.append((
+            tr(lang, 'النسخ الاحتياطي لحساب ولي الأمر', 'Parent account and progress backups'),
+            tr(lang,
+               'يمكن لولي الأمر إنشاء حساب اختياري في تطبيق Android. تستخدم خدمة Google Firebase البريد الإلكتروني لولي الأمر لتسجيل الدخول والتحقق من الحساب. عند اختيار حفظ نسخة احتياطية، تحفظ الخدمة نتائج المستويات المكتملة ونجومها. يبقى اسم الطفل وعمره وإعدادات الصوت على الجهاز. تبقى النسخ متاحة إلى أن يختار ولي الأمر حذف الحساب والنسخ عبر إعدادات التطبيق.',
+               'A parent or guardian can create an optional account in the Android app. Google Firebase uses the adult’s email address for sign-in and account verification. When the adult chooses to save a backup, the service stores completed-level scores and stars. The child’s name and age and the audio settings stay on the device. Backups remain available until the adult deletes the account and backups from the app’s settings.')))
+    content = articles(sections)
     if not embeds_enabled:
         content = content.replace(
             'يظهر غلاف الحلقة من الموقع، ويتصل مشغّل يوتيوب بخدمته عند طلب تشغيل الفيديو.',
@@ -512,6 +523,8 @@ def public_sitemap(urls):
 def build():
     published = json.loads((ROOT / 'scripts/youtube-public.json').read_text())
     videos = published['items']
+    backup_config = ROOT / 'assets/parent-backup-config.json'
+    parent_backup_enabled = backup_config.is_file() and bool(json.loads(backup_config.read_text()))
     catalog = json.loads((ROOT / 'assets/app-learning-v5.json').read_text())['series']
     curriculum = (ROOT / 'assets/game-age-paths.js').read_text()
     version = re.search(r'android:versionName="([^"]+)"', (ROOT / 'scripts/build-android.sh').read_text())[1]
@@ -617,7 +630,7 @@ def build():
             page['mainEntity'] = {'@id': APP_ID}
             text = app_details(text, lang, version, release_date)
         elif section == 'privacy':
-            text = privacy_refresh(text, lang, embeds_enabled)
+            text = privacy_refresh(text, lang, embeds_enabled, parent_backup_enabled)
         elif route in episode_routes:
             series, episode = episode_routes[route]
             id = video_id(episode['video'])

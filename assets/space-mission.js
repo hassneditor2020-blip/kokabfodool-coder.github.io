@@ -1,5 +1,5 @@
 import {createIllustration} from './learning-art.js?v=2';
-import {instructionButton, readInstruction, stopSpeech} from './game-voice.js?v=1';
+import {instructionButton, readInstruction, stopSpeech} from './game-voice.js?v=2';
 
 export function renderSpaceMission(round, {cue, options, journey, el, btn, tr, wrong, done}) {
   const panel = el('section', '', 'mission-board');

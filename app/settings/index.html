@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#49308f">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; img-src 'self' data:; frame-src 'none'; connect-src 'self' https://identitytoolkit.googleapis.com https://firestore.googleapis.com">
+<title>الإعدادات | كوكب فضول</title>
+<link rel="preload" href="/assets/nunito.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/noto-arabic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/noto-arabic-bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="/assets/app-icon-192.png">
+<link rel="stylesheet" href="/assets/site.css?v=15">
+<link rel="stylesheet" href="/assets/app-experience.css?v=1">
+<link rel="stylesheet" href="/assets/app-settings.css?v=1">
+<link rel="stylesheet" href="/assets/learning-presence.css?v=1">
+<script type="module" src="/assets/app-settings.js?v=1"></script>
+</head>
+<body class="app-experience-body">
+<main class="app-experience app-settings" data-settings>
+<header class="app-top">
+  <a class="app-top-brand" href="/play-app/"><img src="/assets/app-icon-192.png" alt="" width="43" height="43"><span>كوكب فضول</span></a>
+  <div class="app-top-actions"><a href="/en/app/settings/">English</a><a href="/play-app/">الرئيسية</a></div>
+</header>
+<div class="settings-intro"><h1>الإعدادات</h1><p>خصّص صوت التطبيق واسم اللاعب وتولَّ نقل تقدّمه إلى جهاز آخر.</p></div>
+<section class="settings-card" aria-labelledby="player-settings-title">
+  <h2 id="player-settings-title">اللاعب</h2>
+  <p class="settings-note">الملف الحالي · <bdi data-player-label></bdi></p>
+  <form data-player-form>
+    <label>اسم اللاعب<input name="nickname" type="text" maxlength="20" autocomplete="off" autocapitalize="words" spellcheck="false" dir="auto" placeholder="مثل النجم الصغير"></label>
+    <p class="settings-note">اختر اسمًا مستعارًا للتشجيع والتهنئة. يُحفظ الاسم على هذا الجهاز. اترك الحقل فارغًا لإزالة الاسم.</p>
+    <div class="settings-actions"><button type="submit" class="button button-primary">حفظ الاسم</button><a class="button button-white settings-profile-link" href="/app/family/">ملفات اللاعبين</a></div>
+  </form>
+  <p class="settings-alert" data-player-status role="status"></p>
+</section>
+<section class="settings-card" aria-labelledby="sound-settings-title">
+  <h2 id="sound-settings-title">مستويات الصوت</h2>
+  <label><span class="settings-range-title">المؤثرات<output for="volume-effects" dir="ltr">100%</output></span><input id="volume-effects" data-volume="effects" type="range" min="0" max="100" step="5" value="100"></label>
+  <label><span class="settings-range-title">الشرح والتشجيع<output for="volume-voice" dir="ltr">100%</output></span><input id="volume-voice" data-volume="voice" type="range" min="0" max="100" step="5" value="100"></label>
+  <div class="settings-actions"><button type="button" class="button button-white" data-preview-effects>جرّب المؤثرات</button><button type="button" class="button button-white" data-preview-voice>جرّب صوت الترحيب</button></div>
+  <p class="settings-note">يستخدم نطق الاسم صوت اللغة المثبّت على الجهاز.</p>
+  <p class="settings-alert" data-audio-status role="status"></p>
+</section>
+<section class="settings-card" aria-labelledby="progress-settings-title">
+  <h2 id="progress-settings-title">نقل التقدّم · للأهل</h2>
+  <p class="settings-note">احفظ ملف مستويات اللاعب الحالي ونجومه. افتح الإعدادات على الجهاز الآخر لاستعادته. يمكنك اختيار Google Drive إذا ظهر في نافذة الملفات.</p>
+  <div class="settings-actions"><button type="button" class="button button-primary" data-export-progress>حفظ ملف التقدّم</button><button type="button" class="button button-white" data-import-progress>استعادة ملف</button></div>
+  <input type="file" accept="application/json,.json" data-backup-input hidden>
+  <p class="settings-alert" data-backup-status role="status"></p>
+  <div data-parent-backup hidden>
+  <h3>حساب ولي الأمر</h3>
+  <p class="settings-note">للأهل فقط. يستخدم Google Firebase بريد ولي الأمر للتحقق من الحساب وحفظ نسخة المستويات والنجوم. اسم اللاعب يبقى على جهازه.</p>
+  <form data-parent-auth>
+    <label>بريد ولي الأمر<input name="email" type="email" required autocomplete="email" dir="ltr" maxlength="254"></label>
+    <label>كلمة المرور<input name="password" type="password" autocomplete="current-password" dir="ltr" maxlength="128"></label>
+    <label class="settings-check"><input name="adult" type="checkbox" required><span>أنا ولي الأمر وأستخدم بريدي الشخصي.</span></label>
+    <div class="settings-actions">
+      <button class="button button-primary" type="submit" value="sign-in">تسجيل الدخول</button>
+      <button class="button button-white" type="submit" value="sign-up">إنشاء حساب</button>
+      <button class="button button-white" type="submit" value="reset">استعادة كلمة المرور</button>
+    </div>
+  </form>
+  <div data-parent-tools hidden>
+    <p class="settings-note"><bdi data-parent-player></bdi> · اختر الخانة نفسها لهذا اللاعب عند استخدام جهاز آخر.</p>
+    <label>خانة النسخة المحفوظة<select><option value="1">الخانة 1</option><option value="2">الخانة 2</option><option value="3">الخانة 3</option><option value="4">الخانة 4</option><option value="5">الخانة 5</option><option value="6">الخانة 6</option></select></label>
+    <div class="settings-actions">
+      <button class="button button-primary" type="button" data-parent-save>حفظ عبر الحساب</button>
+      <button class="button button-white" type="button" data-parent-restore>استعادة من الحساب</button>
+      <button class="button button-white" type="button" data-parent-signout>تسجيل الخروج</button>
+      <button class="button button-white" type="button" data-parent-delete>حذف الحساب ونسخه</button>
+    </div>
+  </div>
+  <p class="settings-alert" data-parent-status role="status"></p>
+</div>
+</section>
+</main>
+<a class="download-app-bubble" href="/downloads/apps/kawkab-fudool.apk" download><span aria-hidden="true">↓</span> تحميل التطبيق</a>
+</body>
+</html>
