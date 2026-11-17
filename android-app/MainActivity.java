@@ -6,7 +6,11 @@ import android.os.Bundle;
 import android.webkit.*;
 import android.net.Uri;
 import android.graphics.Color;
-import android.view.ViewGroup;
+import android.view.View;
+import android.view.WindowInsets;
+import android.os.Build;
+import android.text.InputType;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
@@ -49,7 +53,13 @@ public class MainActivity extends Activity {
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest req){
                 Uri u=req.getUrl();String p=u.getPath();
                 if(req.isForMainFrame() && "https".equals(u.getScheme()) && host.equals(u.getHost()) && "/play-app/external/".equals(p)){openExternalLink(u.getQueryParameter("url"));return true;}
-                if("https".equals(u.getScheme())&&host.equals(u.getHost())&&allowedPage(p))return false;
+                if ("https".equals(u.getScheme()) && host.equals(u.getHost())) {
+                    if (req.isForMainFrame() && WorksheetActivity.validPath(p)) {
+                        startActivity(new Intent(MainActivity.this, WorksheetActivity.class).putExtra("worksheet", p));
+                        return true;
+                    }
+                    if (allowedPage(p)) return false;
+                }
                 if(req.isForMainFrame())Toast.makeText(MainActivity.this,"هذا الرابط غير متاح | Link unavailable",Toast.LENGTH_SHORT).show();
                 return true;
             }
@@ -63,6 +73,7 @@ public class MainActivity extends Activity {
                 if(req.isForMainFrame())runOnUiThread(()->Toast.makeText(MainActivity.this,"تعذر فتح الصفحة | Unable to open page",Toast.LENGTH_SHORT).show());
             }
         });
+        padForSystemBars(web);
         setContentView(web);
         if(state==null)web.loadUrl(home);else if(web.restoreState(state)==null)web.loadUrl(home);
     }
@@ -117,7 +128,45 @@ public class MainActivity extends Activity {
         if(value==null)return;
         Uri u=Uri.parse(value);String h=u.getHost();
         if(!"https".equals(u.getScheme())||u.getUserInfo()!=null||(u.getPort()!=-1&&u.getPort()!=443)||!("kokabfodool.com".equals(h)||"www.youtube.com".equals(h)||"www.instagram.com".equals(h)))return;
-        try{startActivity(new Intent(Intent.ACTION_VIEW,u));}catch(Exception e){Toast.makeText(this,"لا يمكن فتح الرابط | Unable to open link",Toast.LENGTH_SHORT).show();}
+        boolean ar = getResources().getConfiguration().locale.getLanguage().equals("ar");
+        int a = 12 + new Random().nextInt(18);
+        int b = 12 + new Random().nextInt(18);
+        EditText answer = new EditText(this);
+        answer.setInputType(InputType.TYPE_CLASS_NUMBER);
+        answer.setHint(ar ? "الإجابة" : "Answer");
+        AlertDialog gate = new AlertDialog.Builder(this)
+                .setTitle(ar ? "للأهل" : "For parents")
+                .setMessage((ar ? "لفتح رابط خارج كوكب فضول، أدخل ناتج " : "To open a link outside Kawkab Fudool, enter the answer to ")
+                        + a + " × " + b)
+                .setView(answer)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(ar ? "فتح الرابط" : "Open link", null)
+                .create();
+        gate.setOnShowListener(dialog -> gate.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+            String digits = answer.getText().toString().trim();
+            try {
+                if (Integer.parseInt(digits) != a * b) throw new NumberFormatException();
+            } catch (NumberFormatException error) {
+                answer.setError(ar ? "أعد المحاولة" : "Try again");
+                return;
+            }
+            gate.dismiss();
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, u));
+            } catch (android.content.ActivityNotFoundException error) {
+                Toast.makeText(this, ar ? "لا يمكن فتح الرابط" : "Unable to open link", Toast.LENGTH_SHORT).show();
+            }
+        }));
+        gate.show();
+    }
+    static void padForSystemBars(View view) {
+        if (Build.VERSION.SDK_INT < 35) return;
+        view.setOnApplyWindowInsetsListener((v, insets) -> {
+            android.graphics.Insets safe = insets.getInsets(
+                WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout() | WindowInsets.Type.ime());
+            v.setPadding(safe.left, safe.top, safe.right, safe.bottom);
+            return WindowInsets.CONSUMED;
+        });
     }
     private boolean allowedPage(String p){
         if(p==null)return false;
