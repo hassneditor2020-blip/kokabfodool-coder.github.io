@@ -94,7 +94,7 @@ for lang,prefix in [('ar',''),('en','en/')]:
     assert download.count('data-release-mode="unified"')==1
     assert 'data-release-mode="offline"' not in download and 'data-release-mode="online"' not in download
     html=(root/(prefix+'play-app/index.html')).read_text()
-    for view in ['home','learn','games','achievements','more']:
+    for view in ['home','learn','games','achievements','more','stories']:
         assert html.count('data-v5-view="'+view+'"')==1,(lang,view)
     for hook in ['data-app-games','data-app-stats','data-app-avatar','data-app-resume','data-profile-list']:
         assert html.count(hook)==1,(lang,hook)
@@ -112,7 +112,7 @@ for lang,prefix in [('ar',''),('en','en/')]:
             assert file_for(ep['image']).is_file()
             count+=1
     assert count>=54
-    print(lang,'20 games, 5 views,',count,'episodes')
+    print(lang,'20 games, 6 views,',count,'episodes')
 assert '/assets/app-learning-v5.json' in paths
 print('Offline:',len(paths),'files;',sum(file_for(p).stat().st_size for p in paths),'bytes')
 print('Static preflight PASS. This does not replace Android/device testing.')

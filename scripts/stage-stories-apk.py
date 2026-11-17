@@ -7,11 +7,11 @@ import shutil
 import sys
 
 build = Path(sys.argv[1])
-apk = build / 'Kawkab-Fudool-6.8.4.apk'
+apk = build / 'Kawkab-Fudool-6.8.5.apk'
 badge = (build / 'apk-badging.txt').read_text()
 signature = (build / 'apk-signature.txt').read_text()
 fingerprint = 'ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729'
-if not re.search(r"^package: name='com\.kokabfodool\.offline' versionCode='74' versionName='6\.8\.4'", badge, re.M):
+if not re.search(r"^package: name='com\.kokabfodool\.offline' versionCode='75' versionName='6\.8\.5'", badge, re.M):
     raise SystemExit('Unexpected Android package or version')
 if fingerprint not in signature or "targetSdkVersion:'36'" not in badge:
     raise SystemExit('Expected the established signing certificate and Android 16 target')
@@ -20,7 +20,7 @@ downloads = Path('downloads/apps')
 destination = downloads / 'kawkab-fudool.apk'
 shutil.copyfile(apk, destination)
 destination.with_suffix('.apk.idsig').unlink(missing_ok=True)
-metadata = {'unified': {'file': destination.name, 'version': '6.8.4', 'versionCode': 74,
+metadata = {'unified': {'file': destination.name, 'version': '6.8.5', 'versionCode': 75,
                         'bytes': destination.stat().st_size,
                         'sha256': hashlib.sha256(destination.read_bytes()).hexdigest(),
                         'certificate_sha256': fingerprint}}
