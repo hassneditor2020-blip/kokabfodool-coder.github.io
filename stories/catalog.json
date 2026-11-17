@@ -65,6 +65,73 @@
       "educationalValue": "التفكير العلمي، الاستدامة، المسؤولية البيئية",
       "cover": "cover.webp",
       "titleEn": "A Journey to the Clean Energy City"
+    },
+    {
+      "id": "lumaa-colorful-breakfast",
+      "titleAr": "لمعة ووجبة الألوان",
+      "ageMin": 3,
+      "ageMax": 4,
+      "theme": "الصحة والتغذية",
+      "characters": [
+        "لُمعة"
+      ],
+      "pageCount": 6,
+      "readingMinutes": 2,
+      "educationalValue": "التغذية المتنوعة والنظافة",
+      "cover": "cover.webp",
+      "titleEn": "Lumaa and the Colorful Meal"
+    },
+    {
+      "id": "robo-block-tower",
+      "titleAr": "روبو وبرج المكعبات",
+      "ageMin": 5,
+      "ageMax": 6,
+      "theme": "المثابرة والتفكير الهندسي",
+      "characters": [
+        "روبو",
+        "مشعال"
+      ],
+      "pageCount": 7,
+      "readingMinutes": 3,
+      "educationalValue": "المثابرة والتعلم من الخطأ",
+      "cover": "cover.webp",
+      "titleEn": "Robo and the Block Tower"
+    },
+    {
+      "id": "fudool-sealed-letter",
+      "titleAr": "فضّول والرسالة المغلقة",
+      "ageMin": 7,
+      "ageMax": 8,
+      "theme": "الأمانة والخصوصية",
+      "characters": [
+        "فضّول",
+        "روبو",
+        "أمينة المكتبة",
+        "طفل"
+      ],
+      "pageCount": 9,
+      "readingMinutes": 4,
+      "educationalValue": "الأمانة واحترام الخصوصية",
+      "cover": "cover.webp",
+      "titleEn": "Fudool and the Sealed Letter"
+    },
+    {
+      "id": "mishaal-mysterious-news",
+      "titleAr": "مشعال والخبر الغامض",
+      "ageMin": 9,
+      "ageMax": 10,
+      "theme": "الثقافة الرقمية والتحقق من الأخبار",
+      "characters": [
+        "مشعال",
+        "روبو",
+        "فضّول",
+        "المعلمة"
+      ],
+      "pageCount": 9,
+      "readingMinutes": 6,
+      "educationalValue": "التفكير النقدي والتحقق من المعلومات قبل مشاركتها",
+      "cover": "cover.webp",
+      "titleEn": "Mishaal and the Mysterious News"
     }
   ]
 }
