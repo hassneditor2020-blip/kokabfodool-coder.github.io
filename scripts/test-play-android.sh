@@ -3,7 +3,7 @@ set -euo pipefail
 
 package=com.kokabfodool.offline
 activity="$package/com.kokabfodool.shell.MainActivity"
-apk=build/play/Kawkab-Fudool-6.8.2.apk
+apk=build/play/Kawkab-Fudool-6.8.3.apk
 mkdir -p build/play-device
 
 adb shell wm size 390x844
@@ -11,8 +11,8 @@ adb shell wm density 160
 adb shell input keyevent 82
 adb install downloads/apps/Kokab-Fodool-V6.7.1.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=72'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.8.2'
+adb shell dumpsys package "$package" | grep -F 'versionCode=73'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.8.3'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -62,7 +62,7 @@ for attempt in range(15):
                 if tap == 'yes' and not (exact or clickable):
                     continue
                 center_y = (y1+y2)//2
-                if tap == 'yes' and label not in ('الألعاب', 'المزيد') and center_y >= 740:
+                if tap == 'yes' and label not in ('الألعاب', 'المزيد') and center_y >= (1230 if label in ('صفحات فضول','فضّول وسرّ الحديقة','رحلة إلى مدينة الطاقة النظيفة','التالي','كل القصص') else 740):
                     behind_navigation = True
                     continue
                 priority = (not exact, not clickable)
@@ -79,12 +79,38 @@ for attempt in range(15):
                 time.sleep(.5)
                 continue
     if attempt in (3,6,9,12):
-        subprocess.run(['adb','shell','input','swipe','193','725','193','370','350'],check=True)
+        subprocess.run(['adb','shell','input','swipe','193', '1110' if label in ('صفحات فضول','فضّول وسرّ الحديقة','رحلة إلى مدينة الطاقة النظيفة','التالي','كل القصص') else '725','193','370','350'],check=True)
     time.sleep(1)
 print('Visible controls:', visible, flush=True)
 raise SystemExit('Offline Android view did not display: ' + label)
 PY
 }
+
+adb shell wm size 820x1280
+adb shell wm density 160
+adb shell am force-stop "$package"
+adb shell am start -W -n "$activity"
+adb shell input swipe 385 1060 385 450 300
+find_label 'صفحات فضول' yes
+adb shell input swipe 385 1090 385 490 300
+find_label 'فضّول وسرّ الحديقة' yes
+find_label '1/9' no
+find_label 'التالي' yes
+find_label '2/9' no
+adb exec-out screencap -p > build/play-device/android-offline-garden.png
+find_label 'كل القصص' yes
+adb shell input swipe 385 1090 385 490 300
+find_label 'رحلة إلى مدينة الطاقة النظيفة' yes
+find_label '1/8' no
+find_label 'التالي' yes
+find_label '2/8' no
+adb exec-out screencap -p > build/play-device/android-offline-clean-energy.png
+echo 'PASS Android 6.8.3 opens and turns pages in both new stories in airplane mode.'
+
+adb shell am force-stop "$package"
+adb shell wm size 390x844
+adb shell wm density 160
+adb shell am start -W -n "$activity"
 
 find_label 'المزيد' yes
 find_label 'الحروف العربية' yes
@@ -150,7 +176,7 @@ find_label 'تُقبل الكتابة عند تجاوز 75%' no
 find_label 'اسمع الكلمة' yes
 find_label 'استمع ببطء' yes
 adb exec-out screencap -p > build/play-device/android-offline-writing.png
-echo 'PASS Android 6.8.2 upgrades from 6.7.1 and opens settings, dictation, memory and age-based games in airplane mode.'
+echo 'PASS Android 6.8.3 upgrades from 6.7.1 and opens settings, dictation, memory and age-based games in airplane mode.'
 
 adb shell am force-stop "$package"
 adb shell wm size 800x1280
