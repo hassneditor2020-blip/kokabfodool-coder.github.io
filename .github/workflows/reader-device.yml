@@ -1,0 +1,36 @@
+name: Confirm Android 6.8.4 reader and system bars
+on:
+  push:
+    branches: [qa/fudool-reader-684]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  offline-reader:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Kawkab-Fudool-Google-Play-Signed-6.8.4
+          path: build/play
+          run-id: 44087897472
+          github-token: ${{ github.token }}
+      - run: cd build/play && sha256sum -c SHA256SUMS
+      - run: sudo chmod a+rw /dev/kvm
+      - name: Prepare the focused story checks
+        run: awk '/^echo .*opens and turns pages/{print;exit}{print}' scripts/test-play-android.sh > /tmp/test-play-reader.sh
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -memory 2048 -cores 2
+          script: bash /tmp/test-play-reader.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Fudool-Reader-6.8.4-Android-Evidence
+          path: build/play-device/
