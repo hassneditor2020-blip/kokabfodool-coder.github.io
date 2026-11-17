@@ -103,12 +103,16 @@ for p in root.rglob('index.html'):
         s=re.sub(r'(/assets/'+name+r'\.js\?v=)\d+',lambda m:m[1]+str(ver),s)
     p.write_text(s)
 # Pack includes the current canonical app/game pages, all local media and code required by the games.
-pages=['/','/en/','/games/','/en/games/','/app/','/en/app/','/play-app/','/en/play-app/','/app/family/','/en/app/family/','/app/settings/','/en/app/settings/','/offline/','/en/offline/','/grown-ups/','/en/grown-ups/','/episodes/','/en/episodes/','/privacy/','/en/privacy/','/terms/','/en/terms/','/faq/','/en/faq/']
+pages=['/','/en/','/games/','/en/games/','/app/','/en/app/','/play-app/','/en/play-app/','/app/family/','/en/app/family/','/app/settings/','/en/app/settings/','/app/credits/','/en/app/credits/','/offline/','/en/offline/','/grown-ups/','/en/grown-ups/','/episodes/','/en/episodes/','/privacy/','/en/privacy/','/terms/','/en/terms/','/faq/','/en/faq/']
 for prefix in ['', 'en/']:
     pages += ['/'+p.parent.as_posix()+'/' for p in (root/(prefix+'games')).glob('*/index.html')]
 assert len([x for x in pages if re.match(r'^/(?:en/)?games/[^/]+/$',x)])==40
 files={u:root/(u.lstrip('/')+'index.html') for u in pages}
 files['/manifest.webmanifest']=root/'manifest.webmanifest'
+for story_path in sorted((root / 'stories').rglob('*')):
+    if story_path.is_file() and story_path.suffix in {'.html', '.json', '.webp'}:
+        url = '/' + story_path.as_posix()
+        files[url.removesuffix('index.html')] = story_path
 # Offline home pages fall back to the full covers already in the pack.
 # All original audio variants are retained, including old references that may still occur.
 for p in assets.rglob('*'):

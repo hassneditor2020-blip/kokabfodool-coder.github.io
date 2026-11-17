@@ -37,6 +37,9 @@ nameForm.addEventListener('submit', event => {
   }
 });
 
+nameForm.elements.nickname.disabled = false;
+nameForm.querySelector('button[type=submit]').disabled = false;
+
 const sliders = [...root.querySelectorAll('[data-volume]')];
 function showVolume() {
   const saved = audioPreferences();

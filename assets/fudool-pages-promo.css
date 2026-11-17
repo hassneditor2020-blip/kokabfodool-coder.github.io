@@ -1,0 +1,7 @@
+.fudool-pages-promo{box-sizing:border-box;max-width:70rem;margin:clamp(1rem,3vw,2rem) auto;padding:0 clamp(.65rem,3vw,1.5rem)}
+.fudool-pages-promo a{display:flex;align-items:center;gap:clamp(.85rem,3vw,1.75rem);padding:clamp(.85rem,3vw,1.6rem);border:1px solid #e1d3fc;border-radius:1.45rem;background:linear-gradient(125deg,#efe5ff,#eaf9ff);color:#26124f;text-decoration:none;box-shadow:0 6px 18px #492a9214}
+.fudool-pages-promo a:focus-visible{outline:3px solid #0759a4;outline-offset:3px}
+.fudool-pages-promo img{flex:none;width:clamp(4.5rem,18vw,8rem);height:auto;aspect-ratio:1;border-radius:50%}
+.fudool-pages-promo a>span{display:grid;gap:.15rem;min-width:0}
+.fudool-pages-promo strong{font-size:clamp(1.35rem,4vw,2.1rem);line-height:1.2}
+.fudool-pages-promo b{color:#4a24a0}

@@ -1,0 +1,9 @@
+/android-app/.gradle/
+/android-app/build/
+/android-app/local.properties
+/build/
+/node_modules/
+__pycache__/
+*.jks
+*.keystore
+*.p12

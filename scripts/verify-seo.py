@@ -99,6 +99,9 @@ def main():
         suffix = url.removeprefix(SITE)
         arabic_suffix = suffix.removeprefix('/en') if page.language == 'en' else suffix
         assert arabic_suffix.startswith('/'), f'Invalid localized path: {url}'
+        if suffix.startswith('/stories/'):
+            assert page.language == 'ar' and not page.alternates and not sitemap[url], url
+            continue
         ar = SITE + arabic_suffix
         en = SITE + '/en' + arabic_suffix
         expected = {'ar': ar, 'en': en, 'x-default': ar}

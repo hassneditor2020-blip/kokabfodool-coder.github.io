@@ -1,0 +1,167 @@
+name: Google Play release candidate
+on:
+  push:
+    branches: [development/fudool-pages]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Prepare signing key
+        id: signing
+        env:
+          RELEASE_BUNDLE: ${{ secrets.FUDOOL_RELEASE_BUNDLE }}
+          RELEASE_KEY_B64: ${{ secrets.FUDOOL_KEYSTORE_BASE64 }}
+          RELEASE_ALIAS: ${{ secrets.FUDOOL_KEY_ALIAS }}
+          RELEASE_STORE: ${{ secrets.FUDOOL_STORE_PASSWORD }}
+          RELEASE_PASS: ${{ secrets.FUDOOL_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          KEY="$RUNNER_TEMP/fudool-signing.jks"
+          if [ -n "$RELEASE_BUNDLE" ]; then
+            python3 - "$KEY" <<'PY'
+          import os,sys,json,base64,pathlib
+          b=json.loads(base64.b64decode(os.environ['RELEASE_BUNDLE'].strip(),validate=True))
+          assert b['certificate_sha256']=='ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729'
+          pathlib.Path(sys.argv[1]).write_bytes(base64.b64decode(b['keystore_base64'],validate=True))
+          for k,v in [('FUDOOL_KEY_ALIAS',b['alias']),('FUDOOL_STORE_PASSWORD',b['store_password']),('FUDOOL_KEY_PASSWORD',b['key_password']),('FUDOOL_CERT_SHA256',b['certificate_sha256'])]:
+              assert '\n' not in v and '\r' not in v
+              if 'PASSWORD' in k: print('::add-mask::'+v)
+              with open(os.environ['GITHUB_ENV'],'a') as f: f.write(k+'='+v+'\n')
+          PY
+            echo "kind=release" >> "$GITHUB_OUTPUT"
+          elif [ -n "$RELEASE_KEY_B64" ]; then
+            test -n "$RELEASE_ALIAS" && test -n "$RELEASE_STORE" && test -n "$RELEASE_PASS"
+            printf '%s' "$RELEASE_KEY_B64" | base64 -d > "$KEY"
+            echo "FUDOOL_KEY_ALIAS=$RELEASE_ALIAS" >> "$GITHUB_ENV"
+            echo "FUDOOL_STORE_PASSWORD=$RELEASE_STORE" >> "$GITHUB_ENV"
+            echo "FUDOOL_KEY_PASSWORD=$RELEASE_PASS" >> "$GITHUB_ENV"
+            echo "kind=release" >> "$GITHUB_OUTPUT"
+          else
+            echo 'Original release signing secret is required.' >&2
+            exit 1
+          fi
+          chmod 600 "$KEY"
+          echo "FUDOOL_KEYSTORE=$KEY" >> "$GITHUB_ENV"
+          echo "FUDOOL_CERT_SHA256=ee4e5f8887447d750263ce35798c3c0c0e5a7a01a03d678712ad49d48abdb729" >> "$GITHUB_ENV"
+      - name: Build and verify the AAB and standalone APK
+        run: |
+          set -euo pipefail
+          gradle -p android-app --no-daemon bundleRelease assembleRelease
+          mkdir -p build/play
+          cp build/play-gradle/outputs/bundle/release/*.aab build/play/Kawkab-Fudool-6.8.2.aab
+          cp build/play-gradle/outputs/apk/release/*-release.apk build/play/Kawkab-Fudool-6.8.2.apk
+          tools="$ANDROID_HOME/build-tools/35.0.0"
+          "$tools/apksigner" verify --verbose --print-certs build/play/*.apk | tee build/play/apk-signature.txt
+          grep -F "$FUDOOL_CERT_SHA256" build/play/apk-signature.txt
+          "$tools/zipalign" -c -P 16 -v 4 build/play/*.apk > build/play/alignment.txt
+          "$tools/aapt" dump badging build/play/*.apk > build/play/apk-badging.txt
+          grep -F "targetSdkVersion:'36'" build/play/apk-badging.txt
+          grep -F "name='com.kokabfodool.offline' versionCode='72'" build/play/apk-badging.txt
+          jarsigner -verify build/play/*.aab | tee build/play/aab-signature.txt
+          grep -Fx 'jar verified.' build/play/aab-signature.txt
+          keytool -printcert -jarfile build/play/*.aab > build/play/aab-certificate.txt
+          cert=$(awk '/SHA256:/{print $2; exit}' build/play/aab-certificate.txt | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          test "$cert" = "$FUDOOL_CERT_SHA256"
+          curl --fail --silent --show-error --location --retry 2 \
+            https://github.com/google/bundletool/releases/download/1.18.2/bundletool-all-1.18.2.jar \
+            -o "$RUNNER_TEMP/bundletool.jar"
+          java -jar "$RUNNER_TEMP/bundletool.jar" validate --bundle=build/play/Kawkab-Fudool-6.8.2.aab
+          java -jar "$RUNNER_TEMP/bundletool.jar" dump manifest --bundle=build/play/Kawkab-Fudool-6.8.2.aab --module=base > build/play/aab-manifest.xml
+          grep -F 'android:targetSdkVersion="36"' build/play/aab-manifest.xml
+          python3 scripts/verify-play-artifacts.py build/play
+          (cd build/play && sha256sum *.apk *.aab > SHA256SUMS)
+      - name: Remove signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/fudool-signing.jks"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kawkab-Fudool-Google-Play-Signed-6.8.2
+          path: build/play/
+          if-no-files-found: error
+
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python3 scripts/verify-v5.py && python3 scripts/verify-seo.py && python3 scripts/verify-learning-presence.py
+      - run: npm install --no-save --no-package-lock playwright@1.56.1
+      - run: npx playwright install --with-deps chromium
+      - run: |
+          node scripts/test-v5-browser.cjs
+          node scripts/test-v6-worlds.cjs
+          node scripts/test-v6-challenges.cjs
+          node scripts/test-v65-play.cjs
+          node scripts/test-app-settings.cjs
+          node scripts/test-fudool-pages.cjs
+
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Kawkab-Fudool-Google-Play-Signed-6.8.2
+          path: build/play
+      - run: sudo chmod a+rw /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan -memory 2048 -cores 2
+          script: bash scripts/test-play-android.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Kawkab-Fudool-Android-Device-Results
+          path: build/play-device/
+
+  stage-website-apk:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/development/fudool-pages'
+    needs: [build, browser]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: Kawkab-Fudool-Google-Play-Signed-6.8.2
+          path: build/play
+      - name: Stage the verified APK for the website download
+        run: |
+          set -euo pipefail
+          (cd build/play && sha256sum -c SHA256SUMS)
+          python3 scripts/stage-stories-apk.py build/play
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add downloads/apps/kawkab-fudool.apk downloads/apps/release.json
+          git add -u downloads/apps/kawkab-fudool.apk.idsig
+          git commit -m 'Stage signed Fudool Pages APK 6.8.2 for the website'
+          git push origin HEAD:refs/heads/development/fudool-pages
