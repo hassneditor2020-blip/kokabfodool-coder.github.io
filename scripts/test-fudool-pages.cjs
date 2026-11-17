@@ -118,6 +118,37 @@ const root='http://127.0.0.1:8714';
   await context.close();
   console.log('PASS all pages, comprehension quiz and offline reread: '+id);
  }
+ const zoomPage=await browser.newPage({viewport:{width:360,height:740},hasTouch:true});
+ await zoomPage.addInitScript(()=>{
+  window.turns=[];
+  HTMLMediaElement.prototype.play=function(){
+   window.turns.push({file:new URL(this.src).pathname,volume:this.volume});
+   return Promise.resolve();
+  };
+  localStorage.setItem('fudool-audio-levels-v1',JSON.stringify({effects:35}));
+ });
+ await zoomPage.goto(root+'/play-app/');
+ await zoomPage.locator('.v5-nav a[href="/stories/"]').click();
+ await zoomPage.getByRole('link',{name:'فضّول وسرّ الحديقة'}).click();
+ await zoomPage.getByRole('button',{name:'تكبير الصورة'}).click();
+ const dialog=zoomPage.getByRole('dialog');
+ await dialog.getByText('1/9',{exact:true}).waitFor();
+ assert(await dialog.getByRole('button',{name:'السابق'}).isDisabled());
+ await dialog.getByRole('button',{name:'التالي'}).click();
+ await dialog.getByText('2/9',{exact:true}).waitFor();
+ assert.deepEqual(await zoomPage.evaluate(()=>window.turns),[{file:'/assets/story-page-turn.wav',volume:.35}]);
+ const zoomArt=dialog.locator('img');
+ await zoomArt.dispatchEvent('pointerdown',{pointerType:'touch',clientX:25,clientY:60});
+ await zoomArt.dispatchEvent('pointerup',{pointerType:'touch',clientX:125,clientY:62});
+ await dialog.getByText('3/9',{exact:true}).waitFor();
+ await zoomPage.evaluate(()=>localStorage.setItem('fudool-game-sound','off'));
+ await dialog.press('ArrowRight');
+ await dialog.getByText('2/9',{exact:true}).waitFor();
+ assert.equal(await zoomPage.evaluate(()=>window.turns.length),2);
+ await dialog.getByRole('button',{name:'إغلاق'}).click();
+ await zoomPage.locator('.pages-book > .pages-actions .pages-counter').getByText('2/9',{exact:true}).waitFor();
+ await zoomPage.close();
+ console.log('PASS bottom Stories navigation, enlarged pagination, RTL swipe and muted effects');
  const native=await browser.newPage({userAgent:'Mozilla/5.0 FudoolAndroidUnified'});
  await native.goto(root+'/play-app/');
  await native.locator('.fudool-pages-promo a').click();

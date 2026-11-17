@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.graphics.Color;
 import android.view.View;
 import android.view.WindowInsets;
+import android.view.WindowInsetsController;
+import android.widget.FrameLayout;
 import android.os.Build;
 import android.text.InputType;
 import android.widget.EditText;
@@ -73,8 +75,23 @@ public class MainActivity extends Activity {
                 if(req.isForMainFrame())runOnUiThread(()->Toast.makeText(MainActivity.this,"تعذر فتح الصفحة | Unable to open page",Toast.LENGTH_SHORT).show());
             }
         });
-        padForSystemBars(web);
-        setContentView(web);
+        if (Build.VERSION.SDK_INT >= 35) {
+            getWindow().setDecorFitsSystemWindows(false);
+            FrameLayout viewport = new FrameLayout(this);
+            viewport.setBackgroundColor(Color.rgb(248,246,255));
+            viewport.addView(web, new FrameLayout.LayoutParams(-1, -1));
+            padForSystemBars(viewport);
+            setContentView(viewport);
+            viewport.requestApplyInsets();
+            WindowInsetsController bars = getWindow().getInsetsController();
+            if (bars != null) {
+                int lightBars = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                bars.setSystemBarsAppearance(lightBars, lightBars);
+            }
+        } else {
+            setContentView(web);
+        }
         if (Build.VERSION.SDK_INT >= 33) {
             getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
                     android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::navigateBack);

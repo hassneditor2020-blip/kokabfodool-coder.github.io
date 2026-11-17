@@ -1,3 +1,4 @@
+import {audioPreferences} from './audio-settings.js';
 import {activeProfile} from './profile-state.js';
 
 const catalogURL = '/stories/catalog.json';
@@ -161,12 +162,30 @@ function reader(story) {
         large.setAttribute('aria-pressed', String(enlarged));
     });
     const dialog = node('dialog');
+    dialog.className = 'pages-zoom';
+    dialog.setAttribute('aria-label', 'قراءة بالصورة المكبّرة');
     const zoomImage = node('img');
-    zoomImage.alt = '';
-    dialog.append(zoomImage, button('إغلاق', () => dialog.close()));
+    const zoomControls = node('div');
+    zoomControls.className = 'pages-actions';
+    const zoomCounter = node('span');
+    zoomCounter.className = 'pages-counter';
+    zoomCounter.setAttribute('aria-live', 'polite');
+    const zoomPrevious = button('السابق', () => move(-1));
+    const zoomNext = button('التالي', () => move(1));
+    const closeZoom = button('إغلاق', () => dialog.close());
+    closeZoom.autofocus = true;
+    zoomControls.append(zoomPrevious, zoomCounter, zoomNext, closeZoom);
+    dialog.append(zoomImage, zoomControls);
     const zoom = button('تكبير الصورة', () => {
-        zoomImage.src = image.src;
+        renderZoom();
         dialog.showModal();
+    });
+    dialog.addEventListener('keydown', event => {
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            move(event.key === 'ArrowLeft' ? 1 : -1);
+        }
     });
     const full = button('ملء الشاشة', async () => {
         try {
@@ -190,6 +209,14 @@ function reader(story) {
         link.rel = 'noopener noreferrer';
         controls.append(link);
     }
+    let turnSound;
+    function renderZoom() {
+        zoomImage.src = image.src;
+        zoomImage.alt = text.textContent;
+        zoomCounter.textContent = counter.textContent;
+        zoomPrevious.disabled = position === 0;
+        zoomNext.disabled = seenEnd();
+    }
     function seenEnd() { return position === story.pages.length - 1; }
     function render() {
         const page = story.pages[position];
@@ -199,6 +226,7 @@ function reader(story) {
         counter.textContent = `${position + 1}/${story.pages.length}`;
         previous.disabled = position === 0;
         next.textContent = seenEnd() ? 'إنهاء القصة' : 'التالي';
+        if (dialog.open) renderZoom();
         update(story.id, {page: position});
     }
     function move(delta) {
@@ -206,6 +234,13 @@ function reader(story) {
         if (nextPage < 0 || nextPage >= story.pages.length) return;
         position = nextPage;
         render();
+        const effects = audioPreferences().effects;
+        if (effects > 0) {
+            turnSound ||= new Audio('/assets/story-page-turn.wav');
+            turnSound.volume = effects / 100;
+            turnSound.currentTime = 0;
+            turnSound.play().catch(() => {});
+        }
     }
     function finish() {
         const already = saved.completed;
@@ -214,18 +249,20 @@ function reader(story) {
         if (!quizShown) quiz(story);
         quizShown = true;
     }
-    let start;
-    frame.addEventListener('pointerdown', event => {
-        start = event.pointerType === 'touch' ? [event.clientX, event.clientY] : null;
-    });
-    frame.addEventListener('pointercancel', () => { start = null; });
-    frame.addEventListener('pointerup', event => {
-        if (!start) return;
-        const dx = event.clientX - start[0];
-        const dy = event.clientY - start[1];
-        if (Math.abs(dx) > 48 && Math.abs(dx) > 1.3 * Math.abs(dy)) move(dx > 0 ? 1 : -1);
-        start = null;
-    });
+    for (const swipeArea of [frame, zoomImage]) {
+        let start;
+        swipeArea.addEventListener('pointerdown', event => {
+            start = event.pointerType === 'touch' ? [event.clientX, event.clientY] : null;
+        });
+        swipeArea.addEventListener('pointercancel', () => { start = null; });
+        swipeArea.addEventListener('pointerup', event => {
+            if (!start) return;
+            const dx = event.clientX - start[0];
+            const dy = event.clientY - start[1];
+            start = null;
+            if (Math.abs(dx) > 48 && Math.abs(dx) > 1.3 * Math.abs(dy)) move(dx > 0 ? 1 : -1);
+        });
+    }
     render();
 }
 
@@ -246,6 +283,7 @@ async function downloadControls(story, controls, notice) {
                     await cache.addAll([base, base + 'story.json', base + story.cover,
                         '/stories/', catalogURL, '/assets/fudool-pages-cover.webp', '/assets/fudool-pages.js',
                         '/assets/fudool-pages.css', '/assets/profile-state.js',
+                        '/assets/audio-settings.js', '/assets/story-page-turn.wav',
                         ...story.pages.map(page => base + page.image)]);
                     notice.textContent = 'القصة جاهزة للقراءة دون إنترنت.';
                 } catch (error) {
