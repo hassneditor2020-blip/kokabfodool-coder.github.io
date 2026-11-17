@@ -75,6 +75,10 @@ public class MainActivity extends Activity {
         });
         padForSystemBars(web);
         setContentView(web);
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::navigateBack);
+        }
         if(state==null)web.loadUrl(home);else if(web.restoreState(state)==null)web.loadUrl(home);
     }
     private void readBackupConfig() {
@@ -128,7 +132,8 @@ public class MainActivity extends Activity {
         if(value==null)return;
         Uri u=Uri.parse(value);String h=u.getHost();
         if(!"https".equals(u.getScheme())||u.getUserInfo()!=null||(u.getPort()!=-1&&u.getPort()!=443)||!("kokabfodool.com".equals(h)||"www.youtube.com".equals(h)||"www.instagram.com".equals(h)))return;
-        boolean ar = getResources().getConfiguration().locale.getLanguage().equals("ar");
+        String current = web.getUrl();
+        boolean ar = current == null || !Uri.parse(current).getPath().startsWith("/en/");
         int a = 12 + new Random().nextInt(18);
         int b = 12 + new Random().nextInt(18);
         EditText answer = new EditText(this);
@@ -199,7 +204,14 @@ public class MainActivity extends Activity {
         if(p.endsWith(".svg"))return "image/svg+xml";if(p.endsWith(".webp"))return "image/webp";if(p.endsWith(".png"))return "image/png";if(p.endsWith(".jpg")||p.endsWith(".jpeg"))return "image/jpeg";
         if(p.endsWith(".mp3"))return "audio/mpeg";if(p.endsWith(".wav"))return "audio/wav";if(p.endsWith(".ogg"))return "audio/ogg";if(p.endsWith(".woff2"))return "font/woff2";if(p.endsWith(".json")||p.endsWith(".webmanifest"))return "application/json";return "application/octet-stream";
     }
-    @Override public void onBackPressed(){if(web.canGoBack())web.goBack();else super.onBackPressed();}
+    private void navigateBack() {
+        if (web.canGoBack()) web.goBack();
+        else finish();
+    }
+
+    @Override public void onBackPressed() {
+        navigateBack();
+    }
     @Override protected void onSaveInstanceState(Bundle out){web.saveState(out);super.onSaveInstanceState(out);}
     @Override protected void onPause(){super.onPause();device.stopVoice();web.onPause();}
     @Override protected void onActivityResult(int request,int result,Intent data){

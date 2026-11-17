@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'self' https://identitytoolkit.googleapis.com https://firestore.googleapis.com">
+<title>حذف حساب كوكب فضول</title>
+<link rel="stylesheet" href="/assets/app-settings.css">
+<link rel="stylesheet" href="/assets/site.css?v=14">
+<script type="module" src="/assets/account-deletion.js"></script>
+</head>
+<body>
+<main class="wrap app-settings">
+<nav><a href="/privacy/">الخصوصية</a> · <a href="/en/account-deletion/">English</a></nav>
+<h1>حذف حساب كوكب فضول</h1>
+<p>هذه الصفحة مخصّصة لولي الأمر. يمكنك حذف حسابك ونسخ المستويات والنجوم المحفوظة سحابيًا من هنا، من دون تنزيل التطبيق.</p>
+<section class="settings-card">
+<form id="delete-account">
+<label>البريد المسجّل<input name="email" type="email" required autocomplete="username" maxlength="254" dir="ltr"></label>
+<label>كلمة المرور<input name="password" type="password" required autocomplete="current-password" maxlength="128" dir="ltr"></label>
+<button class="button button-primary" type="submit" disabled>حذف الحساب والنسخ السحابية</button>
+</form>
+<p id="deletion-status" role="status"></p>
+<noscript>يتطلّب الحذف المباشر تشغيل JavaScript. يمكنك التواصل مع الدعم عبر البريد أدناه.</noscript>
+</section>
+<p>يحذف هذا الإجراء الحساب ونسخه السحابية. لمسح التقدّم واسم اللاعب المحفوظَين على الهاتف، امسح بيانات التطبيق من إعدادات Android. وللاستفسار تواصل مع <a href="mailto:kokabfodool@gmail.com">kokabfodool@gmail.com</a>.</p>
+</main></body></html>
