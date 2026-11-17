@@ -149,12 +149,18 @@ public class MainActivity extends Activity {
         if(value==null)return;
         Uri u=Uri.parse(value);String h=u.getHost();
         boolean allowedTikTok = "www.tiktok.com".equals(h) && "/@kokab_fodool".equals(u.getPath());
-        boolean allowedHost = "kokabfodool.com".equals(h) || "www.youtube.com".equals(h)
+        boolean youtube = "www.youtube.com".equals(h) || "youtube.com".equals(h)
+                || "m.youtube.com".equals(h) || "youtu.be".equals(h);
+        boolean allowedHost = "kokabfodool.com".equals(h) || youtube
                 || "www.instagram.com".equals(h) || allowedTikTok;
         if (!"https".equals(u.getScheme()) || u.getUserInfo() != null
                 || (u.getPort() != -1 && u.getPort() != 443) || !allowedHost) return;
         String current = web.getUrl();
         boolean ar = current == null || !Uri.parse(current).getPath().startsWith("/en/");
+        if (youtube) {
+            launchExternalLink(u, ar);
+            return;
+        }
         int a = 12 + new Random().nextInt(18);
         int b = 12 + new Random().nextInt(18);
         EditText answer = new EditText(this);
@@ -177,13 +183,17 @@ public class MainActivity extends Activity {
                 return;
             }
             gate.dismiss();
-            try {
-                startActivity(new Intent(Intent.ACTION_VIEW, u));
-            } catch (android.content.ActivityNotFoundException error) {
-                Toast.makeText(this, ar ? "لا يمكن فتح الرابط" : "Unable to open link", Toast.LENGTH_SHORT).show();
-            }
+            launchExternalLink(u, ar);
         }));
         gate.show();
+    }
+
+    private void launchExternalLink(Uri uri, boolean arabic) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } catch (android.content.ActivityNotFoundException error) {
+            Toast.makeText(this, arabic ? "لا يمكن فتح الرابط" : "Unable to open link", Toast.LENGTH_SHORT).show();
+        }
     }
     static void padForSystemBars(View view) {
         if (Build.VERSION.SDK_INT < 35) return;
