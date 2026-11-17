@@ -11,7 +11,7 @@ paths = [unquote(url.lstrip('/')) + ('index.html' if url.endswith('/') else '')
          for url in pack['files']]
 paths.extend(str(path) for path in sorted(Path('print').glob('*/*.pdf')))
 for artifact, prefix in [('apk', ''), ('aab', 'base/')]:
-    with ZipFile(out / ('Kawkab-Fudool-6.8.5.' + artifact)) as archive:
+    with ZipFile(out / ('Kawkab-Fudool-6.8.6.' + artifact)) as archive:
         names = archive.namelist()
         assert not any(name.endswith('.so') for name in names), 'Unexpected native library'
         assert ('base/dex/classes.dex' if prefix else 'classes.dex') in names

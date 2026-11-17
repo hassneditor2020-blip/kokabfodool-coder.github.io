@@ -36,7 +36,7 @@ document.querySelectorAll('[data-v5-open-library]').forEach(b=>b.addEventListene
 function openExternal(value){
  let u;try{u=new URL(value,'https://kokabfodool.com')}catch{return}
  const tiktok = u.origin === 'https://www.tiktok.com' && u.pathname === '/@kokab_fodool';
- if((!tiktok && !['https://kokabfodool.com','https://www.youtube.com','https://www.instagram.com'].includes(u.origin))||u.username||u.password)return;
+ if((!tiktok && !['https://kokabfodool.com','https://www.youtube.com','https://youtube.com','https://m.youtube.com','https://youtu.be','https://www.instagram.com'].includes(u.origin))||u.username||u.password)return;
  if(nativeApp)location.assign('/play-app/external/?url='+encodeURIComponent(u.href));else location.assign(u.href);
 }
 document.querySelectorAll('[data-v5-external]').forEach(b=>b.addEventListener('click',()=>openExternal(b.dataset.v5External)));

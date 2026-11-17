@@ -33,7 +33,7 @@ const root='http://127.0.0.1:8714';
   await page.getByText('1/7',{exact:true}).waitFor();
   assert.equal(await page.locator('[dir=rtl]').count(),1);
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
-  const frame=page.locator('figure');
+  const frame=page.locator('.pages-book > figure');
   await frame.dispatchEvent('pointerdown',{pointerType:'touch',clientX:30,clientY:60});
   await frame.dispatchEvent('pointerup',{pointerType:'touch',clientX:130,clientY:64});
   await page.getByText('2/7',{exact:true}).waitFor();
@@ -53,7 +53,7 @@ const root='http://127.0.0.1:8714';
   await context.setOffline(true);
   await page.reload();
   await page.getByText('7/7',{exact:true}).waitFor();
-  await page.locator('figure img').evaluate(image=>image.decode());
+  await page.locator('.pages-book > figure img').evaluate(image=>image.decode());
   await page.getByRole('link',{name:'كل القصص'}).click();
   await page.getByText(/نجوم القراءة: 3/).waitFor();
   await context.setOffline(false);
@@ -64,14 +64,14 @@ const root='http://127.0.0.1:8714';
   await page.locator('.fudool-pages-promo a').click();
   await page.getByRole('link',{name:'مشعال والبالون الأزرق'}).click();
   await page.getByText('1/6',{exact:true}).waitFor();
-  const portrait = await page.locator('figure img').evaluate(async image=>{
+  const portrait = await page.locator('.pages-book > figure img').evaluate(async image=>{
     await image.decode();
     return image.naturalHeight / image.naturalWidth;
   });
   assert.equal(portrait,1.25);
-  assert.equal(await page.locator('figcaption').evaluate(caption=>caption.offsetWidth),1);
+  assert.equal(await page.locator('.pages-book > figure figcaption').evaluate(caption=>caption.offsetWidth),1);
   await page.getByRole('button',{name:'تكبير النص'}).click();
-  assert(await page.locator('figcaption').evaluate(caption=>caption.offsetWidth)>1);
+  assert(await page.locator('.pages-book > figure figcaption').evaluate(caption=>caption.offsetWidth)>1);
   for(let i=0;i<5;i++) await page.getByRole('button',{name:'التالي',exact:true}).click();
   await page.getByText('6/6',{exact:true}).waitFor();
   await page.getByRole('button',{name:'إنهاء القصة'}).click();
@@ -83,7 +83,7 @@ const root='http://127.0.0.1:8714';
   await context.setOffline(true);
   await page.reload();
   await page.getByText('6/6',{exact:true}).waitFor();
-  await page.locator('figure img').evaluate(image=>image.decode());
+  await page.locator('.pages-book > figure img').evaluate(image=>image.decode());
   await page.getByRole('link',{name:'كل القصص'}).click();
   await page.getByText(/نجوم القراءة: 6/).waitFor();
   await context.close();
@@ -101,8 +101,8 @@ const root='http://127.0.0.1:8714';
   assert.equal(new URL(page.url()).pathname,'/stories/'+id+'/');
   for(let i=1;i<=total;i++){
    await page.getByText(i+'/'+total,{exact:true}).waitFor();
-   await page.locator('figure img').evaluate(image=>image.decode());
-   assert(await page.locator('figcaption').innerText());
+   await page.locator('.pages-book > figure img').evaluate(image=>image.decode());
+   assert(await page.locator('.pages-book > figure figcaption').innerText());
    if(i<total) await page.getByRole('button',{name:'التالي',exact:true}).click();
   }
   await page.getByRole('button',{name:'إنهاء القصة'}).click();
@@ -114,10 +114,40 @@ const root='http://127.0.0.1:8714';
   await context.setOffline(true);
   await page.reload();
   await page.getByText(total+'/'+total,{exact:true}).waitFor();
-  await page.locator('figure img').evaluate(image=>image.decode());
+  await page.locator('.pages-book > figure img').evaluate(image=>image.decode());
   await context.close();
   console.log('PASS all pages, comprehension quiz and offline reread: '+id);
  }
+ const reader = await browser.newPage({viewport:{width:320,height:570}});
+ for(const {id,pageCount} of require('../stories/catalog.json').stories){
+  const story = require('../stories/'+id+'/story.json');
+  assert.equal(story.pages.length,pageCount);
+  await reader.goto(root+'/play-app/');
+  await reader.locator('.v5-nav a[href="#v5-pages"]').click();
+  await reader.getByRole('link',{name:story.titleAr,exact:true}).click();
+  await reader.getByRole('button',{name:'تكبير الصورة'}).click();
+  const enlarged = reader.getByRole('dialog');
+  const caption = enlarged.locator('figcaption');
+  const art = enlarged.locator('img');
+  const next = enlarged.getByRole('button',{name:'التالي'});
+  for(const [index,storyPage] of story.pages.entries()){
+   await enlarged.getByText((index+1)+'/'+pageCount,{exact:true}).waitFor();
+   await art.evaluate(image=>image.decode());
+   assert(storyPage.text.trim());
+   assert.equal(await caption.innerText(),storyPage.text);
+   const artBounds = await art.boundingBox();
+   const textBounds = await caption.boundingBox();
+   assert(textBounds.height > 1 && textBounds.y >= artBounds.y + artBounds.height - 1, id+' page '+(index+1));
+   assert(await caption.evaluate(text=>getComputedStyle(text).clipPath === 'none'));
+   if(index+1 < pageCount) await next.click();
+  }
+  assert(await next.isDisabled());
+  await enlarged.getByRole('button',{name:'السابق'}).click();
+  assert.equal(await caption.innerText(),story.pages[pageCount-2].text);
+  await enlarged.getByRole('button',{name:'إغلاق'}).click();
+  console.log('PASS enlarged illustrations and captions: '+id+' ('+pageCount+' pages)');
+ }
+ await reader.close();
  const zoomPage=await browser.newPage({viewport:{width:360,height:740},hasTouch:true});
  await zoomPage.addInitScript(()=>{
   window.turns=[];

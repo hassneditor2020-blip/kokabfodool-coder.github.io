@@ -168,6 +168,12 @@ function reader(story) {
     dialog.className = 'pages-zoom';
     dialog.setAttribute('aria-label', 'قراءة بالصورة المكبّرة');
     const zoomImage = node('img');
+    zoomImage.alt = '';
+    const zoomFrame = node('figure');
+    zoomFrame.className = 'pages-zoom-frame';
+    const zoomText = node('figcaption');
+    zoomText.setAttribute('aria-live', 'polite');
+    zoomFrame.append(zoomImage, zoomText);
     const zoomControls = node('div');
     zoomControls.className = 'pages-actions';
     const zoomCounter = node('span');
@@ -178,7 +184,7 @@ function reader(story) {
     const closeZoom = button('إغلاق', () => dialog.close());
     closeZoom.autofocus = true;
     zoomControls.append(zoomPrevious, zoomCounter, zoomNext, closeZoom);
-    dialog.append(zoomImage, zoomControls);
+    dialog.append(zoomFrame, zoomControls);
     const zoom = button('تكبير الصورة', () => {
         renderZoom();
         dialog.showModal();
@@ -215,7 +221,8 @@ function reader(story) {
     let turnSound;
     function renderZoom() {
         zoomImage.src = image.src;
-        zoomImage.alt = text.textContent;
+        zoomText.textContent = text.textContent;
+        dialog.scrollTop = 0;
         zoomCounter.textContent = counter.textContent;
         zoomPrevious.disabled = position === 0;
         zoomNext.disabled = seenEnd();
