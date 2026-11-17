@@ -64,8 +64,8 @@ jobs:
           set -euo pipefail
           gradle -p android-app --no-daemon bundleRelease assembleRelease
           mkdir -p build/play
-          cp android-app/build/outputs/bundle/release/*.aab build/play/Kawkab-Fudool-6.8.0.aab
-          cp android-app/build/outputs/apk/release/*-release.apk build/play/Kawkab-Fudool-6.8.0.apk
+          cp build/play-gradle/outputs/bundle/release/*.aab build/play/Kawkab-Fudool-6.8.0.aab
+          cp build/play-gradle/outputs/apk/release/*-release.apk build/play/Kawkab-Fudool-6.8.0.apk
           tools="$ANDROID_HOME/build-tools/35.0.0"
           "$tools/apksigner" verify --verbose --print-certs build/play/*.apk | tee build/play/apk-signature.txt
           grep -F "$FUDOOL_CERT_SHA256" build/play/apk-signature.txt

@@ -3,6 +3,7 @@ plugins {
 }
 
 def repositoryRoot = rootDir.parentFile
+layout.buildDirectory.set(new File(repositoryRoot, 'build/play-gradle'))
 def contentRoot = layout.buildDirectory.dir('generated/fudool/assets')
 def generatedResources = layout.buildDirectory.dir('generated/fudool/res')
 def credential = { name -> providers.environmentVariable(name).orNull }
@@ -38,6 +39,7 @@ android {
         manifest.srcFile 'play/AndroidManifest.xml'
         java.setSrcDirs(['.'])
         java.include '*.java'
+        java.exclude '.gradle/**', 'build/**', 'play/**'
         res.setSrcDirs(['play/res', generatedResources])
         assets.setSrcDirs([contentRoot])
     }
