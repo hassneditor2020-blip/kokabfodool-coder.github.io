@@ -1,0 +1,19 @@
+{
+  "stories": [
+    {
+      "id": "robo-little-seed",
+      "titleAr": "روبو والبذرة الصغيرة",
+      "ageMin": 5,
+      "ageMax": 6,
+      "theme": "الطبيعة والنباتات",
+      "characters": [
+        "روبو",
+        "مشعال"
+      ],
+      "pageCount": 7,
+      "readingMinutes": 2,
+      "educationalValue": "الصبر، المسؤولية، والعناية بالنباتات",
+      "cover": "cover.webp"
+    }
+  ]
+}

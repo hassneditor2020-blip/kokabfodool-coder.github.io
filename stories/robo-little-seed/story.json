@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "id": "robo-little-seed",
+  "series": "صفحات فضول",
+  "title": "روبو والبذرة الصغيرة",
+  "titleAr": "روبو والبذرة الصغيرة",
+  "titleEn": "Robo and the Little Seed",
+  "ageGroup": "5–6",
+  "ageMin": 5,
+  "ageMax": 6,
+  "description": "يعثر روبو على بذرة صغيرة، ويزرعها مع مشعال، ويتعلمان كيف تنمو النباتات بالصبر والعناية.",
+  "educationalValue": "الصبر، المسؤولية، والعناية بالنباتات",
+  "characters": [
+    "روبو",
+    "مشعال"
+  ],
+  "theme": "الطبيعة والنباتات",
+  "pageCount": 7,
+  "readingMinutes": 2,
+  "cover": "cover.webp",
+  "language": "ar",
+  "status": "published",
+  "isFree": true,
+  "youtubeUrl": null,
+  "pages": [
+    {
+      "number": 1,
+      "type": "cover",
+      "text": "رُوبُو وَالْبَذْرَةُ الصَّغِيرَةُ",
+      "image": "page-01.webp",
+      "audio": null
+    },
+    {
+      "number": 2,
+      "type": "story",
+      "text": "وَجَدَ رُوبُو بَذْرَةً صَغِيرَةً فِي الْحَدِيقَةِ.",
+      "image": "page-02.webp",
+      "audio": null
+    },
+    {
+      "number": 3,
+      "type": "story",
+      "text": "وَضَعَ مِشْعَالٌ الْبَذْرَةَ فِي التُّرْبَةِ.",
+      "image": "page-03.webp",
+      "audio": null
+    },
+    {
+      "number": 4,
+      "type": "story",
+      "text": "سَقَاهَا رُوبُو بِالْمَاءِ، وَانْتَظَرَ نُمُوَّهَا.",
+      "image": "page-04.webp",
+      "audio": null
+    },
+    {
+      "number": 5,
+      "type": "story",
+      "text": "بَعْدَ أَيَّامٍ، ظَهَرَتْ أَوْرَاقٌ خَضْرَاءُ.",
+      "image": "page-05.webp",
+      "audio": null
+    },
+    {
+      "number": 6,
+      "type": "story",
+      "text": "نَقَلَ الصَّدِيقَانِ الشَّتْلَةَ إِلَى الْحَدِيقَةِ، وَاعْتَنَيَا بِهَا.",
+      "image": "page-06.webp",
+      "audio": null
+    },
+    {
+      "number": 7,
+      "type": "story",
+      "text": "بَعْدَ زَمَنٍ طَوِيلٍ، صَارَتِ الشَّتْلَةُ شَجَرَةً كَبِيرَةً.",
+      "image": "page-07.webp",
+      "audio": null
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "ماذا وجد روبو في الحديقة؟",
+      "options": [
+        "بذرة صغيرة",
+        "بالون أزرق",
+        "حجر كبير"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "ماذا تحتاج النبتة لكي تنمو؟",
+      "options": [
+        "الماء وضوء الشمس",
+        "الألعاب",
+        "الحلوى"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "ماذا أصبحت الشتلة بعد زمن طويل؟",
+      "options": [
+        "شجرة كبيرة",
+        "كرة حمراء",
+        "كتابًا"
+      ],
+      "correctIndex": 0
+    }
+  ]
+}

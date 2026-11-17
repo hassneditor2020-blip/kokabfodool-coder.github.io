@@ -109,6 +109,10 @@ for prefix in ['', 'en/']:
 assert len([x for x in pages if re.match(r'^/(?:en/)?games/[^/]+/$',x)])==40
 files={u:root/(u.lstrip('/')+'index.html') for u in pages}
 files['/manifest.webmanifest']=root/'manifest.webmanifest'
+for story_path in sorted((root / 'stories').rglob('*')):
+    if story_path.is_file() and story_path.suffix in {'.html', '.json', '.webp'}:
+        url = '/' + story_path.as_posix()
+        files[url.removesuffix('index.html')] = story_path
 # Offline home pages fall back to the full covers already in the pack.
 # All original audio variants are retained, including old references that may still occur.
 for p in assets.rglob('*'):

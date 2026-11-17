@@ -131,7 +131,11 @@ public class MainActivity extends Activity {
     private void openExternalLink(String value){
         if(value==null)return;
         Uri u=Uri.parse(value);String h=u.getHost();
-        if(!"https".equals(u.getScheme())||u.getUserInfo()!=null||(u.getPort()!=-1&&u.getPort()!=443)||!("kokabfodool.com".equals(h)||"www.youtube.com".equals(h)||"www.instagram.com".equals(h)))return;
+        boolean allowedTikTok = "www.tiktok.com".equals(h) && "/@kokab_fodool".equals(u.getPath());
+        boolean allowedHost = "kokabfodool.com".equals(h) || "www.youtube.com".equals(h)
+                || "www.instagram.com".equals(h) || allowedTikTok;
+        if (!"https".equals(u.getScheme()) || u.getUserInfo() != null
+                || (u.getPort() != -1 && u.getPort() != 443) || !allowedHost) return;
         String current = web.getUrl();
         boolean ar = current == null || !Uri.parse(current).getPath().startsWith("/en/");
         int a = 12 + new Random().nextInt(18);
@@ -175,7 +179,7 @@ public class MainActivity extends Activity {
     }
     private boolean allowedPage(String p){
         if(p==null)return false;
-        return p.equals("/")||p.equals("/en/")||p.matches("^/(en/)?(play-app|games|app|privacy|terms|faq)(/.*)?$");
+        return p.equals("/")||p.equals("/en/")||p.matches("^/(en/)?(play-app|games|app|privacy|terms|faq|stories)(/.*)?$");
     }
     private static WebResourceResponse error(int code,String message){
         return new WebResourceResponse("text/plain","UTF-8",code,message,Collections.emptyMap(),new ByteArrayInputStream(message.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
