@@ -4,7 +4,7 @@ mkdir -p build/play-device
 adb shell wm size 390x844
 adb shell wm density 160
 adb shell input keyevent 82
-adb install build/play/Kawkab-Fudool-6.8.1.apk
+adb install build/play/Kawkab-Fudool-6.8.2.apk
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -54,7 +54,7 @@ for attempt in range(15):
                 if tap == 'yes' and not (exact or clickable):
                     continue
                 center_y = (y1+y2)//2
-                if tap == 'yes' and label not in ('الألعاب', 'المزيد') and center_y >= 740:
+                if tap == 'yes' and center_y >= 800:
                     behind_navigation = True
                     continue
                 priority = (not exact, not clickable)
@@ -70,7 +70,7 @@ for attempt in range(15):
                 subprocess.run(['adb','shell','input','swipe','193','690','193','490','280'],check=True)
                 time.sleep(.5)
                 continue
-    if attempt in (3,6,9,12):
+    if attempt in (0,2,4,6,8):
         subprocess.run(['adb','shell','input','swipe','193','725','193','370','350'],check=True)
     time.sleep(1)
 print('Visible controls:', visible, flush=True)
@@ -78,12 +78,13 @@ raise SystemExit('Offline Android view did not display: ' + label)
 PY
 }
 
+adb shell input swipe 193 720 193 365 300
 find_label 'صفحات فضول' yes
-find_label 'روبو والبذرة الصغيرة' yes
-find_label '1/7' no
+adb shell input swipe 193 720 193 310 300
+find_label 'مشعال والبالون الأزرق' yes
+find_label '1/6' no
 find_label 'التالي' yes
-find_label '2/7' no
-find_label 'وَجَدَ رُوبُو بَذْرَةً' no
+find_label '2/6' no
 adb exec-out screencap -p > build/play-device/story-offline-reader.png
 adb shell getconf PAGE_SIZE > build/play-device/emulator-page-size.txt
 echo 'PASS: Android 16 launched the packaged story with radios off and turned to page 2.'
