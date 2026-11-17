@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "id": "fudool-sealed-letter",
+  "series": "صفحات فضول",
+  "title": "فضّول والرسالة المغلقة",
+  "titleAr": "فضّول والرسالة المغلقة",
+  "titleEn": "Fudool and the Sealed Letter",
+  "ageGroup": "7–8",
+  "ageMin": 7,
+  "ageMax": 8,
+  "description": "يعثر فضّول على رسالة مغلقة في المكتبة، ويختار احترام خصوصية صاحبها وإعادتها بأمانة.",
+  "educationalValue": "الأمانة واحترام الخصوصية",
+  "characters": [
+    "فضّول",
+    "روبو",
+    "أمينة المكتبة",
+    "طفل"
+  ],
+  "theme": "الأمانة والخصوصية",
+  "pageCount": 9,
+  "readingMinutes": 4,
+  "cover": "cover.webp",
+  "language": "ar",
+  "status": "published",
+  "isFree": true,
+  "youtubeUrl": null,
+  "pages": [
+    {
+      "number": 1,
+      "type": "cover",
+      "text": "فضّول والرسالة المغلقة",
+      "image": "page-01.webp",
+      "audio": null
+    },
+    {
+      "number": 2,
+      "type": "story",
+      "text": "وجد فضّول ظرفًا مغلقًا على طاولة المكتبة. رفعه برفق، وتساءل: لمن تكون هذه الرسالة؟",
+      "image": "page-02.webp",
+      "audio": null
+    },
+    {
+      "number": 3,
+      "type": "story",
+      "text": "أراد فضّول معرفة ما بداخل الظرف، لكن روبو سأله: هل الرسالة لك؟ فكر فضّول قليلًا.",
+      "image": "page-03.webp",
+      "audio": null
+    },
+    {
+      "number": 4,
+      "type": "story",
+      "text": "قال فضّول: لا يحق لي أن أقرأ رسالة شخص آخر دون إذنه. سأحافظ عليها مغلقة.",
+      "image": "page-04.webp",
+      "audio": null
+    },
+    {
+      "number": 5,
+      "type": "story",
+      "text": "ذهب الصديقان إلى أمينة المكتبة. سلّمها فضّول الظرف، وأخبرها أين وجده.",
+      "image": "page-05.webp",
+      "audio": null
+    },
+    {
+      "number": 6,
+      "type": "story",
+      "text": "شكرتْهما أمينة المكتبة، وسجّلت مكان العثور على الرسالة لتساعد في إعادتها إلى صاحبها.",
+      "image": "page-06.webp",
+      "audio": null
+    },
+    {
+      "number": 7,
+      "type": "story",
+      "text": "جاء طفل يبحث عن رسالة فقدها. وصف لأمينة المكتبة الظرف وختمه الأحمر، فتأكدت أنه صاحبه.",
+      "image": "page-07.webp",
+      "audio": null
+    },
+    {
+      "number": 8,
+      "type": "story",
+      "text": "أعادت أمينة المكتبة الرسالة إلى الطفل. ابتسم وقال: شكرًا لأنكما حافظتما عليها دون فتحها!",
+      "image": "page-08.webp",
+      "audio": null
+    },
+    {
+      "number": 9,
+      "type": "story",
+      "text": "فرح الجميع. تعلّم فضّول أن الفضول جميل، لكن الأمانة تعني احترام خصوصية الآخرين وحفظ ممتلكاتهم.",
+      "image": "page-09.webp",
+      "audio": null
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "أين وجد فضّول الظرف؟",
+      "options": [
+        "في المكتبة",
+        "في الحديقة",
+        "في المختبر"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "لماذا لم يفتح فضّول الرسالة؟",
+      "options": [
+        "لأنه نسيها",
+        "لأنه احترم خصوصية صاحبها",
+        "لأنها فارغة"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "لمن سلّم الصديقان الظرف؟",
+      "options": [
+        "لأمينة المكتبة",
+        "لأي شخص في الشارع",
+        "للبستاني"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "كيف تأكدت أمينة المكتبة من صاحب الرسالة؟",
+      "options": [
+        "فتحتها أمام الجميع",
+        "خمّنت اسمه",
+        "وصف الطفل الظرف وختمه"
+      ],
+      "correctIndex": 2
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "ماذا تفعل إذا وجدت رسالة تخص شخصًا آخر؟",
+      "options": [
+        "أفتحها",
+        "أسلّمها لشخص بالغ مسؤول دون فتحها",
+        "أنشر صورتها"
+      ],
+      "correctIndex": 1
+    }
+  ]
+}

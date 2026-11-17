@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "id": "robo-block-tower",
+  "series": "صفحات فضول",
+  "title": "روبو وبرج المكعبات",
+  "titleAr": "روبو وبرج المكعبات",
+  "titleEn": "Robo and the Block Tower",
+  "ageGroup": "5–6",
+  "ageMin": 5,
+  "ageMax": 6,
+  "description": "يبني روبو برجًا من المكعبات ويتعلم من سقوطه كيف يصنع قاعدة أكثر ثباتًا.",
+  "educationalValue": "المثابرة والتعلم من الخطأ",
+  "characters": [
+    "روبو",
+    "مشعال"
+  ],
+  "theme": "المثابرة والتفكير الهندسي",
+  "pageCount": 7,
+  "readingMinutes": 3,
+  "cover": "cover.webp",
+  "language": "ar",
+  "status": "published",
+  "isFree": true,
+  "youtubeUrl": null,
+  "pages": [
+    {
+      "number": 1,
+      "type": "cover",
+      "text": "روبو وبرج المكعبات",
+      "image": "page-01.webp",
+      "audio": null
+    },
+    {
+      "number": 2,
+      "type": "story",
+      "text": "بَنَى رُوبُو بُرْجًا عَالِيًا مِنَ الْمُكَعَّبَاتِ.",
+      "image": "page-02.webp",
+      "audio": null
+    },
+    {
+      "number": 3,
+      "type": "story",
+      "text": "سَقَطَ الْبُرْجُ، فَحَزِنَ رُوبُو.",
+      "image": "page-03.webp",
+      "audio": null
+    },
+    {
+      "number": 4,
+      "type": "story",
+      "text": "قَالَ مِشْعَالٌ: لِنُجَرِّبْ طَرِيقَةً أُخْرَى.",
+      "image": "page-04.webp",
+      "audio": null
+    },
+    {
+      "number": 5,
+      "type": "story",
+      "text": "وَضَعَ رُوبُو الْمُكَعَّبَاتِ الْكَبِيرَةَ فِي الْأَسْفَلِ.",
+      "image": "page-05.webp",
+      "audio": null
+    },
+    {
+      "number": 6,
+      "type": "story",
+      "text": "ثُمَّ رَتَّبَ الْمُكَعَّبَاتِ الصَّغِيرَةَ فَوْقَهَا بِحَذَرٍ.",
+      "image": "page-06.webp",
+      "audio": null
+    },
+    {
+      "number": 7,
+      "type": "story",
+      "text": "ثَبَتَ الْبُرْجُ! فَرِحَ رُوبُو لِأَنَّهُ حَاوَلَ مَرَّةً أُخْرَى.",
+      "image": "page-07.webp",
+      "audio": null
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "ماذا حدث للبرج الأول؟",
+      "options": [
+        "طار",
+        "سقط",
+        "اختفى"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "أين وضع روبو المكعبات الكبيرة؟",
+      "options": [
+        "في الأسفل",
+        "في الأعلى",
+        "خارج الغرفة"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "ماذا تعلم روبو؟",
+      "options": [
+        "أن يتوقف عند أول خطأ",
+        "أن يحاول بطريقة أخرى",
+        "أن يرمي المكعبات"
+      ],
+      "correctIndex": 1
+    }
+  ]
+}
