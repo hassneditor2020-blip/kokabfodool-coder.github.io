@@ -37,7 +37,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    await page.locator('.v5-nav a[href="#v5-achievements"]').click();await visible('achievements');await fit();
    await page.waitForSelector('.v5-badge');assert.equal(await page.locator('.v5-badge').count(),4);
    await page.locator('.v5-nav a[href="#v5-more"]').click();await visible('more');await fit();
-   assert.equal(await page.locator('.v5-social').count(),3);
+   assert.equal(await page.locator('.v5-social').count(),4);
    await page.screenshot({path:'build/v5-screenshots/'+lang+'-'+width+'-more.png',fullPage:true});
    assert.deepEqual(errors,[],lang+' '+width+' JS errors');
    await page.close();
@@ -127,7 +127,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    assert.equal(opened,catalog.series.find(s=>s.id==='english-fun')[lang].episodes[0].video);
    await page.goto(home,{waitUntil:'networkidle'});
    await page.locator('.v5-nav a[href="#v5-more"]').click();
-   for(const host of ['www.youtube.com','www.instagram.com','kokabfodool.com']){
+   for(const host of ['www.youtube.com','www.instagram.com','www.tiktok.com','kokabfodool.com']){
     await page.locator('.v5-social[data-v5-external*="'+host+'"]').click();
     await page.waitForURL('**/play-app/external/?url=*');
     assert.equal(new URL(opened).hostname,host);
