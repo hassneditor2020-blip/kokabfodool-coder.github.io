@@ -16,40 +16,125 @@ body:has(> .pages-layout){margin:0}
 .pages-layout :focus-visible{outline:3px solid #0769b2;outline-offset:3px}
 .pages-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),22rem));gap:1rem}
 .pages-card{overflow:hidden}
-.pages-card img{width:100%;height:auto;aspect-ratio:1;object-fit:cover;display:block}
+.pages-card .pages-cover {
+    display: block;
+    position: relative;
+    color: #fff;
+    background: #292050;
+    text-decoration: none;
+    border-inline-start: .45rem solid #9271ce;
+}
+.pages-cover img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+}
+.pages-cover h2 {
+    margin: 0;
+    padding: .75rem 1rem;
+    border-block-start: 2px solid #efca72;
+}
 .pages-card div,.pages-text,.pages-quiz{padding:1rem}
-.pages-card h2{font-size:1.45rem;margin:.15rem 0}
+.pages-card h2{font-size:1.45rem;line-height:1.4}
 .pages-book,.pages-quiz,.pages-text{max-width:43rem;margin:1rem auto}
-.pages-book{padding:clamp(.65rem,2vw,1.5rem)}
-.pages-book::backdrop{background:#1d1235}
+.pages-book {
+    --paper: #fffbef;
+    --ink: #30204f;
+    --paper-edge: #e3d3b4;
+    padding: clamp(.45rem, 2vw, 1.25rem);
+    background: #e9def7;
+}
+.pages-book::backdrop{background:#241736}
 .pages-book:fullscreen{max-width:none;width:100%;margin:0;overflow:auto}
-.pages-book:fullscreen .pages-frame{max-width:min(75vh,100%);margin-inline:auto}
-.pages-frame{margin:0;text-align:center;touch-action:pan-y}
-.pages-frame img,[data-reader]>img{display:block;width:100%;max-width:48rem;height:auto;aspect-ratio:1;object-fit:cover;border-radius:1rem}
-.pages-frame img{animation:pages-in .22s ease-out}
-.pages-frame figcaption{font-size:clamp(1.2rem,4vw,1.95rem);line-height:1.9;padding:.6rem}
-.pages-book[data-large] figcaption{font-size:clamp(1.5rem,6vw,2.6rem)}
-.pages-book dialog{max-width:96vw;border:0;border-radius:1rem}
-.pages-book dialog img{display:block;max-width:100%;max-height:75vh;margin:auto}
-.pages-book dialog::backdrop{background:#1d1235b3}
-.pages-actions{align-items:center;justify-content:center;margin-block:.5rem}
+.pages-frame {
+    width: 100%;
+    max-width: 36rem;
+    display: grid;
+    gap: clamp(.4rem, 2vw, .85rem);
+    margin: 0 auto;
+    padding: clamp(.6rem, 3vw, 1.35rem);
+    text-align: center;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--paper-edge);
+    border-inline-start: .42rem solid #8666b5;
+    border-radius: .55rem 1.2rem 1.2rem .55rem;
+    box-shadow: 0 3px var(--paper-edge), 0 6px #fff6e1, 0 7px #ccb9a5;
+    touch-action: pan-y;
+}
+.pages-book:fullscreen > .pages-frame{max-width:min(69vh,36rem)}
+.pages-running-title {
+    color: #634185;
+    font-size: clamp(.85rem, 2.7vw, 1.05rem);
+    font-weight: 750;
+    line-height: 1.4;
+}
+.pages-illustration {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: .7rem;
+    background: #eee6d7;
+}
+.pages-illustration img {
+    display: block;
+    width: 100%;
+    height: auto;
+    animation: pages-in .22s ease-out;
+}
+/* Illustration bounds within the two original 640 × 800 print layouts. */
+.pages-frame[data-artwork="story-print"] { --art-width: 111.5%; --art-top: -12.2%; }
+.pages-frame[data-artwork="page-print"] { --art-width: 118.1%; --art-top: -13.3%; }
+.pages-frame:is([data-artwork="story-print"], [data-artwork="page-print"]) .pages-illustration img {
+    position: absolute;
+    width: var(--art-width);
+    max-width: none;
+    top: var(--art-top);
+    left: calc((100% - var(--art-width)) / 2);
+}
+[data-reader]>img { display: block; width: 100%; max-width: 48rem; height: auto; border-radius: 1rem; }
+.pages-frame figcaption {
+    border-block-start: 1px solid var(--paper-edge);
+    padding: .55rem .12rem .12rem;
+    font-size: clamp(1.15rem, 3.6vw, 1.65rem);
+    font-weight: 650;
+    line-height: 1.75;
+}
+.pages-book[data-large] .pages-frame figcaption{font-size:clamp(1.45rem,5vw,2.35rem)}
+.pages-actions{align-items:center;justify-content:center;margin-block:.75rem}
 .pages-counter{direction:ltr;font-weight:750;font-variant-numeric:tabular-nums}
 .pages-quiz fieldset{border:1px solid #ded4fa;border-radius:1rem;margin-bottom:.8rem}
 .pages-quiz label{display:flex;align-items:center;gap:.5rem}
 .pages-quiz input{min-height:0;width:1.25rem;height:1.25rem}
 .pages-notice{min-height:1.7em}
-@keyframes pages-in{from{opacity:.6;transform:translateX(6px)}to{opacity:1;transform:none}}
+@keyframes pages-in{from{opacity:.6;transform:scale(1.02)}to{opacity:1;transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.pages-frame img{animation:none}}
 
-.pages-book[data-embedded-text] .pages-frame img{aspect-ratio:auto;object-fit:contain}
-.pages-book[data-embedded-text]:not([data-large]) figcaption{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-
-.pages-book .pages-zoom{width:min(96vw,68rem);max-height:calc(100dvh - 1rem);padding:clamp(.45rem,2vw,1rem);border-radius:1rem;overflow:auto;background:#fff}
-.pages-zoom[open]{display:grid;gap:.5rem;justify-items:center}
-.pages-zoom-frame{width:100%;margin:0}
-.pages-book .pages-zoom img{width:100%;height:auto;max-height:min(56dvh,40rem);object-fit:contain;touch-action:pan-y pinch-zoom}
-.pages-book .pages-zoom .pages-zoom-frame figcaption{position:static;width:auto;height:auto;white-space:normal;clip-path:none;text-align:center;font-size:clamp(1rem,3vw,1.4rem);line-height:1.65;padding:.45rem .25rem}
-.pages-book .pages-zoom .pages-actions{position:sticky;bottom:0;width:100%;margin:0;padding:.4rem 0;background:#fff}
+.pages-book .pages-zoom {
+    width: min(96vw, 40rem);
+    max-height: calc(100dvh - 1rem);
+    padding: clamp(.45rem, 2vw, 1rem);
+    border: 0;
+    border-radius: 1rem;
+    overflow: auto;
+    background: #e9def7;
+}
+.pages-zoom::backdrop{background:#241736c7}
+.pages-zoom .pages-frame{margin-block-end:.8rem}
+.pages-zoom .pages-illustration{width:min(100%,51dvh);margin-inline:auto}
+.pages-zoom .pages-illustration img{touch-action:pan-y pinch-zoom}
+.pages-zoom .pages-frame figcaption{font-size:clamp(1rem,3vw,1.4rem)}
+.pages-book .pages-zoom .pages-actions {
+    position: sticky;
+    bottom: 0;
+    margin: 0;
+    padding: .35rem;
+    border-radius: .7rem;
+    background: #e9def7;
+}
 
 .v5-stories.pages-layout{width:100%;padding:0}
 .v5-stories.pages-layout[hidden]{display:none}
