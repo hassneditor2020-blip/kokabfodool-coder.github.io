@@ -133,24 +133,40 @@ async function testCloudForm(browser) {
     json: {apiKey: 'AIza' + 'x'.repeat(35), projectId: 'demo-fudool-settings'}}));
   let verified = false;
   let verificationSent = false;
+  let initialSignIns = 0;
+  let refreshes = 0;
+  let offline = false;
+  const sessionKey = 'fudool-parent-session-v1:demo-fudool-settings';
+  await page.route('https://securetoken.googleapis.com/**', route => {
+    if (offline) return route.abort('internetdisconnected');
+    const body = new URLSearchParams(route.request().postData());
+    assert.equal(body.get('grant_type'), 'refresh_token');
+    assert.match(body.get('refresh_token'), /^test-refresh/);
+    refreshes++;
+    return route.fulfill({json: {user_id: 'demo-parent', id_token: 'refreshed-token',
+      refresh_token: 'test-refresh-' + refreshes, expires_in: '3600'}});
+  });
   await page.route('https://identitytoolkit.googleapis.com/**', async route => {
     const rpc = new URL(route.request().url()).pathname.split(':').at(-1);
     assert.equal(route.request().method(), 'POST');
     const body = route.request().postDataJSON();
-    if (rpc === 'lookup') return route.fulfill({json: {users: [{emailVerified: verified}]}});
+    if (rpc === 'lookup') return route.fulfill({json: {users: [{localId: 'demo-parent', email: 'tester@example.com', emailVerified: verified}]}});
     if (rpc === 'sendOobCode') {
       verificationSent = body.requestType === 'VERIFY_EMAIL';
       return route.fulfill({json: {}});
     }
+    assert.equal(rpc, 'signUp');
     assert.equal(body.email, 'tester@example.com');
-    return route.fulfill({json: {localId: 'demo-parent', idToken: 'test-token'}});
+    initialSignIns++;
+    return route.fulfill({json: {localId: 'demo-parent', idToken: 'test-token',
+      refreshToken: 'test-refresh', expiresIn: '3600'}});
   });
   let progress = {version: {integerValue: '1'}, levels: {stringValue: 'counting:30;memory:3'}};
   let updateTime = '2026-11-16T17:00:00.000000Z';
   let writes = 0;
   await page.route('https://firestore.googleapis.com/**', async route => {
     const req = route.request();
-    assert.equal(req.headers().authorization, 'Bearer test-token');
+    assert.equal(req.headers().authorization, 'Bearer refreshed-token');
     const endpoint = new URL(req.url());
     if (req.method() === 'GET') {
       assert(endpoint.pathname.endsWith('/documents/familyBackups/demo-parent/slots/1'));
@@ -175,18 +191,27 @@ async function testCloudForm(browser) {
   await page.goto(origin + '/en/app/settings/');
   const form = page.locator('[data-parent-auth]');
   await form.waitFor();
-  const signIn = async () => {
-    await form.locator('[name="email"]').fill('tester@example.com');
-    await form.locator('[name="password"]').fill('TestPass123!');
-    await form.locator('[name="adult"]').check();
-    await form.getByRole('button', {name: 'Sign in'}).click();
-  };
-  await signIn();
-  await page.getByText(/Open the verification link/).waitFor();
+  assert.deepEqual(await form.getByRole('button').allTextContents(), ['Sign in', 'Create account']);
+  await form.locator('[name="email"]').fill('tester@example.com');
+  await form.locator('[name="password"]').fill('TestPass123!');
+  await form.getByRole('button', {name: 'Create account'}).click();
+  await page.getByText(/Verification link sent/).waitFor();
   assert(verificationSent);
   assert(await page.locator('[data-parent-tools]').isHidden());
+  assert.equal(await page.locator('[data-parent-pending-email]').textContent(), 'tester@example.com');
+  await page.reload();
+  await page.locator('[data-parent-pending]').waitFor();
+  await page.waitForFunction(() => !document.querySelector('[data-parent-backup]').hasAttribute('aria-busy'));
+  assert(await form.isHidden());
   verified = true;
-  await signIn();
+  await page.locator('[data-parent-check]').click();
+  await page.locator('[data-parent-tools]').waitFor();
+  assert.equal(await page.locator('[data-parent-email]').textContent(), 'tester@example.com');
+  assert.equal(initialSignIns, 1);
+  assert(refreshes >= 1);
+  await page.reload();
+  await page.locator('[data-parent-tools]').waitFor();
+  assert.equal(await page.locator('[data-parent-email]').textContent(), 'tester@example.com');
   await page.locator('[data-parent-restore]').click();
   await page.getByText('Progress restored for 2 levels.').waitFor();
   await page.evaluate(() => localStorage.setItem('fudool-games-v1:counting', JSON.stringify({scores: [3, 2]})));
@@ -195,9 +220,19 @@ async function testCloudForm(browser) {
   assert.equal(writes, 2);
   assert.match(progress.levels.stringValue, /counting:32/);
   assert.match(progress.levels.stringValue, /trace:2/);
-  await page.locator('[data-parent-signout]').click();
+  offline = true;
+  await page.reload();
+  await page.locator('[data-parent-tools]').waitFor();
+  await page.locator('[data-parent-restore]').click();
+  await page.getByText(/Check your connection/).waitFor();
+  const saved = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), sessionKey);
+  assert.deepEqual(Object.keys(saved).sort(), ['email', 'refreshToken', 'uid', 'verified']);
+  assert.equal(saved.email, 'tester@example.com');
+  await page.locator('[data-parent-tools] [data-parent-signout]').click();
   assert(await form.isVisible());
-  assert(!await page.evaluate(() => JSON.stringify(localStorage).includes('test-token')));
+  await page.reload();
+  await form.waitFor();
+  assert.equal(await page.evaluate(key => localStorage.getItem(key), sessionKey), null);
   await context.close();
 }
 

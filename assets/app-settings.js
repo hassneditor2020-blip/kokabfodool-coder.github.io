@@ -127,7 +127,7 @@ window.fudoolBackupFile = (status, contents) => {
 
 if (device?.emailBackupAvailable?.()) {
   const parentPanel = root.querySelector('[data-parent-backup]');
-  import('./parent-backup.js?v=1')
+  import('./parent-backup.js?v=2')
     .then(module => module.mountParentBackup(parentPanel, () => label.textContent))
     .catch(() => {});
 }

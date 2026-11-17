@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,follow">
 <meta name="theme-color" content="#49308f">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; img-src 'self' data:; frame-src 'none'; connect-src 'self' https://identitytoolkit.googleapis.com https://firestore.googleapis.com">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; img-src 'self' data:; frame-src 'none'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com">
 <title>Settings | Kokab Fodool</title>
 <link rel="preload" href="/assets/nunito.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="/assets/app-icon-192.png">
@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/assets/app-experience.css?v=1">
 <link rel="stylesheet" href="/assets/app-settings.css?v=1">
 <link rel="stylesheet" href="/assets/learning-presence.css?v=1">
-<script type="module" src="/assets/app-settings.js?v=1"></script>
+<script type="module" src="/assets/app-settings.js?v=2"></script>
 </head>
 <body class="app-experience-body">
 <main class="app-experience app-settings" data-settings>
@@ -48,18 +48,27 @@
   <p class="settings-alert" data-backup-status role="status"></p>
   <div data-parent-backup hidden>
   <h3>Parent account</h3>
-  <p class="settings-note">For grown-ups. Google Firebase uses the parent’s email for account verification and saves the levels and stars you choose to back up. The player’s name stays on their device.</p>
+  <p class="settings-note">For grown-ups. Google Firebase uses the parent’s email for account verification and saves the levels and stars you choose to back up. The player’s name stays on their device. This device stays signed in until you sign out.</p>
   <form data-parent-auth>
     <label>Parent email<input name="email" type="email" required autocomplete="email" dir="ltr" maxlength="254"></label>
     <label>Password<input name="password" type="password" autocomplete="current-password" dir="ltr" maxlength="128"></label>
-    <label class="settings-check"><input name="adult" type="checkbox" required><span>I am the parent or guardian and I am using my own email.</span></label>
     <div class="settings-actions">
       <button class="button button-primary" type="submit" value="sign-in">Sign in</button>
       <button class="button button-white" type="submit" value="sign-up">Create account</button>
-      <button class="button button-white" type="submit" value="reset">Reset password</button>
     </div>
   </form>
+  <div data-parent-pending hidden>
+    <p class="settings-note"><strong>Verify your email</strong></p>
+    <p class="settings-note">Open the verification email sent to <bdi data-parent-pending-email></bdi>. Your account will appear here after verification.</p>
+    <div class="settings-actions">
+      <button class="button button-primary" type="button" data-parent-check>I verified my email</button>
+      <button class="button button-white" type="button" data-parent-resend>Resend link</button>
+      <button class="button button-white" type="button" data-parent-signout>Sign out</button>
+    </div>
+  </div>
+  <button class="button button-white" type="button" data-parent-reset hidden>Forgot your password?</button>
   <div data-parent-tools hidden>
+    <p class="settings-note">Signed in as <strong><bdi data-parent-email></bdi></strong></p>
     <p class="settings-note"><bdi data-parent-player></bdi> · Use the same slot for this player on another device.</p>
     <label>Backup slot<select><option value="1">Slot 1</option><option value="2">Slot 2</option><option value="3">Slot 3</option><option value="4">Slot 4</option><option value="5">Slot 5</option><option value="6">Slot 6</option></select></label>
     <div class="settings-actions">

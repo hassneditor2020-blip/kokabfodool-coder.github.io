@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,follow">
 <meta name="theme-color" content="#49308f">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; img-src 'self' data:; frame-src 'none'; connect-src 'self' https://identitytoolkit.googleapis.com https://firestore.googleapis.com">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; img-src 'self' data:; frame-src 'none'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com">
 <title>الإعدادات | كوكب فضول</title>
 <link rel="preload" href="/assets/nunito.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/noto-arabic.woff2" as="font" type="font/woff2" crossorigin>
@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="/assets/app-experience.css?v=1">
 <link rel="stylesheet" href="/assets/app-settings.css?v=1">
 <link rel="stylesheet" href="/assets/learning-presence.css?v=1">
-<script type="module" src="/assets/app-settings.js?v=1"></script>
+<script type="module" src="/assets/app-settings.js?v=2"></script>
 </head>
 <body class="app-experience-body">
 <main class="app-experience app-settings" data-settings>
@@ -50,18 +50,27 @@
   <p class="settings-alert" data-backup-status role="status"></p>
   <div data-parent-backup hidden>
   <h3>حساب ولي الأمر</h3>
-  <p class="settings-note">للأهل فقط. يستخدم Google Firebase بريد ولي الأمر للتحقق من الحساب وحفظ نسخة المستويات والنجوم. اسم اللاعب يبقى على جهازه.</p>
+  <p class="settings-note">للأهل فقط. يستخدم Google Firebase بريد ولي الأمر للتحقق من الحساب وحفظ نسخة المستويات والنجوم. اسم اللاعب يبقى على جهازه. يظل الحساب مسجّلًا على هذا الجهاز حتى تختار تسجيل الخروج.</p>
   <form data-parent-auth>
     <label>بريد ولي الأمر<input name="email" type="email" required autocomplete="email" dir="ltr" maxlength="254"></label>
     <label>كلمة المرور<input name="password" type="password" autocomplete="current-password" dir="ltr" maxlength="128"></label>
-    <label class="settings-check"><input name="adult" type="checkbox" required><span>أنا ولي الأمر وأستخدم بريدي الشخصي.</span></label>
     <div class="settings-actions">
       <button class="button button-primary" type="submit" value="sign-in">تسجيل الدخول</button>
       <button class="button button-white" type="submit" value="sign-up">إنشاء حساب</button>
-      <button class="button button-white" type="submit" value="reset">استعادة كلمة المرور</button>
     </div>
   </form>
+  <div data-parent-pending hidden>
+    <p class="settings-note"><strong>تأكيد البريد الإلكتروني</strong></p>
+    <p class="settings-note">افتح رسالة التأكيد المرسلة إلى <bdi data-parent-pending-email></bdi>. سيظهر حسابك هنا بعد التأكيد.</p>
+    <div class="settings-actions">
+      <button class="button button-primary" type="button" data-parent-check>أكدت بريدي</button>
+      <button class="button button-white" type="button" data-parent-resend>إعادة إرسال الرابط</button>
+      <button class="button button-white" type="button" data-parent-signout>تسجيل الخروج</button>
+    </div>
+  </div>
+  <button class="button button-white" type="button" data-parent-reset hidden>نسيت كلمة المرور؟</button>
   <div data-parent-tools hidden>
+    <p class="settings-note">حسابك <strong><bdi data-parent-email></bdi></strong></p>
     <p class="settings-note"><bdi data-parent-player></bdi> · اختر الخانة نفسها لهذا اللاعب عند استخدام جهاز آخر.</p>
     <label>خانة النسخة المحفوظة<select><option value="1">الخانة 1</option><option value="2">الخانة 2</option><option value="3">الخانة 3</option><option value="4">الخانة 4</option><option value="5">الخانة 5</option><option value="6">الخانة 6</option></select></label>
     <div class="settings-actions">
