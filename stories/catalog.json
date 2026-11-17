@@ -13,7 +13,8 @@
       "pageCount": 6,
       "readingMinutes": 2,
       "educationalValue": "التعاون وشكر من يساعدنا",
-      "cover": "cover.webp"
+      "cover": "cover.webp",
+      "titleEn": "Mishal and the Blue Balloon"
     },
     {
       "id": "robo-little-seed",
@@ -28,7 +29,8 @@
       "pageCount": 7,
       "readingMinutes": 2,
       "educationalValue": "الصبر، المسؤولية، والعناية بالنباتات",
-      "cover": "cover.webp"
+      "cover": "cover.webp",
+      "titleEn": "Robo and the Little Seed"
     },
     {
       "id": "fudool-garden-mystery",
@@ -43,7 +45,8 @@
       "pageCount": 9,
       "readingMinutes": 3,
       "educationalValue": "الملاحظة والاستقصاء، حل المشكلات، ترشيد الماء",
-      "cover": "cover.webp"
+      "cover": "cover.webp",
+      "titleEn": "Fudool and the Garden Mystery"
     },
     {
       "id": "clean-energy-city",
@@ -60,7 +63,8 @@
       "pageCount": 8,
       "readingMinutes": 4,
       "educationalValue": "التفكير العلمي، الاستدامة، المسؤولية البيئية",
-      "cover": "cover.webp"
+      "cover": "cover.webp",
+      "titleEn": "A Journey to the Clean Energy City"
     }
   ]
 }

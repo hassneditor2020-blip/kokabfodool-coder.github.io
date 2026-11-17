@@ -3,6 +3,8 @@ import {activeProfile} from './profile-state.js';
 
 const catalogURL = '/stories/catalog.json';
 const android = /FudoolAndroidUnified/.test(navigator.userAgent);
+const english = document.documentElement.lang === 'en';
+const tr = (ar, en) => english ? en : ar;
 const localKey = 'fudool-pages-v1:' + activeProfile().id;
 const root = document.querySelector('[data-library], [data-reader]');
 
@@ -47,15 +49,16 @@ async function data(path) {
 }
 
 function library(catalog) {
-    const filters = document.querySelector('[data-filters]');
-    const summary = document.querySelector('[data-summary]');
+    const layout = root.closest('.pages-layout');
+    const filters = layout.querySelector('[data-filters]');
+    const summary = layout.querySelector('[data-summary]');
     const render = () => {
         const {search, age, status} = Object.fromEntries(new FormData(filters));
         const query = search.normalize('NFC').trim().toLowerCase();
         const stories = catalog.stories.filter(story =>
             (!age || Number(age) === story.ageMin) &&
             (!status || record(story.id)[status]) &&
-            (!query || [story.titleAr, story.theme, ...story.characters].join(' ').normalize('NFC').toLowerCase().includes(query)));
+            (!query || [story.titleAr, story.titleEn, story.theme, ...story.characters].join(' ').normalize('NFC').toLowerCase().includes(query)));
         root.replaceChildren();
         const all = Object.values(progress);
         const completed = all.filter(item => item.completed).length;
@@ -70,7 +73,7 @@ function library(catalog) {
             const card = node('article');
             card.className = 'pages-card';
             const body = node('div');
-            const link = node('a', story.titleAr);
+            const link = node('a', english && story.titleEn ? story.titleEn : story.titleAr);
             link.href = storyPath(story.id);
             const title = node('h2');
             title.append(link);
@@ -79,7 +82,7 @@ function library(catalog) {
             image.alt = '';
             image.loading = 'lazy';
             const saved = record(story.id);
-            const favorite = button('المفضلة', () => {
+            const favorite = button(tr('المفضلة', 'Favorite'), () => {
                 update(story.id, {favorite: !saved.favorite});
                 if (status === 'favorite') render();
                 else favorite.setAttribute('aria-pressed', String(saved.favorite));
@@ -302,8 +305,15 @@ async function downloadControls(story, controls, notice) {
 }
 
 if (root) {
-    if (android && root.hasAttribute('data-library')) document.querySelector('nav a').href = '/play-app/';
     const id = root.dataset.story;
+    const topLink = root.closest('.pages-layout').querySelector(':scope > nav a');
+    const source = document.referrer && new URL(document.referrer);
+    const fromApp = source && source.origin === location.origin && ['/play-app/', '/en/play-app/'].includes(source.pathname);
+    if (topLink && id && (fromApp || android)) {
+        topLink.href = (fromApp ? source.pathname : '/play-app/') + '#v5-pages';
+    } else if (topLink && android && root.hasAttribute('data-library')) {
+        topLink.href = '/play-app/';
+    }
     (id ? data(storyPath(id) + 'story.json').then(reader) : data(catalogURL).then(library))
         .catch(() => root.append(node('p', 'تعذر تحميل القصة أو المكتبة. جرّب مجددًا عند توفر الاتصال.')));
 }

@@ -3,7 +3,7 @@ set -euo pipefail
 
 package=com.kokabfodool.offline
 activity="$package/com.kokabfodool.shell.MainActivity"
-apk=build/play/Kawkab-Fudool-6.8.4.apk
+apk=build/play/Kawkab-Fudool-6.8.5.apk
 mkdir -p build/play-device
 
 adb shell wm size 390x844
@@ -11,8 +11,8 @@ adb shell wm density 160
 adb shell input keyevent 82
 adb install downloads/apps/Kokab-Fodool-V6.7.1.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=74'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.8.4'
+adb shell dumpsys package "$package" | grep -F 'versionCode=75'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.8.5'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -112,7 +112,7 @@ find_label '1/8' no
 find_label 'التالي' yes
 find_label '2/8' no
 adb exec-out screencap -p > build/play-device/android-offline-clean-energy.png
-echo 'PASS Android 6.8.4 opens and turns pages in both new stories in airplane mode.'
+echo 'PASS Android 6.8.5 opens and turns pages in both new stories in airplane mode.'
 
 adb shell am force-stop "$package"
 adb shell wm size 390x844
@@ -183,7 +183,7 @@ find_label 'تُقبل الكتابة عند تجاوز 75%' no
 find_label 'اسمع الكلمة' yes
 find_label 'استمع ببطء' yes
 adb exec-out screencap -p > build/play-device/android-offline-writing.png
-echo 'PASS Android 6.8.4 upgrades from 6.7.1 and opens settings, dictation, memory and age-based games in airplane mode.'
+echo 'PASS Android 6.8.5 upgrades from 6.7.1 and opens settings, dictation, memory and age-based games in airplane mode.'
 
 adb shell am force-stop "$package"
 adb shell wm size 800x1280
