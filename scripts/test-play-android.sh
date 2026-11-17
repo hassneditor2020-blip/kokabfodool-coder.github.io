@@ -62,7 +62,7 @@ for attempt in range(15):
                 if tap == 'yes' and not (exact or clickable):
                     continue
                 center_y = (y1+y2)//2
-                if tap == 'yes' and label not in ('الألعاب', 'المزيد', 'صفحات') and center_y >= (1230 if label in ('صفحات فضول','فضّول وسرّ الحديقة','رحلة إلى مدينة الطاقة النظيفة','التالي','كل القصص') else 740):
+                if tap == 'yes' and label not in ('الألعاب', 'المزيد', 'صفحات') and center_y >= (1230 if label in ('صفحات فضول','فضّول وسرّ الحديقة','رحلة إلى مدينة الطاقة النظيفة','التالي','كل القصص','تكبير الصورة','إغلاق') else 740):
                     behind_navigation = True
                     continue
                 priority = (not exact, not clickable)
@@ -79,7 +79,7 @@ for attempt in range(15):
                 time.sleep(.5)
                 continue
     if attempt in (3,6,9,12):
-        subprocess.run(['adb','shell','input','swipe','193', '1110' if label in ('صفحات فضول','فضّول وسرّ الحديقة','رحلة إلى مدينة الطاقة النظيفة','التالي','كل القصص') else '725','193','370','350'],check=True)
+        subprocess.run(['adb','shell','input','swipe','193', '1110' if label in ('صفحات فضول','فضّول وسرّ الحديقة','رحلة إلى مدينة الطاقة النظيفة','التالي','كل القصص','تكبير الصورة','إغلاق') else '725','193','370','350'],check=True)
     time.sleep(1)
 print('Visible controls:', visible, flush=True)
 raise SystemExit('Offline Android view did not display: ' + label)
@@ -90,6 +90,7 @@ adb shell wm size 820x1280
 adb shell wm density 160
 adb shell am force-stop "$package"
 adb shell am start -W -n "$activity"
+find_label 'صفحات' no
 adb exec-out screencap -p > build/play-device/android-home-safe-bars.png
 find_label 'صفحات' yes
 adb shell input swipe 385 1090 385 490 300
@@ -101,6 +102,7 @@ find_label 'تكبير الصورة' yes
 find_label 'إغلاق' no
 find_label 'التالي' yes
 find_label '3/9' no
+adb exec-out screencap -p > build/play-device/android-zoom-reader.png
 find_label 'إغلاق' yes
 adb exec-out screencap -p > build/play-device/android-offline-garden.png
 find_label 'كل القصص' yes
