@@ -1,6 +1,21 @@
 {
   "stories": [
     {
+      "id": "mishal-blue-balloon",
+      "titleAr": "مشعال والبالون الأزرق",
+      "ageMin": 3,
+      "ageMax": 4,
+      "theme": "الصداقة والتعاون",
+      "characters": [
+        "مشعال",
+        "روبو"
+      ],
+      "pageCount": 6,
+      "readingMinutes": 2,
+      "educationalValue": "التعاون وشكر من يساعدنا",
+      "cover": "cover.webp"
+    },
+    {
       "id": "robo-little-seed",
       "titleAr": "روبو والبذرة الصغيرة",
       "ageMin": 5,

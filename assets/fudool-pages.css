@@ -40,3 +40,6 @@ h1{font-size:clamp(1.85rem,6vw,4rem);line-height:1.2;margin:.25em 0}
 .pages-notice{min-height:1.7em}
 @keyframes pages-in{from{opacity:.6;transform:translateX(6px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.pages-frame img{animation:none}}
+
+.pages-book[data-embedded-text] .pages-frame img{aspect-ratio:auto;object-fit:contain}
+.pages-book[data-embedded-text]:not([data-large]) figcaption{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}

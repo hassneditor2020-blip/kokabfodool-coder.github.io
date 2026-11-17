@@ -143,6 +143,7 @@ function reader(story) {
     let quizShown = false;
     const book = node('div');
     book.className = 'pages-book';
+    book.toggleAttribute('data-embedded-text', story.embeddedText === true);
     const frame = node('figure');
     frame.className = 'pages-frame';
     const image = node('img');

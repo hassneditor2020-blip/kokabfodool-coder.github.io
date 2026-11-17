@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "id": "mishal-blue-balloon",
+  "titleAr": "مشعال والبالون الأزرق",
+  "titleEn": "Mishal and the Blue Balloon",
+  "ageMin": 3,
+  "ageMax": 4,
+  "description": "يطير بالون مشعال الأزرق ويعلق في الشجرة، فيساعده صديقه روبو على استعادته.",
+  "educationalValue": "التعاون وشكر من يساعدنا",
+  "theme": "الصداقة والتعاون",
+  "characters": [
+    "مشعال",
+    "روبو"
+  ],
+  "isFree": true,
+  "readingMinutes": 2,
+  "pageCount": 6,
+  "cover": "cover.webp",
+  "embeddedText": true,
+  "pages": [
+    {
+      "number": 1,
+      "image": "page-01.webp",
+      "text": "مِشْعَالٌ وَالْبَالُونُ الْأَزْرَقُ"
+    },
+    {
+      "number": 2,
+      "image": "page-02.webp",
+      "text": "أَمْسَكَ مِشْعَالٌ بَالُونًا أَزْرَقَ."
+    },
+    {
+      "number": 3,
+      "image": "page-03.webp",
+      "text": "طَارَ الْبَالُونُ عَالِيًا!"
+    },
+    {
+      "number": 4,
+      "image": "page-04.webp",
+      "text": "عَلِقَ الْبَالُونُ فِي الشَّجَرَةِ."
+    },
+    {
+      "number": 5,
+      "image": "page-05.webp",
+      "text": "سَاعَدَ رُوبُو مِشْعَالًا."
+    },
+    {
+      "number": 6,
+      "image": "page-06.webp",
+      "text": "قَالَ مِشْعَالٌ: شُكْرًا يَا رُوبُو!"
+    }
+  ],
+  "questions": [
+    {
+      "question": "ما لون بالون مشعال؟",
+      "options": [
+        "أزرق",
+        "أصفر",
+        "أحمر"
+      ],
+      "correctIndex": 0
+    },
+    {
+      "question": "أين علق البالون؟",
+      "options": [
+        "على الباب",
+        "في الشجرة",
+        "على الكرسي"
+      ],
+      "correctIndex": 1
+    },
+    {
+      "question": "ماذا قال مشعال لروبو؟",
+      "options": [
+        "إلى اللقاء",
+        "صباح الخير",
+        "شكرًا يا روبو"
+      ],
+      "correctIndex": 2
+    }
+  ],
+  "status": "published"
+}
