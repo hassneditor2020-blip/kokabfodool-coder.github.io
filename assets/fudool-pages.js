@@ -76,7 +76,7 @@ function library(catalog) {
             const link = node('a', english && story.titleEn ? story.titleEn : story.titleAr);
             link.href = storyPath(story.id);
             const title = node('h2');
-            title.append(link);
+            title.textContent = link.textContent;
             const image = node('img');
             image.src = link.href + story.cover;
             image.alt = '';
@@ -88,10 +88,12 @@ function library(catalog) {
                 else favorite.setAttribute('aria-pressed', String(saved.favorite));
             });
             favorite.setAttribute('aria-pressed', String(Boolean(saved.favorite)));
-            body.append(title, node('p', `${story.ageMin}–${story.ageMax} سنوات · ${story.pageCount} صفحات · ${story.readingMinutes} د`),
+            link.className = 'pages-cover';
+            link.replaceChildren(image, title);
+            body.append(node('p', `${story.ageMin}–${story.ageMax} سنوات · ${story.pageCount} صفحات · ${story.readingMinutes} د`),
                 node('p', story.educationalValue),
                 node('p', saved.completed ? 'اكتملت القراءة' : saved.page > 0 ? `تابع من صفحة ${saved.page + 1}` : ''), favorite);
-            card.append(image, body);
+            card.append(link, body);
             root.append(card);
         }
     };
@@ -147,13 +149,22 @@ function reader(story) {
     let quizShown = false;
     const book = node('div');
     book.className = 'pages-book';
-    const frame = node('figure');
-    frame.className = 'pages-frame';
-    const image = node('img');
-    image.alt = '';
-    const text = node('figcaption');
-    text.setAttribute('aria-live', 'polite');
-    frame.append(image, text);
+    function folio() {
+        const frame = node('figure');
+        frame.className = 'pages-frame';
+        const title = node('div', story.titleAr || story.title);
+        title.className = 'pages-running-title';
+        const artwork = node('div');
+        artwork.className = 'pages-illustration';
+        const image = node('img');
+        image.alt = '';
+        artwork.append(image);
+        const text = node('figcaption');
+        text.setAttribute('aria-live', 'polite');
+        frame.append(title, artwork, text);
+        return {frame, image, text};
+    }
+    const {frame, image, text} = folio();
     const counter = node('span');
     counter.className = 'pages-counter';
     const controls = node('div');
@@ -167,13 +178,7 @@ function reader(story) {
     const dialog = node('dialog');
     dialog.className = 'pages-zoom';
     dialog.setAttribute('aria-label', 'قراءة بالصورة المكبّرة');
-    const zoomImage = node('img');
-    zoomImage.alt = '';
-    const zoomFrame = node('figure');
-    zoomFrame.className = 'pages-zoom-frame';
-    const zoomText = node('figcaption');
-    zoomText.setAttribute('aria-live', 'polite');
-    zoomFrame.append(zoomImage, zoomText);
+    const {frame: zoomFrame, image: zoomImage, text: zoomText} = folio();
     const zoomControls = node('div');
     zoomControls.className = 'pages-actions';
     const zoomCounter = node('span');
@@ -188,6 +193,7 @@ function reader(story) {
     const zoom = button('تكبير الصورة', () => {
         renderZoom();
         dialog.showModal();
+        dialog.scrollTop = 0;
     });
     dialog.addEventListener('keydown', event => {
         if (event.altKey || event.ctrlKey || event.metaKey) return;
@@ -230,7 +236,10 @@ function reader(story) {
     function seenEnd() { return position === story.pages.length - 1; }
     function render() {
         const page = story.pages[position];
-        book.toggleAttribute('data-embedded-text', story.embeddedText === true || page.embeddedText === true);
+        // The original artwork remains intact. The reader uses the illustration area
+        // of predesigned pages and lays out their text in the common book template.
+        const layout = story.embeddedText === true ? 'story-print' : page.embeddedText === true ? 'page-print' : 'square';
+        frame.dataset.artwork = zoomFrame.dataset.artwork = layout;
         image.src = base + page.image;
         text.textContent = page.text;
         counter.textContent = `${position + 1}/${story.pages.length}`;
