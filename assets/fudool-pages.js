@@ -323,7 +323,10 @@ async function downloadControls(story, controls, notice) {
 if (root) {
     const id = root.dataset.story;
     const topLink = root.closest('.pages-layout').querySelector(':scope > nav a');
-    const source = document.referrer && new URL(document.referrer);
+    const source = (() => {
+        try { return document.referrer ? new URL(document.referrer) : null; }
+        catch { return null; }
+    })();
     const fromApp = source && source.origin === location.origin && ['/play-app/', '/en/play-app/'].includes(source.pathname);
     if (topLink && id && (fromApp || android)) {
         topLink.href = (fromApp ? source.pathname : '/play-app/') + '#v5-pages';
@@ -331,5 +334,8 @@ if (root) {
         topLink.href = '/play-app/';
     }
     (id ? data(storyPath(id) + 'story.json').then(reader) : data(catalogURL).then(library))
-        .catch(() => root.append(node('p', 'تعذر تحميل القصة أو المكتبة. جرّب مجددًا عند توفر الاتصال.')));
+        .catch(error => {
+            console.error('Fudool story reader initialization failed:', error);
+            root.append(node('p', 'تعذر تحميل القصة أو المكتبة. جرّب مجددًا عند توفر الاتصال.'));
+        });
 }
