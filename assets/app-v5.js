@@ -26,6 +26,17 @@ function showSeries(id,slug){
 }
 function route(){const hash=location.hash||'#top';let view='home',match=hash.match(/^#v5-series-([a-z-]+)(?:\/([a-z0-9-]+))?$/);if(hash==='#v5-watch'||match&&config[match[1]])view='learn';else if(hash==='#v5-games')view='games';else if(hash==='#v5-achievements')view='achievements';else if(hash==='#v5-more')view='more';else if(hash==='#v5-pages')view='stories';
  views.forEach(v=>v.hidden=v.dataset.v5View!==view);const target={home:'#top',learn:'#v5-watch',games:'#v5-games',achievements:'#v5-achievements',more:'#v5-more',stories:'#v5-pages'}[view];nav.forEach(a=>{if(a.getAttribute('href')===target)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});if(view==='learn'&&match&&config[match[1]])showSeries(match[1],match[2]);else{token++;detail.hidden=true;series.hidden=false;latest.hidden=false}window.scrollTo(0,0)}
+// Native WebView can restore a deep scroll position after returning from a game.
+if(nativeApp && 'scrollRestoration' in history) history.scrollRestoration='manual';
+function resetGamesScroll(){
+ if(location.hash!=='#v5-games')return;
+ window.scrollTo(0,0);
+ requestAnimationFrame(()=>window.scrollTo(0,0));
+}
+if(nativeApp){
+ addEventListener('pageshow',resetGamesScroll);
+ nav.filter(a=>a.getAttribute('href')==='#v5-games').forEach(a=>a.addEventListener('click',resetGamesScroll));
+}
 addEventListener('hashchange',route);route();
 document.querySelectorAll('[data-v5-episode]').forEach(b=>b.addEventListener('click',()=>{
  const [group,slug]=b.dataset.v5Episode.split('/');

@@ -27,6 +27,7 @@ public class MainActivity extends Activity {
     private String home;
     private String backupProject;
     private String backupKey;
+    private boolean returningFromGame;
     @Override public void onCreate(Bundle state){
         super.onCreate(state);
         // Preserve the old offline package and origin so saved progress is retained on update.
@@ -70,6 +71,15 @@ public class MainActivity extends Activity {
                 if (allowedBackupRequest(req)) return null;
                 if(!"https".equals(u.getScheme())||!host.equals(u.getHost()))return error(403,"Blocked");
                 return local(u,req.getRequestHeaders());
+            }
+            @Override public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (returningFromGame && url.contains("/play-app/") && url.endsWith("#v5-games")) {
+                    returningFromGame = false;
+                    view.clearHistory();
+                    view.scrollTo(0, 0);
+                    view.evaluateJavascript("window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));", null);
+                }
             }
             @Override public void onReceivedError(WebView view,WebResourceRequest req,WebResourceError e){
                 if(req.isForMainFrame())runOnUiThread(()->Toast.makeText(MainActivity.this,"تعذر فتح الصفحة | Unable to open page",Toast.LENGTH_SHORT).show());
@@ -236,6 +246,18 @@ public class MainActivity extends Activity {
         if(p.endsWith(".mp3"))return "audio/mpeg";if(p.endsWith(".wav"))return "audio/wav";if(p.endsWith(".ogg"))return "audio/ogg";if(p.endsWith(".woff2"))return "font/woff2";if(p.endsWith(".json")||p.endsWith(".webmanifest"))return "application/json";return "application/octet-stream";
     }
     private void navigateBack() {
+        String current = web.getUrl();
+        if (current != null) {
+            Uri uri = Uri.parse(current);
+            String path = uri.getPath();
+            if (host.equals(uri.getHost()) && path != null && path.matches("^/(en/)?games/[^/]+/.*$")) {
+                // A game is a child of the app's game library, not an arbitrary browser-history entry.
+                // Reload the library to avoid restoring a stale WebView accessibility tree and scroll offset.
+                returningFromGame = true;
+                web.loadUrl("https://" + host + (path.startsWith("/en/") ? "/en" : "") + "/play-app/#v5-games");
+                return;
+            }
+        }
         if (web.canGoBack()) web.goBack();
         else finish();
     }

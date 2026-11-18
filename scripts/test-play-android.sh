@@ -3,7 +3,7 @@ set -euo pipefail
 
 package=com.kokabfodool.offline
 activity="$package/com.kokabfodool.shell.MainActivity"
-apk=build/play/Kawkab-Fudool-6.8.7.apk
+apk=build/play/Kawkab-Fudool-6.8.8.apk
 mkdir -p build/play-device
 
 adb shell wm size 390x844
@@ -11,8 +11,8 @@ adb shell wm density 160
 adb shell input keyevent 82
 adb install downloads/apps/Kokab-Fodool-V6.7.1.apk
 adb install -r "$apk"
-adb shell dumpsys package "$package" | grep -F 'versionCode=77'
-adb shell dumpsys package "$package" | grep -F 'versionName=6.8.7'
+adb shell dumpsys package "$package" | grep -F 'versionCode=78'
+adb shell dumpsys package "$package" | grep -F 'versionName=6.8.8'
 adb shell cmd connectivity airplane-mode enable
 adb shell svc wifi disable
 adb shell svc data disable
@@ -86,6 +86,13 @@ for attempt in range(15):
         subprocess.run(['adb','shell','input','swipe','193', '1110' if story_reader else '725','193','370','350'],check=True)
     time.sleep(1)
 print('Visible controls:', visible, flush=True)
+# Preserve the actual failed screen and WebView accessibility tree for diagnosis.
+with open('build/play-device/android-failure.png', 'wb') as output:
+    subprocess.run(['adb','exec-out','screencap','-p'], stdout=output, check=False)
+with open('build/play-device/android-failure.xml', 'wb') as output:
+    subprocess.run(['adb','exec-out','cat','/sdcard/fudool-ui.xml'], stdout=output, check=False)
+with open('build/play-device/android-failure-logcat.txt', 'wb') as output:
+    subprocess.run(['adb','logcat','-d','-t','1500','chromium:V','AndroidRuntime:E','*:S'], stdout=output, check=False)
 raise SystemExit('Offline Android view did not display: ' + label)
 PY
 }
@@ -117,7 +124,7 @@ find_label '1/8' no
 find_label 'التالي' yes
 find_label '2/8' no
 adb exec-out screencap -p > build/play-device/android-offline-clean-energy.png
-echo 'PASS Android 6.8.7 opens and turns pages in both new stories in airplane mode.'
+echo 'PASS Android 6.8.8 opens and turns pages in both new stories in airplane mode.'
 
 adb shell am force-stop "$package"
 adb shell wm size 390x844
@@ -188,7 +195,7 @@ find_label 'تُقبل الكتابة عند تجاوز 75%' no
 find_label 'اسمع الكلمة' yes
 find_label 'استمع ببطء' yes
 adb exec-out screencap -p > build/play-device/android-offline-writing.png
-echo 'PASS Android 6.8.7 upgrades from 6.7.1 and opens settings, dictation, memory and age-based games in airplane mode.'
+echo 'PASS Android 6.8.8 upgrades from 6.7.1 and opens settings, dictation, memory and age-based games in airplane mode.'
 
 adb shell am force-stop "$package"
 adb shell wm size 800x1280

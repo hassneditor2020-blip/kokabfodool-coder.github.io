@@ -25,9 +25,9 @@ const root='http://127.0.0.1:8714';
   assert.equal(await page.getByRole('link',{name:'روبو والبذرة الصغيرة'}).count(),0);
   await page.locator('[name="age"]').selectOption('7');
   await page.getByRole('link',{name:'فضّول وسرّ الحديقة'}).waitFor();
-  assert.equal(await page.locator('.pages-card').count(),1);
+  assert.equal(await page.locator('.pages-card').count(),2);
   await page.locator('[name="age"]').selectOption('5');
-  await page.getByRole('button',{name:'المفضلة'}).click();
+  await page.locator('.pages-card').filter({has:page.getByRole('link',{name:'روبو والبذرة الصغيرة',exact:true})}).getByRole('button',{name:'المفضلة'}).click();
   await page.locator('[name="status"]').selectOption('favorite');
   await page.getByRole('link',{name:'روبو والبذرة الصغيرة'}).click();
   await page.getByText('1/7',{exact:true}).waitFor();
@@ -95,6 +95,10 @@ const root='http://127.0.0.1:8714';
  for(const [id, title, age, total, answers] of [
   ['fudool-garden-mystery','فضّول وسرّ الحديقة','7',9,[0,1,2,0,1]],
   ['clean-energy-city','رحلة إلى مدينة الطاقة النظيفة','9',8,[0,1,2,0,1,2]],
+  ["lumaa-colorful-breakfast","لمعة ووجبة الألوان","3",6,[0,1,1]],
+  ["robo-block-tower","روبو وبرج المكعبات","5",7,[1,0,1]],
+  ["fudool-sealed-letter","فضّول والرسالة المغلقة","7",9,[0,1,0,2,1]],
+  ["mishaal-mysterious-news","مشعال والخبر الغامض","9",9,[0,1,2,1,0,2]],
  ]){
   const context=await browser.newContext({viewport:{width:390,height:844}});
   const page=await context.newPage();
