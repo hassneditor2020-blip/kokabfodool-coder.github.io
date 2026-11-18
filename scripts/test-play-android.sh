@@ -86,6 +86,13 @@ for attempt in range(15):
         subprocess.run(['adb','shell','input','swipe','193', '1110' if story_reader else '725','193','370','350'],check=True)
     time.sleep(1)
 print('Visible controls:', visible, flush=True)
+# Preserve the actual failed screen and WebView accessibility tree for diagnosis.
+with open('build/play-device/android-failure.png', 'wb') as output:
+    subprocess.run(['adb','exec-out','screencap','-p'], stdout=output, check=False)
+with open('build/play-device/android-failure.xml', 'wb') as output:
+    subprocess.run(['adb','exec-out','cat','/sdcard/fudool-ui.xml'], stdout=output, check=False)
+with open('build/play-device/android-failure-logcat.txt', 'wb') as output:
+    subprocess.run(['adb','logcat','-d','-t','1500','chromium:V','AndroidRuntime:E','*:S'], stdout=output, check=False)
 raise SystemExit('Offline Android view did not display: ' + label)
 PY
 }
