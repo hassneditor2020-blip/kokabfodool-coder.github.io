@@ -103,7 +103,7 @@ function library(catalog) {
 }
 
 function quiz(story) {
-    if (!story.questions.length) return;
+    if (!Array.isArray(story.questions) || !story.questions.length) return;
     const form = node('form');
     form.className = 'pages-quiz';
     form.append(node('h2', 'ماذا تذكّرت من القصة؟'));
@@ -165,6 +165,10 @@ function reader(story) {
         return {frame, image, text};
     }
     const {frame, image, text} = folio();
+    const meter = node('progress');
+    meter.max = story.pages.length;
+    meter.setAttribute('aria-label', 'تقدم القراءة');
+    meter.style.width = '100%';
     const counter = node('span');
     counter.className = 'pages-counter';
     const controls = node('div');
@@ -185,7 +189,7 @@ function reader(story) {
     zoomCounter.className = 'pages-counter';
     zoomCounter.setAttribute('aria-live', 'polite');
     const zoomPrevious = button('السابق', () => move(-1));
-    const zoomNext = button('التالي', () => move(1));
+    const zoomNext = button('التالي', () => { if (seenEnd()) { dialog.close(); finish(); } else move(1); });
     const closeZoom = button('إغلاق', () => dialog.close());
     closeZoom.autofocus = true;
     zoomControls.append(zoomPrevious, zoomCounter, zoomNext, closeZoom);
@@ -213,7 +217,7 @@ function reader(story) {
     notice.setAttribute('role', 'status');
     notice.className = 'pages-notice';
     controls.append(previous, counter, next, large, zoom, full);
-    book.append(frame, controls, notice, dialog);
+    book.append(frame, meter, controls, notice, dialog);
     root.replaceChildren(book);
     if (!android && navigator.serviceWorker && globalThis.caches) {
         downloadControls(story, controls, notice).catch(() => {});
@@ -231,7 +235,7 @@ function reader(story) {
         dialog.scrollTop = 0;
         zoomCounter.textContent = counter.textContent;
         zoomPrevious.disabled = position === 0;
-        zoomNext.disabled = seenEnd();
+        zoomNext.textContent = seenEnd() ? 'إنهاء القصة' : 'التالي';
     }
     function seenEnd() { return position === story.pages.length - 1; }
     function render() {
@@ -243,6 +247,7 @@ function reader(story) {
         image.src = base + page.image;
         text.textContent = page.text;
         counter.textContent = `${position + 1}/${story.pages.length}`;
+        meter.value = position + 1;
         previous.disabled = position === 0;
         next.textContent = seenEnd() ? 'إنهاء القصة' : 'التالي';
         if (dialog.open) renderZoom();
