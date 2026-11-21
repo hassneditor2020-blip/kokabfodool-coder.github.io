@@ -40,6 +40,15 @@ const games = [
       assert.equal(await page.locator('.fudool-pages-promo a').getAttribute('href'), '/stories/');
       assert(await page.locator('.home-play-button').isVisible());
       assert(await page.locator('.hero-cutout img').evaluate(img => img.complete && img.naturalWidth > 0));
+      assert.equal(await page.locator('.download-app-bubble').evaluate(el => getComputedStyle(el).position), 'static');
+      const parentLink = page.locator('.home-discover-link[href="/grown-ups/"]');
+      await parentLink.focus();
+      assert(await parentLink.evaluate(el => {
+        el.scrollIntoView({ block: 'center' });
+        const rect = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        return hit === el || el.contains(hit);
+      }), `parent shortcut is not covered at ${width}`);
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `no horizontal page overflow at ${width}`);
       if (width < 800) {
         await page.locator('.mobile-nav summary').click();

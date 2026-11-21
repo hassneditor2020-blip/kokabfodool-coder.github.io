@@ -460,7 +460,13 @@
 .manus-home-review .site-foot nav a:hover { color: #ffde87; }
 .manus-home-review .site-foot .button-row > a:not(.button) { display: inline-flex; align-items: center; gap: .4rem; min-height: 44px; color: #f4eefb; }
 .manus-home-review .site-foot .button-youtube { box-shadow: none; }
-.manus-home-review .download-app-bubble { min-height: 44px; background: #4e2fa6; border-color: #e0d4f8; }
+.manus-home-review .home-download { display: flex; justify-content: center; margin-block-start: 1rem; }
+.manus-home-review .download-app-bubble {
+  position: static;
+  min-height: 44px;
+  background: #4e2fa6;
+  border-color: #e0d4f8;
+}
 
 @media (max-width: 1050px) {
   .manus-home-review .head-inner { grid-template-columns: minmax(0, 1fr) auto; }
