@@ -1,0 +1,555 @@
+/* تجربة الصفحة الرئيسية فقط. لا تتطلب خطوطًا أو أصولًا من خارج الموقع. */
+.manus-home-review {
+  --mh-ink: #241a43;
+  --mh-muted: #615775;
+  --mh-purple: #5130ad;
+  --mh-purple-deep: #24144c;
+  --mh-gold: #ffdc79;
+  --mh-mint: #bdeedb;
+  --mh-line: #e8e0f1;
+  --mh-shadow: 0 12px 34px rgba(49, 31, 86, .08);
+  background: #fbf9fd;
+  color: var(--mh-ink);
+}
+
+.manus-home-review [hidden] { display: none !important; }
+.manus-home-review :focus-visible {
+  outline: 3px solid #6640c9;
+  outline-offset: 4px;
+}
+.manus-home-review .home-hero :focus-visible,
+.manus-home-review .grown-banner :focus-visible,
+.manus-home-review .site-foot :focus-visible {
+  outline-color: #ffdf80;
+}
+.manus-home-review .wrap { width: min(100% - 2.5rem, 1200px); }
+.manus-home-review :is(h1, h2, h3) { overflow-wrap: anywhere; }
+.manus-home-review :is(a, button, summary) { touch-action: manipulation; }
+.manus-home-review .button {
+  min-height: 48px;
+  border-radius: 15px;
+  font-weight: 850;
+  line-height: 1.55;
+}
+.manus-home-review .text-link { min-height: 44px; color: #4d2a9d; }
+.manus-home-review .button-primary {
+  color: #fff;
+  background: #5130ad;
+  border-color: #5130ad;
+  box-shadow: 0 4px 0 #392082, 0 9px 20px #4e2c9d29;
+}
+.manus-home-review .button-primary:hover { background: #3f228e; }
+.manus-home-review .button-white {
+  background: #fff;
+  color: #30204d;
+  border-color: #e5daf0;
+  box-shadow: 0 3px 0 #eee8f4;
+}
+.manus-home-review .button-white:hover { background: #f6f1ff; }
+
+/* شريط تنقل هادئ يترك مساحة للهوية والروابط. */
+.manus-home-review .site-head {
+  background: rgba(255, 253, 255, .97);
+  border-color: #eee9f4;
+  box-shadow: 0 5px 25px rgba(40, 23, 74, .045);
+}
+.manus-home-review .head-inner { min-height: 78px; }
+.manus-home-review .site-head .wordmark { color: #2d1b58; gap: .65rem; }
+.manus-home-review .wordmark { min-height: 44px; }
+.manus-home-review .site-head .wordmark img {
+  border-radius: 15px;
+  background: #f6f0ff;
+  border-color: #eee5f8;
+}
+.manus-home-review .desktop-nav {
+  gap: .1rem;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.manus-home-review .desktop-nav a { color: #504660; padding-inline: .7rem; }
+.manus-home-review .desktop-nav a:hover { background: #f2edfb; color: #4b2a9d; }
+.manus-home-review :is(.language, .mobile-nav summary) {
+  color: #4b2a9d;
+  border-color: #e6def1;
+  background: #f8f5fc;
+}
+.manus-home-review .mobile-nav[open] summary { color: #fff; background: #5130ad; }
+.manus-home-review .mobile-nav[open] nav { border-color: #e9dff2; box-shadow: 0 16px 36px #24144524; }
+
+/* مقدمة كونية: المحتوى والرسم كلاهما من الصفحة الأصلية. */
+.manus-home-review .home-page .home-hero {
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(3rem, 6vw, 6rem);
+  color: #fff;
+  border: 0;
+  background:
+    radial-gradient(circle at 11% 22%, rgba(148, 115, 245, .42), transparent 28%),
+    radial-gradient(circle at 86% 85%, rgba(103, 77, 186, .35), transparent 27%),
+    linear-gradient(125deg, #1d123f 0%, #332065 54%, #24164c 100%);
+}
+.manus-home-review .home-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .33;
+  background-image: radial-gradient(circle, #fff 1px, transparent 1.5px);
+  background-size: 67px 67px;
+  background-position: 14px 23px;
+}
+.manus-home-review .home-page .hero-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 5vw, 5.5rem);
+}
+.manus-home-review .hero-copy { position: relative; text-align: start; padding: 0; }
+.manus-home-review .age-label {
+  justify-content: flex-start;
+  gap: .6rem;
+  padding: .48rem .85rem;
+  color: #ffecb8;
+  background: #ffffff12;
+  border: 1px solid #ffffff37;
+  border-radius: 999px;
+  font-size: .83rem;
+  line-height: 1.5;
+}
+.manus-home-review .age-label span { color: #ffd66a; }
+.manus-home-review .home-page .hero-copy h1 {
+  margin-block: .42em .38em;
+  color: #fff;
+  font-size: clamp(2.7rem, 4.8vw, 4.65rem);
+  line-height: 1.38;
+  letter-spacing: -.025em;
+}
+.manus-home-review .hero-copy h1 span { color: #ffdf86; }
+.manus-home-review .home-page .hero-text {
+  max-width: 37ch;
+  margin: 0 0 1.65rem;
+  color: #eae4f8;
+  font-size: clamp(1rem, 1.45vw, 1.22rem);
+  line-height: 1.95;
+}
+.manus-home-review .home-page .hero-copy .home-actions {
+  display: flex;
+  justify-content: flex-start;
+  max-width: 100%;
+  gap: .7rem;
+}
+.manus-home-review .home-page .home-actions .button {
+  min-height: 54px;
+  padding: .65rem 1.15rem;
+  font-size: .95rem;
+}
+.manus-home-review .home-page .home-actions .home-play-button {
+  color: #35204a;
+  background: #ffda76;
+  border-color: #ffda76;
+  box-shadow: 0 4px 0 #ce9c3c, 0 9px 22px #100b2d40;
+}
+.manus-home-review .home-page .home-actions .home-play-button:hover { background: #ffe596; }
+.manus-home-review .home-page .home-actions .home-watch-button {
+  color: #fff;
+  background: #ffffff12;
+  border-color: #ffffff73;
+  box-shadow: none;
+}
+.manus-home-review .home-page .home-actions .home-watch-button:hover { background: #ffffff25; }
+.manus-home-review .home-page .home-actions .home-shortcut {
+  min-height: 44px;
+  padding-inline: .9rem;
+  color: #eae3fa;
+  font-size: .85rem;
+  background: #ffffff0d;
+  border-color: #ffffff31;
+  box-shadow: none;
+}
+.manus-home-review .home-page .home-actions .home-shortcut:hover { background: #ffffff22; }
+.manus-home-review .home-resume { justify-content: flex-start; color: #eee5ff; }
+.manus-home-review .home-resume .text-link { background: #ffdf86; color: #382054; }
+.manus-home-review .home-page .hero-art {
+  min-height: 0;
+  width: 100%;
+  max-width: 560px;
+  max-height: none;
+  aspect-ratio: 1.14;
+  border: 1px solid #ffffff35;
+  border-radius: 38px;
+  background: radial-gradient(circle at 50% 42%, #997bea 0%, #6547be 43%, #3a2375 100%);
+  box-shadow: inset 0 1px 0 #ffffff35, 0 25px 55px #140b3640;
+}
+.manus-home-review .home-page .hero-cutout { inset: 5% 12%; }
+.manus-home-review .home-page .hero-cutout img { filter: drop-shadow(0 16px 18px #1b0b4b66); }
+.manus-home-review .home-page .hero-friend-lumaa { width: 20%; right: 3%; top: 5%; }
+.manus-home-review .home-page .hero-friend-robo { width: 21%; left: 3%; bottom: 5%; }
+.manus-home-review .hero-art .orbit { border-color: #ffffff63; }
+.manus-home-review .hero-art .orbit-2 { border-color: #fff0b25c; }
+
+/* شريط الاستكشاف الاختياري المضاف بعد المقدمة. */
+.manus-home-review .home-discover { padding-block: 1.4rem; background: #f7f3fb; }
+.manus-home-review .home-discover-inner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .8rem;
+}
+.manus-home-review .home-discover-link {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  min-width: 0;
+  min-height: 88px;
+  padding: .8rem;
+  border: 1px solid #ebe4f2;
+  border-radius: 20px;
+  color: #2c1e4d;
+  background: #fff;
+  box-shadow: 0 5px 18px #37215809;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.manus-home-review .home-discover-link:hover { transform: translateY(-3px); border-color: #d2c2ee; box-shadow: var(--mh-shadow); }
+.manus-home-review .home-discover-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: #eee8fc;
+  color: #5334a4;
+  font-size: 1.35rem;
+}
+.manus-home-review .home-discover-link:nth-child(2) .home-discover-icon { background: #fff0c8; color: #77510d; }
+.manus-home-review .home-discover-link:nth-child(3) .home-discover-icon { background: #dcf6ec; color: #286b55; }
+.manus-home-review .home-discover-link:nth-child(4) .home-discover-icon { background: #e3efff; color: #315d93; }
+.manus-home-review .home-discover-icon :is(svg, img) { max-width: 70%; max-height: 70%; }
+.manus-home-review .home-discover-link > span:last-child { display: grid; min-width: 0; gap: .1rem; }
+.manus-home-review .home-discover-link strong { font-size: .98rem; line-height: 1.5; }
+.manus-home-review .home-discover-link small { color: #6a607a; font-size: .75rem; line-height: 1.5; }
+
+/* القصص والإحصاءات. */
+.manus-home-review .fudool-pages-promo {
+  width: min(100% - 2.5rem, 1200px);
+  max-width: none;
+  margin: clamp(2rem, 4vw, 3.5rem) auto 0;
+  padding: 0;
+}
+.manus-home-review .fudool-pages-promo a {
+  position: relative;
+  min-height: 158px;
+  gap: clamp(1rem, 3vw, 2rem);
+  padding: clamp(1rem, 2.5vw, 1.8rem);
+  border: 1px solid #e6ddf1;
+  border-radius: 26px;
+  background: radial-gradient(circle at 12% 20%, #dff8ef 0%, transparent 35%), linear-gradient(110deg, #f4eefe, #fffaf2 75%);
+  color: #2e1f4f;
+  box-shadow: var(--mh-shadow);
+}
+.manus-home-review .fudool-pages-promo a:hover { border-color: #bfaada; }
+.manus-home-review .fudool-pages-promo img {
+  width: clamp(5rem, 11vw, 8.25rem);
+  border: 4px solid #ffffffd9;
+  box-shadow: 0 8px 22px #3f296a26;
+}
+.manus-home-review .fudool-pages-promo a > span { gap: .25rem; }
+.manus-home-review .fudool-pages-promo strong { color: #34215e; font-size: clamp(1.3rem, 2.3vw, 2rem); line-height: 1.5; }
+.manus-home-review .fudool-pages-promo a > span > span { color: #625475; }
+.manus-home-review .fudool-pages-promo b { color: #5130a8; font-size: .9rem; }
+.manus-home-review .home-stats-section { padding: clamp(1.4rem, 3vw, 2.5rem) 0; background: transparent; }
+.manus-home-review .home-stats-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, .9fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 1.5rem;
+  padding: clamp(1.4rem, 3vw, 2.3rem);
+  border-radius: 26px;
+  background: linear-gradient(115deg, #34205f, #4b3482 72%, #594398);
+  box-shadow: 0 14px 30px #33205d1c;
+}
+.manus-home-review .home-stats-heading { text-align: start; }
+.manus-home-review .home-stats-heading h2 { font-size: clamp(1.2rem, 2vw, 1.6rem); line-height: 1.5; }
+.manus-home-review .home-stats-heading p { color: #e7def6; line-height: 1.7; }
+.manus-home-review .home-game-highlights li { justify-content: center; }
+.manus-home-review .home-stat-icon { background: #ffffff17; border: 1px solid #ffffff1a; }
+.manus-home-review .home-game-highlights strong { color: #fff1c2; }
+.manus-home-review .home-stat-label { color: #f4effb; }
+
+/* مسافات تحريرية وعناوين متسقة. */
+.manus-home-review .home-page .section { padding-block: clamp(3rem, 6vw, 5.5rem); }
+.manus-home-review .home-page .section-head { margin-block-end: 1.65rem; gap: .6rem 1.5rem; }
+.manus-home-review .section-head h2,
+.manus-home-review .grown-banner h2,
+.manus-home-review .subscribe-section h2,
+.manus-home-review main > .section > h2 {
+  color: #2b1c4c;
+  font-size: clamp(1.55rem, 2.8vw, 2.45rem);
+  line-height: 1.5;
+}
+.manus-home-review .section-head p { color: #6a607b; line-height: 1.8; }
+.manus-home-review .home-games { background: #fff; border-color: #f0ebf5; }
+.manus-home-review .home-games-total {
+  padding: .28em .7em;
+  background: #f0eafb;
+  color: #53309c;
+  font-size: .48em;
+}
+.manus-home-review .age-home-link { margin-block: 0 1.35rem; }
+.manus-home-review .age-home-link .button {
+  color: #386c59;
+  background: #eaf8f1;
+  border: 1px solid #cbe9da;
+  box-shadow: none;
+  font-size: .88rem;
+}
+.manus-home-review .age-home-link .button:hover { background: #daf3e7; }
+.manus-home-review .home-games .activity-grid.games-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+.manus-home-review .home-games .activity-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr;
+  align-items: start;
+  gap: .25rem .4rem;
+  min-width: 0;
+  height: 100%;
+  padding: .55rem;
+  border: 1px solid #e9e3ee;
+  border-radius: 23px;
+  background: #fff;
+  box-shadow: 0 7px 25px #3120500d;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.manus-home-review .home-games .activity-card:hover {
+  transform: translateY(-4px);
+  border-color: #d3c5e7;
+  box-shadow: 0 16px 30px #30204f1a;
+}
+.manus-home-review .home-games .activity-card > :is(.fudool-world-cover, .game-visual-cover) {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border: 0;
+  border-radius: 17px;
+}
+.manus-home-review .home-games .premium-library-card > .game-visual-cover,
+.manus-home-review .home-games .premium-library-card > .activity-symbol { display: none; }
+.manus-home-review .home-games .activity-card:not(.premium-library-card) > .activity-symbol {
+  grid-column: 1;
+  grid-row: 1;
+  margin: .35rem;
+}
+.manus-home-review .home-games .activity-card > div {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  padding: .75rem .55rem .8rem;
+}
+.manus-home-review .home-games .activity-card > .round-arrow {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: end;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  margin: 0 .25rem .65rem 0;
+  background: #f1ebfb;
+  color: #5a36a7;
+}
+.manus-home-review .home-games .activity-card h3 {
+  color: #2b1d48;
+  font-size: clamp(.98rem, 1.3vw, 1.12rem);
+  line-height: 1.55;
+}
+.manus-home-review .home-games .activity-card p {
+  margin-block-start: .35rem;
+  color: #655a75;
+  font-size: .84rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.manus-home-review .home-games .game-visual-meta { color: #5b4384; line-height: 1.5; }
+.manus-home-review .home-games .game-visual-meta span { background: #f4f0fa; }
+.manus-home-review .home-games .world-cover-scene { object-fit: cover; }
+.manus-home-review .home-games .world-cover-guide {
+  width: 23%;
+  border: 3px solid #fff;
+  box-shadow: 0 5px 14px #21173f4a;
+}
+
+/* الحلقات والسلاسل: صورة كبيرة ومساحة للنص غير المقصوص. */
+.manus-home-review .home-page .section-wash {
+  background: linear-gradient(180deg, #f4effb, #f9f6fc);
+  border-block: 1px solid #eee8f5;
+}
+.manus-home-review .series-grid,
+.manus-home-review .episode-grid { gap: 1.1rem; }
+.manus-home-review .series-card,
+.manus-home-review .episode-card {
+  min-width: 0;
+  border: 1px solid #e9e2f0;
+  border-radius: 23px;
+  background: #fff;
+  box-shadow: 0 8px 24px #3520560b;
+}
+.manus-home-review .series-card:hover,
+.manus-home-review .episode-card:hover { border-color: #d3c1e9; box-shadow: var(--mh-shadow); }
+.manus-home-review .series-art {
+  aspect-ratio: 1.42;
+  margin: .55rem .55rem 0;
+  border-radius: 17px;
+  background: radial-gradient(circle at 50% 25%, #ffffffad, transparent 60%), var(--tone);
+}
+.manus-home-review .series-art img { block-size: 90%; max-inline-size: 90%; }
+.manus-home-review .series-caption { min-height: 0; padding: 1rem 1.1rem 1.2rem; }
+.manus-home-review .home-page .series-caption h3 { min-height: 0; color: #2c1c4e; font-size: 1.02rem; line-height: 1.55; }
+.manus-home-review .series-caption p { color: #695e77; font-size: .82rem; line-height: 1.65; }
+.manus-home-review .series-caption .round-arrow { width: 35px; height: 35px; }
+.manus-home-review .home-page .episode-grid .episode-art {
+  aspect-ratio: 1.08;
+  margin: .55rem .55rem 0;
+  border-radius: 17px;
+  background: radial-gradient(circle at 50% 18%, #fff, transparent 72%), #eee8f9;
+}
+.manus-home-review .home-page .portrait-cover img {
+  height: 91%;
+  max-width: 92%;
+  border-radius: 10px;
+}
+.manus-home-review .episode-caption { min-height: 0; padding: 1rem 1rem 1.15rem; }
+.manus-home-review .home-page .episode-caption h3 { min-height: 0; color: #2d1f4b; font-size: 1rem; line-height: 1.6; }
+.manus-home-review .art-play { width: 36px; background: #f0eafb; color: #5330a7; }
+.manus-home-review .episode-card a:hover .art-play { color: #fff; background: #5330a7; }
+
+/* مساحة للأهالي ونهاية متكاملة للصفحة. */
+.manus-home-review .grown-banner {
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding: clamp(1.5rem, 4.5vw, 3.8rem);
+  border-radius: 30px;
+  background: radial-gradient(circle at 18% 20%, #7457bc, transparent 38%), linear-gradient(120deg, #271849, #3b2868);
+  box-shadow: 0 16px 38px #30205323;
+}
+.manus-home-review .grown-banner h2 { color: #fff; }
+.manus-home-review .grown-banner p { color: #ede6f8; line-height: 1.9; }
+.manus-home-review .grown-banner .button { color: #38224e; background: #ffdc83; border-color: #ffdc83; box-shadow: 0 4px 0 #b98737; }
+.manus-home-review .grown-banner .button:hover { background: #ffebae; }
+.manus-home-review .grown-art span { box-shadow: 0 8px 0 #160f353d; }
+.manus-home-review .home-page .subscribe-section {
+  gap: 1.25rem;
+  margin-block: 0 clamp(2.5rem, 5vw, 4rem);
+  padding: clamp(1.5rem, 3vw, 2.4rem);
+  border: 1px solid #dcebe4;
+  border-radius: 26px;
+  background: linear-gradient(110deg, #f2fbf6, #f8f2ff);
+}
+.manus-home-review .subscribe-section p { max-width: 55ch; color: #625a70; }
+.manus-home-review main > .section.wrap { padding-block: 1rem clamp(3rem, 5vw, 4.5rem); }
+.manus-home-review .learning-crosslinks { gap: .65rem; margin-block: 1rem 0; }
+.manus-home-review .learning-crosslinks .button { min-height: 48px; }
+.manus-home-review .site-foot { padding-block: 2.7rem 3rem; color: #f7f2ff; border: 0; background: #251940; }
+.manus-home-review .site-foot .wordmark { color: #fff; }
+.manus-home-review .site-foot .wordmark img { background: #fff; }
+.manus-home-review .site-foot p { color: #d4cbe4; }
+.manus-home-review .site-foot nav { gap: .15rem 1.1rem; color: #f4eefb; }
+.manus-home-review .site-foot nav a:hover { color: #ffde87; }
+.manus-home-review .site-foot .button-row > a:not(.button) { display: inline-flex; align-items: center; gap: .4rem; min-height: 44px; color: #f4eefb; }
+.manus-home-review .site-foot .button-youtube { box-shadow: none; }
+.manus-home-review .download-app-bubble { min-height: 44px; background: #4e2fa6; border-color: #e0d4f8; }
+
+@media (max-width: 1050px) {
+  .manus-home-review .head-inner { grid-template-columns: minmax(0, 1fr) auto; }
+  .manus-home-review .desktop-nav { display: none; }
+  .manus-home-review .mobile-nav { display: block; }
+}
+@media (max-width: 799px) {
+  .manus-home-review .head-inner { min-height: 68px; }
+  .manus-home-review .home-page .home-hero { padding-block: 2.5rem 3rem; }
+  .manus-home-review .home-page .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 2.2rem; }
+  .manus-home-review .hero-copy { text-align: center; }
+  .manus-home-review .home-page .hero-copy h1 { font-size: clamp(2.1rem, 7vw, 3.8rem); }
+  .manus-home-review .home-page .hero-text { margin-inline: auto; }
+  .manus-home-review .home-page .hero-copy .home-actions { justify-content: center; margin-inline: auto; }
+  .manus-home-review .home-resume { justify-content: center; }
+  .manus-home-review .home-page .hero-art { max-width: 530px; aspect-ratio: 1.3; justify-self: center; }
+  .manus-home-review .home-discover-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .manus-home-review .home-stats-panel { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+  .manus-home-review .home-stats-heading { text-align: center; }
+  .manus-home-review .home-games .activity-grid.games-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .manus-home-review .home-page .section-head { align-items: start; flex-wrap: wrap; }
+}
+@media (max-width: 600px) {
+  .manus-home-review .wrap,
+  .manus-home-review .fudool-pages-promo { width: min(100% - 2rem, 1200px); }
+  .manus-home-review .home-page .home-hero { padding-block: 2.2rem 2.5rem; }
+  .manus-home-review .home-page .hero-copy h1 { font-size: clamp(2rem, 8vw, 2.8rem); }
+  .manus-home-review .home-page .hero-art { aspect-ratio: 1.3; border-radius: 27px; }
+  .manus-home-review .home-page .hero-cutout { inset: 3% 14%; }
+  .manus-home-review .home-page .hero-copy .home-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .manus-home-review .home-page .home-actions .button { padding-inline: .55rem; font-size: .86rem; }
+  .manus-home-review .home-page .home-actions .home-shortcut { font-size: .78rem; }
+  .manus-home-review .home-discover { padding-block: 1rem; }
+  .manus-home-review .home-discover-inner { gap: .6rem; }
+  .manus-home-review .home-discover-link { min-height: 76px; gap: .6rem; padding: .65rem; border-radius: 16px; }
+  .manus-home-review .home-discover-icon { flex-basis: 40px; width: 40px; height: 40px; border-radius: 12px; font-size: 1.1rem; }
+  .manus-home-review .home-discover-link strong { font-size: .87rem; }
+  .manus-home-review .home-discover-link small { font-size: .7rem; }
+  .manus-home-review .fudool-pages-promo a { min-height: 0; gap: .85rem; padding: 1rem; border-radius: 21px; }
+  .manus-home-review .fudool-pages-promo img { width: 4.8rem; }
+  .manus-home-review .fudool-pages-promo strong { font-size: 1.25rem; }
+  .manus-home-review .fudool-pages-promo a > span > span { font-size: .83rem; line-height: 1.7; }
+  .manus-home-review .fudool-pages-promo b { font-size: .8rem; }
+  .manus-home-review .home-stats-panel { padding: 1.25rem .65rem; border-radius: 22px; }
+  .manus-home-review .home-game-highlights li { padding-inline: .25rem; }
+  .manus-home-review .home-stat-label { font-size: .72rem; line-height: 1.5; }
+  .manus-home-review .home-games .activity-grid.games-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  .manus-home-review .home-games .activity-card > div { padding: .6rem .4rem .7rem; }
+  .manus-home-review .home-games .activity-card h3 { font-size: .95rem; }
+  .manus-home-review .home-games .activity-card p { font-size: .82rem; }
+  .manus-home-review .series-grid,
+  .manus-home-review .episode-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  .manus-home-review .series-caption,
+  .manus-home-review .episode-caption { padding: .8rem .7rem 1rem; }
+  .manus-home-review .home-page .series-caption h3,
+  .manus-home-review .home-page .episode-caption h3 { font-size: .91rem; }
+  .manus-home-review .series-caption p { font-size: .77rem; }
+  .manus-home-review .grown-banner { grid-template-columns: minmax(0, 1fr); text-align: center; }
+  .manus-home-review .grown-banner p { margin-inline: auto; }
+  .manus-home-review .home-page .subscribe-section { align-items: flex-start; }
+  .manus-home-review .foot-inner { align-items: flex-start; flex-direction: column; }
+  .manus-home-review .site-foot { padding-block-end: 5rem; }
+}
+@media (max-width: 430px) {
+  .manus-home-review .home-games .activity-grid.games-grid { grid-template-columns: minmax(0, 1fr); }
+  .manus-home-review .home-games .premium-library-card {
+    grid-template-columns: minmax(100px, 37%) minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    align-items: center;
+    gap: .35rem;
+    padding: .5rem;
+  }
+  .manus-home-review .home-games .premium-library-card > .fudool-world-cover {
+    grid-column: 1;
+    grid-row: 1;
+    aspect-ratio: 1 / 1;
+    height: 100%;
+    min-height: 112px;
+  }
+  .manus-home-review .home-games .premium-library-card > div { grid-column: 2; grid-row: 1; padding: .45rem .2rem; }
+  .manus-home-review .home-games .premium-library-card > .round-arrow { grid-column: 3; grid-row: 1; align-self: center; width: 28px; height: 28px; min-width: 28px; min-height: 28px; margin: 0 .1rem; }
+  .manus-home-review .home-games .premium-library-card p { font-size: .8rem; line-height: 1.65; }
+  .manus-home-review .home-games .game-visual-meta { font-size: .68rem; }
+  .manus-home-review .series-caption .round-arrow { display: inline-grid; width: 28px; height: 28px; }
+  .manus-home-review .art-play { width: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .manus-home-review *,
+  .manus-home-review *::before,
+  .manus-home-review *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .manus-home-review :is(.button, .home-discover-link, .activity-card, .series-card, .episode-card):hover { transform: none; }
+}
