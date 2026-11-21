@@ -1,0 +1,206 @@
+/* Arabic app dashboard only. Existing views, routes and app state stay untouched. */
+[data-v5-view="home"] {
+  --dashboard-ink: #2c1c4d;
+  --dashboard-purple: #5130ad;
+  --dashboard-line: #e9e2f1;
+  --dashboard-shadow: 0 8px 24px rgba(49, 31, 86, .08);
+}
+
+[data-v5-view="home"] .v5-hero {
+  position: relative;
+  isolation: isolate;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  min-height: 0;
+  padding: clamp(1.4rem, 4vw, 2.8rem);
+  border: 1px solid #ffffff38;
+  border-radius: 30px;
+  background: radial-gradient(circle at 12% 22%, #7a61bf66, transparent 32%),
+    radial-gradient(circle at 85% 85%, #674dba59, transparent 30%),
+    linear-gradient(125deg, #1d123f, #332065 54%, #24164c);
+  box-shadow: 0 14px 34px #24143e26;
+}
+[data-v5-view="home"] .v5-hero::before {
+  inset: 0;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  opacity: .32;
+  background-image: radial-gradient(circle, #fff 1px, transparent 1.5px);
+  background-size: 67px 67px;
+  background-position: 14px 23px;
+}
+[data-v5-view="home"] .v5-hero::after { content: none; }
+[data-v5-view="home"] .v5-hero > div:first-child {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: center;
+  gap: .65rem;
+  min-width: 0;
+}
+[data-v5-view="home"] .v5-hero :is(small, h1, p, .v5-hero-label) { grid-column: 1 / -1; }
+[data-v5-view="home"] .v5-hero small { color: #eae2f7; font-size: .85rem; line-height: 1.6; }
+[data-v5-view="home"] .v5-hero h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.9rem, 4vw, 3.3rem);
+  line-height: 1.45;
+  letter-spacing: -.025em;
+}
+[data-v5-view="home"] .v5-hero p { margin: 0; color: #eae4f8; font-size: 1rem; line-height: 1.8; }
+[data-v5-view="home"] .v5-hero-label {
+  justify-self: start;
+  margin: .15rem 0 .5rem;
+  padding: .4rem .8rem;
+  border: 1px solid #ffffff38;
+  border-radius: 999px;
+  background: #ffffff12;
+  color: #ffecb8;
+  font-size: .78rem;
+  line-height: 1.6;
+}
+[data-v5-view="home"] .v5-play,
+[data-v5-view="home"] .v5-hero-learn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: .4rem;
+  min-width: 0;
+  min-height: 52px;
+  margin: 0;
+  padding: .6rem .7rem;
+  border-radius: 15px;
+  font-size: .9rem;
+  line-height: 1.5;
+  text-align: center;
+}
+[data-v5-view="home"] .v5-play {
+  border: 1px solid #ffda76;
+  background: #ffda76;
+  color: #35204a;
+  box-shadow: 0 4px 0 #ce9c3c, 0 9px 22px #100b2d40;
+}
+[data-v5-view="home"] .v5-hero-learn {
+  border: 1px solid #ffffff73;
+  background: #ffffff12;
+  color: #fff;
+}
+[data-v5-view="home"] .v5-hero :is(.v5-play, .v5-hero-learn) .v5-icon { width: 27px; height: 27px; }
+[data-v5-view="home"] .v5-hero-art {
+  position: relative;
+  align-self: center;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 1.2;
+  border: 1px solid #ffffff38;
+  border-radius: 28px;
+  background: radial-gradient(circle at 50% 42%, #997bea, #6547be 43%, #3a2375);
+  box-shadow: inset 0 1px 0 #ffffff35, 0 20px 45px #140b3640;
+}
+[data-v5-view="home"] .v5-hero .v5-hero-scene {
+  position: absolute;
+  inset: 4%;
+  width: 92%;
+  height: 92%;
+  max-width: none;
+  border-radius: 0;
+  object-fit: contain;
+  object-position: center;
+  opacity: 1;
+  filter: drop-shadow(0 12px 12px #1b0b4b66);
+  mask-image: none;
+}
+[data-v5-view="home"] .v5-avatar {
+  inset-inline-end: 3%;
+  bottom: 5%;
+  width: 21%;
+  max-width: 86px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #f1ebfb;
+  box-shadow: 0 5px 14px #21173f4a;
+  filter: none;
+}
+[data-v5-view="home"] .v5-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+[data-v5-view="home"] .fudool-pages-promo { max-width: none; margin: 1.4rem 0 0; padding: 0; }
+[data-v5-view="home"] .fudool-pages-promo a {
+  border: 1px solid #e6ddf1;
+  border-radius: 24px;
+  background: radial-gradient(circle at 12% 20%, #dff8ef, transparent 35%), linear-gradient(110deg, #f4eefe, #fffaf2 75%);
+  color: var(--dashboard-ink);
+  box-shadow: var(--dashboard-shadow);
+}
+[data-v5-view="home"] .fudool-pages-promo img { border: 3px solid #fff; box-shadow: 0 8px 22px #3f296a26; }
+[data-v5-view="home"] .fudool-pages-promo strong { color: #34215e; font-size: clamp(1.25rem, 2.3vw, 1.8rem); line-height: 1.5; }
+[data-v5-view="home"] .fudool-pages-promo a > span > span { color: #625475; line-height: 1.7; }
+[data-v5-view="home"] .fudool-pages-promo b { color: #5130a8; }
+[data-v5-view="home"] .v5-actions { gap: .75rem; margin: 1.4rem 0; }
+[data-v5-view="home"] .v5-actions > * {
+  border: 1px solid var(--dashboard-line) !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  color: #352451 !important;
+  box-shadow: var(--dashboard-shadow);
+}
+[data-v5-view="home"] .v5-actions > :nth-child(2) { background: #effaf5 !important; color: #286b55 !important; }
+[data-v5-view="home"] .v5-actions > :nth-child(3) { background: #fff8e8 !important; color: #715013 !important; }
+[data-v5-view="home"] .app-resume {
+  border: 1px solid #d6ece2;
+  border-radius: 22px;
+  background: linear-gradient(110deg, #edf9f2, #f8f3ff);
+  box-shadow: var(--dashboard-shadow);
+}
+[data-v5-view="home"] .v5-section { margin-top: 2.25rem; }
+[data-v5-view="home"] .v5-section-head h2 { color: var(--dashboard-ink); line-height: 1.5; }
+[data-v5-view="home"] .v5-kicker { color: #67449e; }
+[data-v5-view="home"] .v5-text-button { background: #fff; border-color: #e4dbef; box-shadow: none; color: #5130a8; }
+[data-v5-view="home"] .v5-cast-grid a,
+[data-v5-view="home"] .v5-featured {
+  border: 1px solid #e9e2f0;
+  background: #fff;
+  box-shadow: var(--dashboard-shadow);
+  color: var(--dashboard-ink);
+}
+[data-v5-view="home"] .v5-mascot-art { background: radial-gradient(circle at 50% 25%, #fff, #e9ddfb); }
+[data-v5-view="home"] [data-tone="mint"] .v5-mascot-art { background: radial-gradient(circle at 50% 25%, #fff, #d8f4e8); }
+[data-v5-view="home"] [data-tone="sky"] .v5-mascot-art { background: radial-gradient(circle at 50% 25%, #fff, #deefff); }
+[data-v5-view="home"] .v5-cast-grid strong { background: #fff; box-shadow: none; }
+[data-v5-view="home"] .v5-featured > span:last-child { border: 0; background: #f1ebfb; box-shadow: none; color: #5130a8; }
+[data-v5-view="home"] .v5-daily {
+  border: 1px solid #f3e3bc;
+  border-radius: 24px;
+  background: linear-gradient(110deg, #fff6d8, #fffaf2);
+  box-shadow: var(--dashboard-shadow);
+}
+[data-v5-view="home"] .v5-daily::before { opacity: .25; }
+[data-v5-view="home"] .v5-daily small { background: #ffedb9; box-shadow: none; }
+[data-v5-view="home"] .v5-daily h2 { color: #3e2865; text-shadow: none; }
+[data-v5-view="home"] .v5-daily a { border: 0; background: var(--dashboard-purple); box-shadow: 0 4px 0 #392082; }
+[data-v5-view="home"] :is(a, button):focus-visible { outline: 3px solid #6640c9; outline-offset: 3px; }
+[data-v5-view="home"] .v5-hero :is(a, button):focus-visible { outline-color: #ffdf80; }
+
+@media (max-width: 700px) {
+  [data-v5-view="home"] .v5-hero { grid-template-columns: minmax(0, 1fr); gap: 1.4rem; padding: 1.45rem 1rem; border-radius: 25px; }
+  [data-v5-view="home"] .v5-hero > div:first-child { text-align: center; }
+  [data-v5-view="home"] .v5-hero h1 { font-size: clamp(1.8rem, 7.5vw, 2.6rem); }
+  [data-v5-view="home"] .v5-hero-label { justify-self: center; }
+  [data-v5-view="home"] .v5-hero-art { max-width: 460px; justify-self: center; aspect-ratio: 1.3; }
+  [data-v5-view="home"] .fudool-pages-promo a { padding: 1rem; gap: .85rem; border-radius: 20px; }
+  [data-v5-view="home"] .fudool-pages-promo img { width: 4.8rem; }
+  [data-v5-view="home"] .fudool-pages-promo a > span > span { font-size: .83rem; }
+  [data-v5-view="home"] .v5-actions { gap: .5rem; }
+  [data-v5-view="home"] .v5-actions > * { border-radius: 17px !important; }
+}
+@media (max-width: 340px) {
+  [data-v5-view="home"] .v5-hero { padding-inline: .8rem; }
+  [data-v5-view="home"] .v5-hero h1 { font-size: 1.75rem; }
+  [data-v5-view="home"] .v5-hero :is(.v5-play, .v5-hero-learn) { font-size: .78rem; padding-inline: .35rem; }
+  [data-v5-view="home"] .v5-hero :is(.v5-play, .v5-hero-learn) .v5-icon { width: 23px; height: 23px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-v5-view="home"] :is(a, button) { transition: none; }
+}

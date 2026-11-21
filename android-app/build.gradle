@@ -30,6 +30,12 @@ android {
     }
     buildTypes {
         release { signingConfig signingConfigs.release }
+        // A side-by-side debug build: it never replaces the installed release.
+        debug {
+            applicationIdSuffix '.trial'
+            versionNameSuffix '-trial'
+            resValue 'string', 'app_name', 'كوكب فضول - تجربة'
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -43,6 +49,9 @@ android {
         res.setSrcDirs(['play/res', generatedResources])
         assets.setSrcDirs([contentRoot])
     }
+    sourceSets.debug.res.setSrcDirs(['trial-res'])
+    // Override only the debug package's backup config, without mutating release assets.
+    sourceSets.debug.assets.setSrcDirs(['trial-assets'])
 }
 
 tasks.register('stageFudoolAssets', Exec) {
