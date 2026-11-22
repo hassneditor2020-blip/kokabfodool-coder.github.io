@@ -1,7 +1,15 @@
 name: Google Play release candidate
 on:
   push:
-    branches: [release/**]
+    branches: [main, 'release/**']
+    paths:
+      - 'android-app/**'
+      - 'assets/**'
+      - 'offline-pack.json'
+      - 'play-app/**'
+      - 'print/**'
+      - 'scripts/**'
+      - '.github/workflows/google-play.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -145,7 +153,7 @@ jobs:
           path: build/play-device/
 
   stage-website-apk:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/'))
     needs: [build, browser, android]
     runs-on: ubuntu-24.04
     timeout-minutes: 8
